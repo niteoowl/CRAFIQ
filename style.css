@@ -1,20 +1,30 @@
 :root {
-    --brand-primary: #00dc64;
-    /* Naver/Webtoon Green - High Vis */
-    --brand-dark: #00b351;
+    /* --- BRANDING (Ridi Blue + Novelpia Vibes) --- */
+    --color-primary: #1f8ce6;
+    /* Ridi Blue: Trustworthy, Premium */
+    --color-primary-dark: #1273c4;
+    --color-accent: #6c5ce7;
+    /* Novelpia-ish Violet for tags */
 
-    --text-primary: #000000;
-    --text-secondary: #888888;
-    --text-tertiary: #bbbbbb;
+    --color-text-main: #1a1b1c;
+    --color-text-sub: #525458;
+    --color-text-hint: #888d95;
 
-    --bg-base: #ffffff;
-    --bg-gray: #f5f5f5;
+    --bg-main: #ffffff;
+    --bg-secondary: #f7f7fa;
+    --bg-line: #ececec;
 
-    --border: #e0e0e0;
-    --header-h: 56px;
-    --tab-h: 60px;
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+    /* --- LAYOUT --- */
+    --header-h: 54px;
+    --tab-h: 56px;
+    --max-w: 768px;
+    /* Mobile-first container max width for 'App View' on Desktop */
 }
 
+/* Base Reset */
 * {
     margin: 0;
     padding: 0;
@@ -23,280 +33,413 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, sans-serif;
-    color: var(--text-primary);
-    background: var(--bg-base);
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background-color: #f2f2f5;
+    /* Desktop Background */
+    color: var(--color-text-main);
     font-size: 15px;
+    letter-spacing: -0.03em;
+    line-height: 1.5;
     padding-bottom: var(--tab-h);
-    /* Safe area for bottom nav */
 }
 
-@media (min-width: 1024px) {
-    body {
-        padding-bottom: 0;
-        background: var(--bg-gray);
-    }
-
-    /* Desktop: Grey bg outside app area */
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-}
-
-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-img {
-    display: block;
-    width: 100%;
-    object-fit: cover;
-}
-
-/* Utilities */
-.container {
-    max-width: 1024px;
+/* --- APP CONTAINER (The "Phone" view on Desktop) --- */
+.app-container {
+    max-width: var(--max-w);
     margin: 0 auto;
-    background: white;
+    background: var(--bg-main);
     min-height: 100vh;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    position: relative;
+    padding-bottom: 40px;
 }
 
-.full-width {
-    width: 100%;
-}
-
-.flex-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.gap-8 {
-    gap: 8px;
-}
-
-/* --- RESPONSIVE VISIBILITY (Strict) --- */
-.mobile-only {
-    display: flex !important;
-}
-
-.desktop-only {
-    display: none !important;
-}
-
-@media (min-width: 1024px) {
-    .mobile-only {
-        display: none !important;
-    }
-
-    .desktop-only {
-        display: flex !important;
+@media (max-width: 768px) {
+    .app-container {
+        max-width: 100%;
+        box-shadow: none;
     }
 }
 
-/* --- HEADER (App Bar) --- */
-.app-header {
+/* --- TYPOGRAPHY UTILS --- */
+.txt-title-lg {
+    font-size: 20px;
+    font-weight: 800;
+    color: #000;
+    letter-spacing: -0.5px;
+}
+
+.txt-title-md {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111;
+}
+
+.txt-sub {
+    font-size: 13px;
+    color: var(--color-text-sub);
+}
+
+.txt-hint {
+    font-size: 12px;
+    color: var(--color-text-hint);
+}
+
+.txt-primary {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* --- HEADER --- */
+.header-main {
     height: var(--header-h);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
+    background: var(--bg-main);
     position: sticky;
     top: 0;
     z-index: 50;
-    background: white;
-    border-bottom: 1px solid var(--border);
+    /* Subtle blur removed for solid crisp look, preferred by Ridi */
+    border-bottom: 1px solid var(--bg-line);
 }
 
-.logo-area {
+.header-logo {
+    font-family: 'Montserrat', sans-serif;
     font-weight: 900;
     font-size: 18px;
-    letter-spacing: -0.5px;
+    color: var(--color-primary);
 }
 
-/* --- BOTTOM TAB BAR (Native Style) --- */
-.tab-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--tab-h);
-    background: white;
-    border-top: 1px solid var(--border);
+.header-actions {
     display: flex;
-    justify-content: space-around;
-    z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tab-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    gap: 16px;
     align-items: center;
-    justify-content: center;
-    color: #999;
-    gap: 4px;
 }
 
-.tab-item.active {
-    color: var(--text-primary);
-    font-weight: 700;
-}
-
-.tab-icon {
+.btn-icon {
     width: 24px;
     height: 24px;
+    color: #333;
 }
 
-.tab-label {
-    font-size: 10px;
+/* --- SUB-NAVIGATION (Home | Realtime | Event) --- */
+.sub-nav {
+    display: flex;
+    padding: 10px 16px;
+    gap: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+}
+
+.sub-nav-item {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-hint);
+    position: relative;
+    cursor: pointer;
+}
+
+.sub-nav-item.active {
+    color: #000;
+    font-weight: 800;
+}
+
+.sub-nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #000;
+}
+
+/* --- HERO SLIDER --- */
+.hero-slider-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #e0e0e0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 40%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+}
+
+.hero-badge {
+    background: white;
+    color: black;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-bottom: 8px;
+}
+
+.hero-title {
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.3;
 }
 
 /* --- SECTIONS --- */
-.hero-banner {
-    width: 100%;
-    aspect-ratio: 2/1;
-    background: #ddd;
-    position: relative;
-}
-
-@media (min-width: 1024px) {
-    .hero-banner {
-        border-radius: 8px;
-        margin-top: 20px;
-    }
-}
-
 .section {
-    padding: 24px 16px 0;
+    padding: 32px 0 0;
 }
 
-.section-title {
-    font-size: 19px;
-    font-weight: 800;
-    margin-bottom: 16px;
+.section-head {
+    padding: 0 16px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.more-link {
+.more-btn {
     font-size: 13px;
-    color: #999;
-    font-weight: 400;
+    color: var(--color-text-hint);
 }
 
-/* --- CONTENT GRIDS --- */
-/* Horizontal Scroll (Mobile Pattern) */
-.scroll-row {
+/* --- HORIZONTAL BOOK STRIP --- */
+.h-scroll-view {
     display: flex;
-    gap: 12px;
     overflow-x: auto;
-    padding-right: 16px;
+    gap: 12px;
+    padding: 0 16px;
     scroll-snap-type: x mandatory;
+    padding-bottom: 20px;
+    /* Space for shadow */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.scroll-row::-webkit-scrollbar {
+.h-scroll-view::-webkit-scrollbar {
     display: none;
 }
 
-.scroll-item {
-    flex: 0 0 120px;
+.book-card-sm {
+    flex: 0 0 108px;
     scroll-snap-align: start;
-}
-
-.cover-img {
-    width: 120px;
-    height: 160px;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    background: #f4f4f4;
-    margin-bottom: 8px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Vertical List (Ranking) */
-.ranking-list {
     display: flex;
     flex-direction: column;
 }
 
-.rank-row {
+.cover-sm {
+    width: 108px;
+    height: 160px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    position: relative;
+    margin-bottom: 8px;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.cover-sm img {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s;
+}
+
+.book-card-sm:hover img {
+    transform: scale(1.05);
+}
+
+/* --- RANKING LIST --- */
+.ranking-wrap {
+    padding: 0 16px;
+}
+
+.rank-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 12px 0;
     border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
 }
 
 .rank-num {
     font-size: 18px;
-    font-weight: 800;
-    width: 32px;
-    text-align: center;
+    font-weight: 900;
+    color: #000;
+    width: 28px;
     margin-right: 8px;
+    line-height: 1;
+    margin-top: 4px;
+}
+
+.rank-cover {
+    width: 60px;
+    height: 88px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #eee;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-right: 16px;
 }
 
 .rank-info {
     flex: 1;
+}
+
+.rank-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.rank-meta {
+    font-size: 12px;
+    color: var(--color-text-hint);
+    margin-bottom: 4px;
+}
+
+.rank-tags {
+    display: flex;
+    gap: 4px;
+}
+
+.tag {
+    font-size: 11px;
+    background: #f0f0f5;
+    color: #666;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* --- STUDIO / DASHBOARD --- */
+.studio-head {
+    padding: 20px 16px;
+    background: #fcfcfc;
+    border-bottom: 1px solid #eee;
+}
+
+.studio-list {
+    padding: 0 16px;
+}
+
+.project-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.project-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.project-info p {
+    font-size: 12px;
+    color: #999;
+}
+
+.project-acts button {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* --- BOTTOM NAV (Visible Mobile Only via logic, but styled for all if needed by user req?) 
+   User said "PC doesn't need it", so we hide on large screens but for this 'App View' container approach,
+   we usually keep it inside the container to simulate the app experience. 
+   But user strictly said "Why PC?". So we hide it if window > mobile, 
+   OR we treat the "App Container" as the mobile device itself. 
+   Let's stick to strict media query.
+*/
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    /* Keep inside app width */
+    height: var(--tab-h);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    z-index: 100;
+}
+
+@media (min-width: 769px) {
+    .bottom-nav {
+        display: none;
+    }
+
+    /* User strict request: No bottom nav on PC */
+    body {
+        padding-bottom: 0;
+    }
+}
+
+.tab-btn {
+    flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
+    color: #ccc;
 }
 
-/* --- Desktop Specific Overrides --- */
-@media (min-width: 1024px) {
-    .container {
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-        /* Paper look */
-        margin: 40px auto;
-        min-height: 800px;
-    }
-
-    .app-header {
-        padding: 0 40px;
-        height: 70px;
-    }
-
-    .scroll-row {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        overflow: visible;
-        padding-right: 0;
-    }
-
-    .scroll-item {
-        width: auto;
-        flex: none;
-    }
-
-    .cover-img {
-        width: 100%;
-        aspect-ratio: 1/1.5;
-        height: auto;
-    }
+.tab-btn.active {
+    color: var(--color-text-main);
 }
 
-/* Studio Button */
-.btn-studio {
-    font-size: 13px;
+.tab-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 2px;
+}
+
+.tab-btn span {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+/* Icons */
+.icon-active {
+    fill: currentColor;
+}
+
+.icon-outline {
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2px;
+}
+
+/* Helper */
+.badge-up {
+    color: #eb3b5a;
     font-weight: 700;
-    color: white;
-    background: #333;
-    padding: 6px 14px;
-    border-radius: 20px;
+    font-size: 11px;
+    margin-left: 4px;
+    background: #ffebee;
+    padding: 2px 4px;
+    border-radius: 3px;
 }
