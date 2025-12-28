@@ -9,45 +9,8 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
 
-    <!-- Supabase Init -->
+    <!-- Supabase Init MUST come first -->
     <script type="module" src="js/init-supabase.js"></script>
-    <script type="module" src="js/turbo-router.js"></script>
-
-    <script type="module">
-        import { getCurrentUser, signOut } from './js/auth.js';
-
-        window.initMyPage = async () => {
-            // Wait for Supabase to be ready (microtask)
-            await new Promise(r => setTimeout(r, 100));
-
-            const user = await getCurrentUser();
-            const nameEl = document.getElementById('userName');
-            const bioEl = document.getElementById('guestMsg');
-            const btn = document.getElementById('loginBtn');
-
-            if (!nameEl) return;
-
-            if (user) {
-                nameEl.innerText = (user.email ? user.email.split('@')[0] : "독자") + " 님";
-                bioEl.innerText = "나만의 서재를 확인하세요.";
-                btn.innerText = "로그아웃";
-                btn.onclick = async () => {
-                    if (confirm("로그아웃 하시겠습니까?")) {
-                        await signOut();
-                        window.location.reload();
-                    }
-                };
-            } else {
-                nameEl.innerText = "로그인이 필요합니다";
-                bioEl.innerText = "회원가입하고 1초만에 시작하기";
-                btn.innerText = "로그인 / 회원가입";
-                btn.onclick = () => window.location.href = 'login.html';
-            }
-        };
-
-        if (document.body) window.initMyPage();
-        window.addEventListener('turbo:load', window.initMyPage);
-    </script>
 </head>
 
 <body>
@@ -77,29 +40,29 @@
         <div class="profile-card">
             <div class="profile-header">
                 <div class="profile-avatar">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#ccc">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
                         <path
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg>
                 </div>
                 <div class="profile-info">
-                    <div id="userName" class="profile-name">Loading...</div>
-                    <div id="guestMsg" class="profile-bio">...</div>
+                    <div id="userName" class="profile-name">로딩 중...</div>
+                    <div id="guestMsg" class="profile-bio">잠시만 기다려주세요</div>
                 </div>
             </div>
 
             <div class="profile-stats">
                 <div class="stat-item">
-                    <span class="num">0</span>
-                    <span class="label">최근 본</span>
+                    <div class="num" id="recentCount">0</div>
+                    <div class="label">최근 본</div>
                 </div>
                 <div class="stat-item">
-                    <span class="num">0</span>
-                    <span class="label">관심</span>
+                    <div class="num" id="likeCount">0</div>
+                    <div class="label">관심</div>
                 </div>
                 <div class="stat-item">
-                    <span class="num">0</span>
-                    <span class="label">구매</span>
+                    <div class="num" id="purchaseCount">0</div>
+                    <div class="label">구매</div>
                 </div>
             </div>
 
@@ -108,7 +71,7 @@
 
         <!-- Menu List -->
         <div class="menu-list">
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('알림이 없습니다.')">
                 <span>🔔 알림 센터</span>
                 <span class="m-arrow">›</span>
             </div>
@@ -116,21 +79,22 @@
                 <span>🖊️ 창작자 스튜디오</span>
                 <span class="m-arrow">›</span>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('구매 내역이 없습니다.')">
                 <span>💳 구매 내역</span>
                 <span class="m-arrow">›</span>
             </div>
-            <div class="menu-item">
+            <div class="menu-item" onclick="alert('준비 중입니다.')">
                 <span>🎧 고객센터</span>
                 <span class="m-arrow">›</span>
             </div>
         </div>
 
         <div style="text-align:center; font-size:12px; color:#aaa; margin-top:40px;">
-            CRAFIQ Ver 1.0.3
+            CRAFIQ v1.0.3
         </div>
     </div>
 
+    <!-- Bottom Nav -->
     <nav class="bottom-nav mobile-only">
         <a href="index.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
@@ -150,6 +114,43 @@
                 <circle cx="12" cy="7" r="4" />
             </svg><span>MY</span></a>
     </nav>
+
+    <!-- INLINE SCRIPT FOR RELIABILITY -->
+    <script type="module">
+        import { getCurrentUser, signOut } from './js/auth.js';
+
+        async function initMyPage() {
+            // Small delay to ensure Supabase is ready
+            await new Promise(r => setTimeout(r, 150));
+
+            const user = await getCurrentUser();
+            const nameEl = document.getElementById('userName');
+            const bioEl = document.getElementById('guestMsg');
+            const btn = document.getElementById('loginBtn');
+
+            if (!nameEl) return;
+
+            if (user) {
+                nameEl.textContent = (user.email ? user.email.split('@')[0] : "독자") + " 님";
+                bioEl.textContent = "나만의 서재에 오신 걸 환영합니다!";
+                btn.textContent = "로그아웃";
+                btn.onclick = async () => {
+                    if (confirm("로그아웃 하시겠습니까?")) {
+                        await signOut();
+                        location.reload();
+                    }
+                };
+            } else {
+                nameEl.textContent = "로그인이 필요합니다";
+                bioEl.textContent = "로그인하고 서재를 연동하세요";
+                btn.textContent = "로그인하기";
+                btn.onclick = () => location.href = 'login.html';
+            }
+        }
+
+        // Run immediately
+        initMyPage();
+    </script>
 </body>
 
 </html>

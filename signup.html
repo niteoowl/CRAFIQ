@@ -9,73 +9,58 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
 
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="js/turbo-router.js"></script>
+    <!-- Supabase -->
+    <script type="module" src="js/init-supabase.js"></script>
 
-    <script type="module">
-        import { signUpWithEmail } from './js/auth.js';
-
-        window.submitSignup = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const passwordConfirm = document.getElementById('passwordConfirm').value;
-            const btn = document.getElementById('submitBtn');
-            const errorMsg = document.getElementById('errorMsg');
-
-            if (password !== passwordConfirm) {
-                errorMsg.innerText = "비밀번호가 일치하지 않습니다.";
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "가입 처리 중...";
-            errorMsg.style.display = 'none';
-
-            const { data, error } = await signUpWithEmail(email, password);
-
-            if (error) {
-                btn.disabled = false;
-                btn.innerText = "회원가입";
-                errorMsg.innerText = error.message;
-                errorMsg.style.display = 'block';
-            } else {
-                // Success
-                alert("가입이 완료되었습니다! 로그인해주세요.");
-                window.location.href = 'login.html';
-            }
-        };
-    </script>
     <style>
-        .auth-container {
+        body {
+            padding: 0 !important;
+            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: #fafafa;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
             padding: 20px;
         }
 
-        .auth-box {
-            width: 100%;
-            max-width: 400px;
+        .auth-card {
             background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eee;
+            border-radius: 20px;
+            padding: 40px 32px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
-        .auth-brand {
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo a {
             font-size: 28px;
             font-weight: 900;
             color: #1f8ce6;
+            letter-spacing: -1px;
+        }
+
+        .auth-title {
             text-align: center;
-            margin-bottom: 30px;
-            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1b1c;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 32px;
         }
 
         .input-group {
@@ -87,104 +72,192 @@
             font-size: 13px;
             font-weight: 700;
             color: #555;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .input-field {
             width: 100%;
-            height: 48px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            height: 52px;
+            border: 2px solid #eee;
+            border-radius: 12px;
             padding: 0 16px;
             font-size: 15px;
-            transition: 0.2s;
-            background: #fff;
+            transition: all 0.2s;
+            background: #fafafa;
         }
 
         .input-field:focus {
             border-color: #1f8ce6;
+            background: white;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(31, 140, 230, 0.1);
+            box-shadow: 0 0 0 4px rgba(31, 140, 230, 0.1);
         }
 
-        .btn-full {
+        .btn-primary {
             width: 100%;
             height: 52px;
-            background: #1f8ce6;
+            background: linear-gradient(135deg, #1f8ce6 0%, #1273c4 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
-            transition: 0.2s;
+            margin-top: 8px;
+            transition: all 0.2s;
         }
 
-        .btn-full:hover {
-            background: #1273c4;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(31, 140, 230, 0.35);
         }
 
-        .btn-full:disabled {
+        .btn-primary:disabled {
             background: #ccc;
-            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
-        .auth-links {
-            margin-top: 24px;
+        .auth-footer {
             text-align: center;
-            font-size: 13px;
+            margin-top: 24px;
+            font-size: 14px;
             color: #888;
         }
 
-        .auth-links a {
-            text-decoration: underline;
-            color: #555;
-            margin-left: 8px;
+        .auth-footer a {
+            color: #1f8ce6;
+            font-weight: 600;
+            margin-left: 4px;
         }
 
-        .error-banner {
+        .error-msg {
             background: #ffebee;
             color: #c62828;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 13px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: none;
             text-align: center;
+        }
+
+        .success-msg {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .terms {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        .terms a {
+            color: #1f8ce6;
         }
     </style>
 </head>
 
 <body>
+    <a href="index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2">
+            <path d="M15 18l-6-6 6-6" />
+        </svg>
+    </a>
+
     <div class="auth-container">
-        <div class="auth-box">
-            <a href="index.html" class="auth-brand">CRAFIQ</a>
+        <div class="auth-card">
+            <div class="auth-logo">
+                <a href="index.html">CRAFIQ</a>
+            </div>
 
-            <div id="errorMsg" class="error-banner"></div>
+            <h1 class="auth-title">CRAFIQ에 오신 걸 환영해요!</h1>
+            <p class="auth-subtitle">무료 가입하고 수만 편의 작품을 만나보세요</p>
 
-            <form onsubmit="submitSignup(event)">
+            <div id="errorMsg" class="error-msg"></div>
+            <div id="successMsg" class="success-msg"></div>
+
+            <form id="signupForm">
                 <div class="input-group">
                     <label class="input-label">이메일</label>
-                    <input type="email" id="email" class="input-field" placeholder="user@example.com" required>
+                    <input type="email" id="email" class="input-field" placeholder="example@email.com"
+                        autocomplete="email" required>
                 </div>
                 <div class="input-group">
                     <label class="input-label">비밀번호</label>
-                    <input type="password" id="password" class="input-field" placeholder="8자 이상" required minlength="8">
+                    <input type="password" id="password" class="input-field" placeholder="6자 이상 입력하세요"
+                        autocomplete="new-password" minlength="6" required>
                 </div>
-                <div class="input-group">
-                    <label class="input-label">비밀번호 확인</label>
-                    <input type="password" id="passwordConfirm" class="input-field" placeholder="비밀번호를 한번 더 입력"
-                        required>
-                </div>
-                <button type="submit" id="submitBtn" class="btn-full">회원가입</button>
+                <button type="submit" id="submitBtn" class="btn-primary">가입하기</button>
             </form>
 
-            <div class="auth-links">
-                이미 계정이 있으신가요? <a href="login.html">로그인</a>
+            <p class="terms">
+                가입 시 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의합니다.
+            </p>
+
+            <div class="auth-footer">
+                이미 계정이 있으신가요?<a href="login.html">로그인</a>
             </div>
         </div>
     </div>
+
+    <script type="module">
+        import { signUpWithEmail } from './js/auth.js';
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+
+            btn.disabled = true;
+            btn.textContent = '가입 처리 중...';
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            const { data, error } = await signUpWithEmail(email, password);
+
+            if (error) {
+                btn.disabled = false;
+                btn.textContent = '가입하기';
+                errorMsg.textContent = error.message || '가입에 실패했습니다.';
+                errorMsg.style.display = 'block';
+            } else {
+                successMsg.textContent = '가입 성공! 자동 로그인 중...';
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    location.href = 'index.html';
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 
 </html>
