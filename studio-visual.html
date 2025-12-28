@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAFIQ Visual Studio</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+    <script>
+        function selectAsset(name) {
+            alert(name + " 선택됨 (스테이지로 드래그하여 배치하세요)");
+        }
+    </script>
+</head>
+
+<body class="studio-body">
+    <!-- Top Bar -->
+    <div class="studio-header">
+        <div class="studio-title">
+            <a href="dashboard.html" style="color:#888; margin-right:8px;"><svg width="16" height="16" fill="none"
+                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg></a>
+            <span>운명의 사랑 - Scene 1 Editor</span>
+        </div>
+        <div class="studio-toolbar">
+            <button class="tool-btn"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                </svg> 플레이 테스트</button>
+            <div style="width:1px; height:16px; background:#444; margin:0 8px;"></div>
+            <button class="tool-btn primary"> 프로젝트 저장</button>
+            <button class="tool-btn" style="background:#e91e63; color:white;">배포 (Build)</button>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="studio-layout">
+        <!-- Left Panel: Scene Tree & Outline -->
+        <div class="panel-left">
+            <div class="panel-header">SCENE LIST</div>
+            <div class="panel-content">
+                <div class="chapter-list-item active">S1. 학교 정문 (등교)</div>
+                <div class="chapter-list-item">S2. 교실 복도</div>
+                <div class="chapter-list-item">S3. 방과 후 옥상</div>
+                <div class="chapter-list-item">S4. 축제 준비</div>
+                <div class="chapter-list-item">S5. 고백 (엔딩 분기)</div>
+            </div>
+            <div class="panel-header" style="margin-top:1px;">SCRIPT OUTLINE</div>
+            <div class="panel-content" style="font-size:12px; color:#aaa; padding:10px;">
+                1. 배경음악 시작 (Morning.mp3)<br>
+                2. 배경 전환 (School_Gate)<br>
+                3. 캐릭터 등장 (남주, Slide Left)<br>
+                4. 대사: "지각이다!"<br>
+                5. 선택지 발생 (뛰어간다 / 걸어간다)
+            </div>
+        </div>
+
+        <!-- Center: Visual Stage & Timeline -->
+        <div class="panel-center">
+            <!-- Stage -->
+            <div class="stage-area">
+                <div class="stage-canvas"
+                    style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000'); background-size:cover;">
+                    <!-- Mock Character -->
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400"
+                        style="position:absolute; bottom:0; left:100px; height:400px; filter:drop-shadow(0 0 10px rgba(0,0,0,0.5));">
+                    <!-- Dialogue Box UI -->
+                    <div
+                        style="position:absolute; bottom:20px; left:20px; right:20px; height:120px; background:rgba(0,0,0,0.8); border:2px solid #fff; border-radius:8px; padding:16px; display:flex;">
+                        <div style="width:100px; font-weight:700; color:#ffdd59; font-size:18px;">지수</div>
+                        <div style="flex:1; color:white; font-size:16px;">"오늘도 늦었네? 빨리와!"</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-area">
+                <div class="panel-header">TIMELINE</div>
+                <div class="panel-content" style="background:#222;">
+                    <!-- Track 1: BG -->
+                    <div class="timeline-track">
+                        <div class="track-header">배경 (BG)</div>
+                        <div class="track-content">
+                            <div
+                                style="position:absolute; left:0; width:300px; height:100%; background:#4caf50; opacity:0.3; border:1px solid #4caf50;">
+                                School_Gate.jpg</div>
+                        </div>
+                    </div>
+                    <!-- Track 2: Char -->
+                    <div class="timeline-track">
+                        <div class="track-header">캐릭터</div>
+                        <div class="track-content">
+                            <div
+                                style="position:absolute; left:50px; width:200px; height:100%; background:#2196f3; opacity:0.3; border:1px solid #2196f3;">
+                                지수 (Smile)</div>
+                        </div>
+                    </div>
+                    <!-- Track 3: Sound -->
+                    <div class="timeline-track">
+                        <div class="track-header">사운드 (BGM)</div>
+                        <div class="track-content">
+                            <div
+                                style="position:absolute; left:0; width:400px; height:100%; background:#ff9800; opacity:0.3; border:1px solid #ff9800;">
+                                Bright_Morning.mp3</div>
+                        </div>
+                    </div>
+                    <!-- Track 4: Voice -->
+                    <div class="timeline-track">
+                        <div class="track-header">보이스</div>
+                        <div class="track-content">
+                            <div
+                                style="position:absolute; left:60px; width:100px; height:100%; background:#9c27b0; opacity:0.3; border:1px solid #9c27b0;">
+                                vo_001.wav</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Assets & Properties -->
+        <div class="panel-right">
+            <div class="panel-header" style="background:#007acc; color:white;">ASSET LIBRARY (Free)</div>
+            <div style="height:50%; border-bottom:1px solid #000; display:flex; flex-direction:column;">
+                <!-- TABS -->
+                <div style="display:flex; background:#2d2d30;">
+                    <div
+                        style="flex:1; text-align:center; padding:8px; font-size:11px; background:#3e3e42; color:white;">
+                        BGM (Free)</div>
+                    <div style="flex:1; text-align:center; padding:8px; font-size:11px; color:#888;">SFX</div>
+                    <div style="flex:1; text-align:center; padding:8px; font-size:11px; color:#888;">Images</div>
+                </div>
+                <!-- BGM LIST (Massive Mockup) -->
+                <div class="panel-content">
+                    <div class="asset-grid">
+                        <!-- Creative Commons Mocks -->
+                        <div class="asset-item" onclick="selectAsset('Kevin MacLeod - Monkeys Spinning Monkeys')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Monkeys...</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Bensound - Epic')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Epic Theme</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Morning Stroll')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Morning...</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Pixel Story')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Pixel Story</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Sad Piano')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Sad Piano</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Battle Loop 1')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Battle 01</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Forest Ambience')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Forest</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Cafe Noise')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Cafe bg</div>
+                        </div>
+                        <div class="asset-item" onclick="selectAsset('Rain Sound')">
+                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
+                            <div class="asset-name">Rain</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSPECTOR -->
+            <div class="panel-header">PROPERTIES</div>
+            <div class="panel-content" style="padding:10px;">
+                <div class="prop-row">
+                    <div class="prop-label">이름</div>
+                    <input class="prop-input" value="지수 (Smile)">
+                </div>
+                <div class="prop-row">
+                    <div class="prop-label">위치 X</div>
+                    <input class="prop-input" value="100">
+                </div>
+                <div class="prop-row">
+                    <div class="prop-label">위치 Y</div>
+                    <input class="prop-input" value="0">
+                </div>
+                <div class="prop-row">
+                    <div class="prop-label">크기 (Scale)</div>
+                    <input class="prop-input" value="1.0">
+                </div>
+                <div class="prop-row">
+                    <div class="prop-label">투명도</div>
+                    <input class="prop-input" value="100%">
+                </div>
+                <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                    <div style="font-size:11px; color:#888; margin-bottom:4px;">대사 내용</div>
+                    <textarea
+                        style="width:100%; height:60px; background:#333; border:1px solid #555; color:white; font-size:12px; padding:4px;">오늘도 늦었네? 빨리와!</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
