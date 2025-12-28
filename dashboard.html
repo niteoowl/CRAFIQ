@@ -26,6 +26,9 @@
                     // Check for Unique Violation (Postgres 23505) or 409 Conflict
                     if (error.code === '23505' || error.status === 409 || (error.message && error.message.includes('unique'))) {
                         title = prompt("⚠️ 이미 존재하는 제목입니다.\n다른 제목을 입력해주세요:", title);
+                    } else if (error.code === '23503') {
+                        alert("프로필 생성 오류: 계정이 올바르게 설정되지 않았습니다. 로그아웃 후 다시 로그인해보세요.");
+                        break;
                     } else {
                         alert("시스템 오류: " + error.message);
                         console.error(error);

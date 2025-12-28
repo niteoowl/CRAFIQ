@@ -29,8 +29,16 @@ export const createNovel = async (title, type) => {
     if (error) {
         // 1. Missing Profile (FK Violation 23503)
         if (error.code === '23503') {
-            await ensureUserHasProfile(user);
-            // Retry once
+            console.log("⚠️ Detected missing profile (23503). Attempting repair...");
+            const { error: profileError } = await ensureUserHasProfile(user);
+
+            if (profileError) {
+                // If we couldn't create the profile, we can't retry.
+                // Return a clearer error message.
+                return { error: { message: `프로필 생성 실패 (DB 권한을 확인해주세요): ${profileError.message || profileError.details}` } };
+            }
+
+            // Retry once if profile creation succeeded
             const retry = await insertNovel();
             data = retry.data;
             error = retry.error;

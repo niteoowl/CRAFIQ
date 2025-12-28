@@ -95,18 +95,30 @@ export const signOut = async () => {
 };
 
 export const ensureUserHasProfile = async (user) => {
-    if (!user) return;
+    if (!user) return { error: "No user" };
     const sb = getSupabase();
-    // Check if profile exists
-    const { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+
+    // Check if profile exists (Ignore unique error if it exists, just check presence)
+    // Using maybeSingle() is safer than single() for non-existent checks
+    const { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).maybeSingle();
+
     if (!profile) {
-        console.log("⚠️ Profile missing, creating now...");
-        await sb.from('profiles').insert([
+        console.log("⚠️ Profile missing, attempting to create...");
+        const { error: insertError } = await sb.from('profiles').insert([
             {
                 id: user.id,
                 username: user.email.split('@')[0],
                 full_name: user.email.split('@')[0]
             }
         ]);
+
+        if (insertError) {
+            console.error("❌ Failed to create profile:", insertError);
+            return { error: insertError };
+        } else {
+            console.log("✅ Profile created successfully.");
+            return { success: true };
+        }
     }
+    return { success: true, existing: true };
 };
