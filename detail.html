@@ -5,20 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>작품 상세 - CRAFIQ</title>
-    <!-- Pretendard Font -->
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
-
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/turbo-router.js"></script>
 
     <style>
+        /* Immersive Hero */
         .detail-hero {
             position: relative;
             width: 100%;
-            height: 320px;
+            height: 45vh;
+            min-height: 380px;
             overflow: hidden;
             display: flex;
             align-items: flex-end;
@@ -29,92 +28,151 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            filter: blur(20px) brightness(0.5);
-            transform: scale(1.1);
+            filter: blur(40px) brightness(0.4);
+            transform: scale(1.2);
+            z-index: 1;
         }
 
-        .detail-info-wrap {
+        .detail-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #121212);
+            z-index: 2;
+        }
+
+        .detail-content {
             position: relative;
+            z-index: 10;
             width: 100%;
             max-width: 1080px;
             margin: 0 auto;
-            padding: 30px 16px;
+            padding: 0 20px 40px;
             display: flex;
-            gap: 24px;
+            gap: 32px;
             align-items: flex-end;
-            z-index: 10;
         }
 
-        .detail-cover {
-            width: 160px;
-            height: 230px;
-            border-radius: 6px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            background: #eee;
+        .detail-cover-img {
+            width: 180px;
+            aspect-ratio: 2/3;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             object-fit: cover;
             flex-shrink: 0;
         }
 
-        .detail-text {
+        .detail-info {
             flex: 1;
             color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
             margin-bottom: 10px;
         }
 
+        .tag-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            margin-right: 6px;
+        }
+
         .detail-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            margin-bottom: 8px;
-            line-height: 1.3;
+            line-height: 1.2;
+            margin-bottom: 12px;
         }
 
-        .detail-meta {
-            font-size: 14px;
-            opacity: 0.8;
+        .detail-author {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-bottom: 16px;
         }
 
-        .action-bar {
-            padding: 16px 0;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
+        .detail-metrics {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
         }
 
-        .btn-read {
+        /* Body Content */
+        .detail-body {
+            background: #fff;
+            min-height: 500px;
+            padding: 40px 20px 100px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        /* Buttons */
+        .action-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .btn-play-lg {
+            flex: 1;
+            height: 56px;
             background: #1f8ce6;
             color: white;
-            padding: 10px 24px;
-            border-radius: 24px;
+            font-size: 16px;
             font-weight: 700;
+            border-radius: 8px;
             border: none;
-            font-size: 15px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-edit {
-            background: #333;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 24px;
-            font-weight: 700;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        .chapter-list {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-play-lg:hover {
+            background: #1579c9;
+        }
+
+        .btn-sub {
+            width: 56px;
+            height: 56px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .synopsis {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 50px;
+            white-space: pre-wrap;
+        }
+
+        /* Chapter List */
+        .chapter-list {
+            border-top: 1px solid #eee;
         }
 
         .chapter-item {
-            padding: 16px 0;
-            border-bottom: 1px solid #f5f5f5;
             display: flex;
             align-items: center;
+            padding: 16px 8px;
+            border-bottom: 1px solid #f5f5f5;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -123,148 +181,506 @@
             background: #fafafa;
         }
 
-        .ch-num {
-            width: 40px;
-            font-weight: 700;
-            color: #1f8ce6;
-            font-size: 16px;
+        .ch-thumb {
+            width: 80px;
+            height: 50px;
+            background: #eee;
+            border-radius: 4px;
+            margin-right: 16px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .ch-info {
+            flex: 1;
         }
 
         .ch-title {
-            flex: 1;
             font-size: 15px;
             font-weight: 600;
-            color: #333;
+            color: #222;
+            margin-bottom: 4px;
         }
 
-        .ch-date {
+        .ch-meta {
             font-size: 12px;
-            color: #999;
+            color: #888;
         }
 
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal {
-            background: white;
-            width: 400px;
-            padding: 24px;
-            border-radius: 12px;
-        }
-
-        .modal textarea {
-            width: 100%;
-            height: 100px;
-            margin-top: 8px;
+        .ch-btn {
+            padding: 6px 14px;
             border: 1px solid #ddd;
-            padding: 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #555;
+            background: white;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .detail-hero {
+                height: auto;
+                padding-top: 60px;
+                min-height: auto;
+                align-items: flex-start;
+            }
+
+            .detail-bg {
+                filter: blur(60px) brightness(0.3);
+                opacity: 0.8;
+            }
+
+            .detail-gradient {
+                background: linear-gradient(to bottom, transparent, #121212);
+            }
+
+            .detail-content {
+                flex-direction: row;
+                padding: 20px;
+                align-items: flex-start;
+            }
+
+            .detail-cover-img {
+                width: 100px;
+            }
+
+            .detail-title {
+                font-size: 24px;
+                margin-top: 20px;
+            }
+
+            .detail-body {
+                border-radius: 24px 24px 0 0;
+                margin-top: -20px;
+                position: relative;
+                z-index: 20;
+                padding-top: 30px;
+            }
         }
     </style>
+</head>
 
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="brand">CRAFIQ</a>
+            <nav class="nav-pc desktop-only">
+                <a href="index.html">홈</a>
+                <a href="discover.html">탐색</a>
+                <a href="best.html">베스트</a>
+                <a href="my.html">MY</a>
+            </nav>
+            <div class="header-right-pc desktop-only">
+                <a href="dashboard.html" class="btn-studio">스튜디오</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="detail-hero">
+        <div id="bg" class="detail-bg"></div>
+        <div class="detail-gradient"></div>
+
+        <div class="detail-content">
+            <img id="cover" class="detail-cover-img" src="https://via.placeholder.com/200x300">
+            <div class="detail-info">
+                <div id="tags" style="display:flex; flex-wrap:wrap;">
+                    <!-- Tags injected -->
+                </div>
+                <h1 id="title" class="detail-title">Loading...</h1>
+                <div id="author" class="detail-author">Loading...</div>
+                <div class="detail-metrics">
+                    <span>👁 12.5M</span>
+                    <span>⭐ 9.8</span>
+                    <span>❤️ 142k</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-body">
+        <div class="container">
+            <!-- Action Buttons -->
+            <div class="action-area">
+                <button id="readStartBtn" class="btn-play-lg">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <span id="readBtnText">첫화 보기</span>
+                </button>
+                <button class="btn-sub">❤️</button>
+                <button class="btn-sub">🔗</button>
+                <button id="editBtn" class="btn-sub" style="display:none; font-size:14px; width:auto; padding:0 20px;"
+                    onclick="openEdit()">수정</button>
+            </div>
+
+            <div id="desc" class="synopsis">
+                작품 소개 로딩 중...
+            </div>
+
+            <h3 style="font-size:20px; font-weight:800; margin-bottom:16px;">회차 목록</h3>
+            <div id="listContainer" class="chapter-list">
+                <div style="padding:40px; text-align:center; color:#999;">회차 정보를 불러오는 중입니다.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE NAV -->
+    <nav class="bottom-nav mobile-only">
+        <a href="index.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg><span>홈</span></a>
+        <a href="discover.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M16 8l-2 6-6 2 2-6 6-2z" />
+            </svg><span>탐색</span></a>
+        <a href="best.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3 9h9l-7 5 3 9-8-5-8 5 3-9-7-5h9z" />
+            </svg><span>베스트</span></a>
+        <a href="my.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg><span>MY</span></a>
+    </nav>
+
+    <!-- LOGIC -->
     <script type="module">
-        import { getNovelById, getChapters, getScenes, updateNovel } from './js/data.js';
+        import { getNovelById, getChapters, getScenes } from './js/data.js';
         import { getCurrentUser } from './js/auth.js';
 
         let currentNovel = null;
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        async function initDetail() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             if (!id) return alert("작품 정보가 없습니다.");
 
-            // Load Novel and User
             const [user, { data: novel }] = await Promise.all([
                 getCurrentUser(),
                 getNovelById(id)
             ]);
 
+            if (!novel) {
+                alert("삭제되거나 존재하지 않는 작품입니다.");
+                location.href = 'index.html';
+                return;
+            }
+
             currentNovel = novel;
-            renderNovelInfo(novel);
 
-            // Check Ownership
-            if (user && user.id === novel.creator_id) {
-                document.getElementById('editBtn').style.display = 'inline-block';
-            }
-
-            // Load Content List
-            if (novel.is_visual_novel) {
-                loadScenes(id);
-                document.getElementById('readBtnText').innerText = "게임 플레이";
-            } else {
-                loadChapters(id);
-            }
-        });
-
-        function renderNovelInfo(novel) {
+            // Render basic info
             document.getElementById('bg').style.backgroundImage = `url('${novel.cover_url}')`;
             document.getElementById('cover').src = novel.cover_url;
             document.getElementById('title').innerText = novel.title;
-            document.getElementById('author').innerText = novel.profiles?.username || '작가';
-            document.getElementById('desc').innerText = novel.description || "작품 소개가 없습니다.";
+            document.getElementById('author').innerText = novel.profiles?.username || '작가 미상';
+            document.getElementById('desc').innerText = novel.description || novel.synopsis || "작품 소개가 없습니다.";
 
-            // Set Read Button Action
-            const btn = document.getElementById('readStartBtn');
+            // Tags
+            const tagContainer = document.getElementById('tags');
+            // Mock tags or real genre
+            const genre = novel.genre || 'Fantasy';
+            tagContainer.innerHTML = `<span class="tag-badge">${genre}</span><span class="tag-badge">독점</span>`;
+
+            // Button Action
             const targetHtml = novel.is_visual_novel ? 'play.html' : 'read.html';
-            btn.onclick = () => location.href = `${targetHtml}?id=${novel.id}`;
-        }
+            document.getElementById('readStartBtn').onclick = () => location.href = `${targetHtml}?id=${novel.id}`;
+            document.getElementById('readBtnText').innerText = novel.is_visual_novel ? "게임 시작" : "첫화 보기";
 
-        async function loadChapters(id) {
-            const { data: chapters } = await getChapters(id);
-            renderList(chapters, 'read.html');
-        }
+            // Edit Rights
+            if (user && user.id === novel.creator_id) {
+                document.getElementById('editBtn').style.display = 'flex';
+                document.getElementById('editBtn').onclick = () => location.href = `novel-settings.html?id=${novel.id}`;
+            }
 
-        async function loadScenes(id) {
-            const { data: scenes } = await getScenes(id);
-            renderList(scenes, 'play.html');
-        }
-
-        function renderList(list, targetPage) {
+            // Load List
+            const listFn = novel.is_visual_novel ? getScenes : getChapters;
+            const { data: list } = await listFn(novel.id);
             const container = document.getElementById('listContainer');
+
             if (!list || list.length === 0) {
-                container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">아직 등록된 화가 없습니다.</div>';
+                container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">등록된 회차가 없습니다.</div>';
                 return;
             }
-            container.innerHTML = list.map((item, idx) => `
+
+            container.innerHTML = list.map((item, i) => `
+                <div class="chapter-item" onclick="location.href='${targetHtml}?id=${novel.id}&chapter=${i}'">
+                    <div class="ch-thumb" style="background-image:url('${novel.cover_url}')"></div>
+                    <div class="ch-info">
+                        <div class="ch-title">${i + 1}화. ${item.title}</div>
+                        <div class="ch-meta">${new Date(item.created_at).toLocaleDateString()} • Free</div>
+                    </div>
+                    <button class="ch-btn">보기</button>
+                </div>
+            `).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', initDetail);
+    </script>
+</body>
+
+</html>
+<!-- Pretendard Font -->
+<link rel="stylesheet" as="style" crossOrigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="style.css">
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="js/turbo-router.js"></script>
+
+<style>
+    .detail-hero {
+        position: relative;
+        width: 100%;
+        height: 320px;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .detail-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        filter: blur(20px) brightness(0.5);
+        transform: scale(1.1);
+    }
+
+    .detail-info-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 30px 16px;
+        display: flex;
+        gap: 24px;
+        align-items: flex-end;
+        z-index: 10;
+    }
+
+    .detail-cover {
+        width: 160px;
+        height: 230px;
+        border-radius: 6px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        background: #eee;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .detail-text {
+        flex: 1;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .detail-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+
+    .detail-meta {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .action-bar {
+        padding: 16px 0;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+    }
+
+    .btn-read {
+        background: #1f8ce6;
+        color: white;
+        padding: 10px 24px;
+        border-radius: 24px;
+        font-weight: 700;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-edit {
+        background: #333;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 24px;
+        font-weight: 700;
+        border: none;
+        font-size: 14px;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+    .chapter-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chapter-item {
+        padding: 16px 0;
+        border-bottom: 1px solid #f5f5f5;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .chapter-item:hover {
+        background: #fafafa;
+    }
+
+    .ch-num {
+        width: 40px;
+        font-weight: 700;
+        color: #1f8ce6;
+        font-size: 16px;
+    }
+
+    .ch-title {
+        flex: 1;
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .ch-date {
+        font-size: 12px;
+        color: #999;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal {
+        background: white;
+        width: 400px;
+        padding: 24px;
+        border-radius: 12px;
+    }
+
+    .modal textarea {
+        width: 100%;
+        height: 100px;
+        margin-top: 8px;
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+</style>
+
+<script type="module">
+    import { getNovelById, getChapters, getScenes, updateNovel } from './js/data.js';
+    import { getCurrentUser } from './js/auth.js';
+
+    let currentNovel = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (!id) return alert("작품 정보가 없습니다.");
+
+        // Load Novel and User
+        const [user, { data: novel }] = await Promise.all([
+            getCurrentUser(),
+            getNovelById(id)
+        ]);
+
+        currentNovel = novel;
+        renderNovelInfo(novel);
+
+        // Check Ownership
+        if (user && user.id === novel.creator_id) {
+            document.getElementById('editBtn').style.display = 'inline-block';
+        }
+
+        // Load Content List
+        if (novel.is_visual_novel) {
+            loadScenes(id);
+            document.getElementById('readBtnText').innerText = "게임 플레이";
+        } else {
+            loadChapters(id);
+        }
+    });
+
+    function renderNovelInfo(novel) {
+        document.getElementById('bg').style.backgroundImage = `url('${novel.cover_url}')`;
+        document.getElementById('cover').src = novel.cover_url;
+        document.getElementById('title').innerText = novel.title;
+        document.getElementById('author').innerText = novel.profiles?.username || '작가';
+        document.getElementById('desc').innerText = novel.description || "작품 소개가 없습니다.";
+
+        // Set Read Button Action
+        const btn = document.getElementById('readStartBtn');
+        const targetHtml = novel.is_visual_novel ? 'play.html' : 'read.html';
+        btn.onclick = () => location.href = `${targetHtml}?id=${novel.id}`;
+    }
+
+    async function loadChapters(id) {
+        const { data: chapters } = await getChapters(id);
+        renderList(chapters, 'read.html');
+    }
+
+    async function loadScenes(id) {
+        const { data: scenes } = await getScenes(id);
+        renderList(scenes, 'play.html');
+    }
+
+    function renderList(list, targetPage) {
+        const container = document.getElementById('listContainer');
+        if (!list || list.length === 0) {
+            container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">아직 등록된 화가 없습니다.</div>';
+            return;
+        }
+        container.innerHTML = list.map((item, idx) => `
                 <div class="chapter-item" onclick="location.href='${targetPage}?id=${currentNovel.id}'">
                     <div class="ch-num">${idx + 1}</div>
                     <div class="ch-title">${item.title}</div>
                     <div class="ch-date">${new Date(item.created_at).toLocaleDateString()}</div>
                 </div>
             `).join('');
-        }
+    }
 
-        // Edit Logic
-        window.openEdit = () => {
-            document.getElementById('editModal').style.display = 'flex';
-            document.getElementById('editTitle').value = currentNovel.title;
-            document.getElementById('editDesc').value = currentNovel.description || '';
-            document.getElementById('editCover').value = currentNovel.cover_url || '';
+    // Edit Logic
+    window.openEdit = () => {
+        document.getElementById('editModal').style.display = 'flex';
+        document.getElementById('editTitle').value = currentNovel.title;
+        document.getElementById('editDesc').value = currentNovel.description || '';
+        document.getElementById('editCover').value = currentNovel.cover_url || '';
+    };
+    window.closeEdit = () => document.getElementById('editModal').style.display = 'none';
+
+    window.saveEdit = async () => {
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "저장 중...";
+
+        const updates = {
+            title: document.getElementById('editTitle').value,
+            description: document.getElementById('editDesc').value,
+            cover_url: document.getElementById('editCover').value
         };
-        window.closeEdit = () => document.getElementById('editModal').style.display = 'none';
 
-        window.saveEdit = async () => {
-            const btn = document.getElementById('saveBtn');
-            btn.innerText = "저장 중...";
-
-            const updates = {
-                title: document.getElementById('editTitle').value,
-                description: document.getElementById('editDesc').value,
-                cover_url: document.getElementById('editCover').value
-            };
-
-            const { error } = await updateNovel(currentNovel.id, updates);
-            if (error) alert(error.message);
-            else location.reload();
-        };
-    </script>
+        const { error } = await updateNovel(currentNovel.id, updates);
+        if (error) alert(error.message);
+        else location.reload();
+    };
+</script>
 </head>
 
 <body>
