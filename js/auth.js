@@ -80,8 +80,7 @@ export const signUpWithEmail = async (email, password) => {
             await sb.from('profiles').insert([
                 {
                     id: data.user.id,
-                    username: email.split('@')[0],
-                    full_name: email.split('@')[0]
+                    username: email.split('@')[0]
                 }
             ]);
         }
@@ -107,8 +106,7 @@ export const ensureUserHasProfile = async (user) => {
         const { error: insertError } = await sb.from('profiles').insert([
             {
                 id: user.id,
-                username: user.email.split('@')[0],
-                full_name: user.email.split('@')[0]
+                username: user.email.split('@')[0]
             }
         ]);
 
