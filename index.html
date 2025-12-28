@@ -13,200 +13,464 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/turbo-router.js"></script>
+    <script>
+        function toggleSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+            if (overlay.style.display === 'flex') document.getElementById('mobileSearchInput').focus();
+        }
+        window.toggleSearch = toggleSearch;
+    </script>
 
+    <!-- Dynamic Content Injector -->
     <script type="module">
         import { getRecentPublishedNovels } from './js/data.js';
 
-        // Load Dynamic Content
-        const loadDynamic = async () => {
-            const { data: novels, error } = await getRecentPublishedNovels();
+        async function initHome() {
+            const { data: novels } = await getRecentPublishedNovels();
+            if (!novels || novels.length === 0) return;
 
-            if (novels && novels.length > 0) {
-                const container = document.getElementById('homeContentGrid');
-                if (container) {
-                    container.innerHTML = novels.map(n => `
-                        <div class="item" onclick="location.href='detail.html?id=${n.id}'">
-                            <div class="book-cover">
-                                <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
-                                ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
-                            </div>
-                            <div class="book-title">${n.title}</div>
-                            <div class="book-meta">${n.profiles?.username || '작가'}</div>
-                        </div>
-                    `).join('');
-                }
-            }
-        };
+            // Target the first scroll view (Hot New)
+            const container = document.querySelector('.h-scroll-view');
+            if (!container) return;
 
-        loadDynamic();
-        // Also listen for turbo loads
-        // window.addEventListener('DOMContentLoaded', loadDynamic); // Handled by script exec
+            // Create Real Data Cards
+            const realCards = novels.map(n => `
+                <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item">
+                    <div class="book-cover">
+                        <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
+                        ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
+                    </div>
+                    <div class="book-title">${n.title}</div>
+                    <div class="book-meta">${n.profiles?.username || '작가'} • 신작</div>
+                </a>
+            `).join('');
+
+            // Prepend to the existing list
+            container.insertAdjacentHTML('afterbegin', realCards);
+        }
+
+        window.addEventListener('DOMContentLoaded', initHome);
+        // Turbo Router fallback
+        if (document.body.getAttribute('data-turbo-loaded')) initHome();
     </script>
 </head>
 
 <body>
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-overlay-header">
+            <svg onclick="toggleSearch()" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                viewBox="0 0 24 24" style="margin-right:12px; cursor:pointer;">
+                <path d="M15 19l-7-7 7-7" />
+            </svg>
+            <input id="mobileSearchInput" class="search-overlay-input" placeholder="검색">
+        </div>
+        <div class="search-recent">
+            <span class="search-tag">전지적 독자 시점</span>
+            <span class="search-tag">화산귀환</span>
+            <span class="search-tag">로맨스판타지</span>
+            <span class="search-tag">먼치킨</span>
+        </div>
+    </div>
+
     <header>
         <div class="header-inner">
             <a href="index.html" class="brand">CRAFIQ</a>
-
             <nav class="nav-pc desktop-only">
                 <a href="index.html" class="active">홈</a>
                 <a href="discover.html">탐색</a>
                 <a href="best.html">베스트</a>
                 <a href="my.html">MY</a>
             </nav>
-
             <div class="header-right-pc desktop-only">
                 <div class="search-wrap-pc">
-                    <svg width="18" height="18" fill="none" stroke="#888" stroke-width="2" viewBox="0 0 24 24">
+                    <svg width="18" height="18" stroke="#999" stroke-width="2" fill="none" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8" />
-                        <path d="M21 21l-4.35-4.35" />
+                        <path d="M21 21L16.65 16.65" />
                     </svg>
-                    <input type="text" placeholder="작품 검색...">
+                    <input placeholder="작품 검색">
                 </div>
                 <a href="dashboard.html" class="btn-studio">스튜디오</a>
             </div>
-
-            <button class="mobile-search-btn mobile-only" onclick="toggleSearchOverlay(true)">
-                <svg width="24" height="24" fill="none" stroke="#000" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="M21 21l-4.35-4.35" />
-                </svg>
-            </button>
+            <div class="mobile-only" style="margin-left:auto;">
+                <button onclick="toggleSearch()" class="mobile-search-btn"><svg width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="M21 21L16.65 16.65" />
+                    </svg></button>
+            </div>
         </div>
     </header>
 
-    <div id="searchOverlay" class="search-overlay">
-        <div class="search-overlay-header">
-            <button onclick="toggleSearchOverlay(false)" style="background:none; border:none; margin-right:8px;"><svg
-                    width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M15 18l-6-6 6-6" />
-                </svg></button>
-            <input type="text" class="search-overlay-input" placeholder="검색어를 입력하세요">
-        </div>
-        <div class="search-recent">
-            <div class="search-tag">#회귀</div>
-            <div class="search-tag">#먼치킨</div>
-            <div class="search-tag">#로맨스판타지</div>
-        </div>
-    </div>
-    <script>
-        function toggleSearchOverlay(show) {
-            document.getElementById('searchOverlay').style.display = show ? 'flex' : 'none';
-        }
-    </script>
-
     <main class="inner">
-        <!-- Main Banner Carousel -->
+        <!-- MOBILE TABS -->
+        <div class="sub-nav mobile-only"
+            style="padding:16px 16px 0; gap:20px; font-weight:600; color:#888; border-bottom:1px solid #f0f0f0; margin-bottom:20px; overflow-x:auto;">
+            <span
+                style="color:#000; font-weight:800; border-bottom:2px solid #000; padding-bottom:12px; display:inline-block;">홈</span>
+            <span style="padding-bottom:12px; display:inline-block;">실시간</span>
+            <span style="padding-bottom:12px; display:inline-block;">이벤트</span>
+            <span style="padding-bottom:12px; display:inline-block;">무료</span>
+            <span style="padding-bottom:12px; display:inline-block;">판타지</span>
+            <span style="padding-bottom:12px; display:inline-block;">로맨스</span>
+        </div>
+
+        <!-- HERO -->
         <div class="hero-wrap">
-            <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=1600" class="hero-img">
+            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80" class="hero-img">
             <div class="hero-overlay">
-                <div
-                    style="color:white; font-size:12px; font-weight:700; background:#1f8ce6; display:inline-block; padding:4px 8px; border-radius:4px; margin-bottom:8px; width:fit-content;">
-                    독점 연재</div>
-                <div style="color:white; font-size:24px; font-weight:800; text-shadow:0 2px 10px rgba(0,0,0,0.5);">"이번
-                    생은 다를 것이다"</div>
-                <div style="color:rgba(255,255,255,0.8); font-size:14px; margin-top:4px;">압도적 스케일의 판타지 대작</div>
+                <span
+                    style="background:white; color:black; font-size:11px; font-weight:800; padding:4px 8px; border-radius:4px; align-self:flex-start; margin-bottom:8px;">독점
+                    공개</span>
+                <div style="color:white; font-size:24px; font-weight:800; line-height:1.3;">그녀가 공작저로<br>가야 했던 사정</div>
+                <div style="color:rgba(255,255,255,0.8); font-size:14px; margin-top:8px;">돌아온 레전드 로판, 지금 바로 정주행!</div>
             </div>
         </div>
 
-        <!-- Home Sub Nav -->
-        <div class="h-scroll-view" style="margin-bottom:30px; border-bottom:1px solid #eee; padding-bottom:0;">
-            <div style="padding:10px 16px; font-weight:700; border-bottom:2px solid #000; color:#000;">홈</div>
-            <div style="padding:10px 16px; font-weight:500; color:#888;">실시간 랭킹</div>
-            <div style="padding:10px 16px; font-weight:500; color:#888;">이벤크</div>
-            <div style="padding:10px 16px; font-weight:500; color:#888;">무료</div>
-        </div>
-
-        <!-- 1. DYNAMIC: Recent Uploads -->
+        <!-- Section 1: Hot New -->
         <section class="section">
             <div class="section-head">
-                <h3 class="sec-title">🔥 방금 올라온 신작</h3>
-                <span class="sec-more">더보기 ></span>
-            </div>
-            <div id="homeContentGrid" class="h-scroll-view">
-                <!-- Data Loaded by JS -->
-                <div class="item">
-                    <div
-                        style="width:100%; aspect-ratio:1/1.48; background:#eee; display:flex; align-items:center; justify-content:center;">
-                        로딩 중...</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. STATIC: Weekly Best -->
-        <section class="section">
-            <div class="section-head">
-                <h3 class="sec-title">🏆 주간 베스트</h3>
-            </div>
-            <div class="rank-list">
-                <div class="rank-item">
-                    <div class="rank-num">1</div>
-                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/100x150?fantasy"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">나 혼자만 레벨업 (예시)</div>
-                        <div class="rank-desc">판타지 • 추공</div>
-                        <div class="rank-tags"><span class="tag-sm">먼치킨</span><span class="tag-sm">헌터물</span></div>
-                    </div>
-                </div>
-                <div class="rank-item">
-                    <div class="rank-num">2</div>
-                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/101x150?romance"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">황녀님은 파업 중</div>
-                        <div class="rank-desc">로맨스판타지 • 작가명</div>
-                    </div>
-                </div>
-                <div class="rank-item">
-                    <div class="rank-num">3</div>
-                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/102x150?magic"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">마법학교의 천재가 되었다</div>
-                        <div class="rank-desc">판타지 • 글쟁이</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. STATIC: Keyword Recommendations -->
-        <section class="section">
-            <div class="section-head">
-                <h3 class="sec-title">키워드 추천: #아카데미</h3>
+                <h2 class="sec-title">🔥 화제의 신작</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
             </div>
             <div class="h-scroll-view">
-                <div class="item">
-                    <div class="book-cover"><img src="https://source.unsplash.com/random/103x150?school"></div>
-                    <div class="book-title">아카데미의 고인물</div>
-                </div>
-                <div class="item">
-                    <div class="book-cover"><img src="https://source.unsplash.com/random/104x150?student"></div>
-                    <div class="book-title">낙제 기사의 회귀</div>
-                </div>
-                <div class="item">
-                    <div class="book-cover"><img src="https://source.unsplash.com/random/105x150?book"></div>
-                    <div class="book-title">교수님이 흑막임</div>
-                </div>
+                <!-- Real Data will be injected HERE -->
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=400"></div>
+                    <div class="book-title">달빛 조각사</div>
+                    <div class="book-meta">남희성 • 게임판타지</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400"></div>
+                    <div class="book-title">슬라임 전생</div>
+                    <div class="book-meta">퓨즈 • 이세계</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=400"></div>
+                    <div class="book-title">나 혼자만 레벨업</div>
+                    <div class="book-meta">추공 • 헌터물</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400"></div>
+                    <div class="book-title">화산귀환</div>
+                    <div class="book-meta">비가 • 무협</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1463171379577-7f9923021716?w=400"></div>
+                    <div class="book-title">전지적 독자 시점</div>
+                    <div class="book-meta">싱숑 • 판타지</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400"></div>
+                    <div class="book-title">재벌집 막내아들</div>
+                    <div class="book-meta">산경 • 현대판타지</div>
+                </a>
             </div>
         </section>
 
-        <!-- 4. STATIC: Event Banner -->
+        <!-- Section 2: Editor's Pick (Wide Cards) -->
         <section class="section">
-            <div class="wide-cover">
-                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800">
-                <div
-                    style="position:absolute; bottom:20px; left:20px; color:white; font-weight:800; font-size:20px; text-shadow:0 2px 4px rgba(0,0,0,0.6);">
-                    CRAFIQ 게임 잼 개최!<br>총 상금 1,000만원
-                </div>
+            <div class="section-head">
+                <h2 class="sec-title">MD's Pick: 이번 주 필독</h2>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item wide-item">
+                    <div class="wide-cover"><img
+                            src="https://images.unsplash.com/photo-1447968954315-3f0c44f7375c?w=600"></div>
+                    <div class="book-title">감성 충만 로맨스 모음</div>
+                    <div class="book-meta">가을에 읽기 좋은 달달한 이야기</div>
+                </a>
+                <a href="#" class="item wide-item">
+                    <div class="wide-cover"><img
+                            src="https://images.unsplash.com/photo-1518818419601-72c8673f5852?w=600"></div>
+                    <div class="book-title">먼치킨 주인공 특집</div>
+                    <div class="book-meta">답답함 없는 시원한 전개</div>
+                </a>
+                <a href="#" class="item wide-item">
+                    <div class="wide-cover"><img
+                            src="https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=600"></div>
+                    <div class="book-title">밤 새는 줄 모르는 미스터리</div>
+                    <div class="book-meta">당신의 심장을 뛰게 할 스릴러</div>
+                </a>
             </div>
         </section>
 
+        <!-- Section 3: Ranking -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">🏆 실시간 랭킹</h2>
+                <a href="best.html" class="sec-more">전체</a>
+            </div>
+            <div class="rank-list" style="padding:0;">
+                <a href="#" class="rank-item" style="padding:12px 16px;">
+                    <div class="rank-num">1</div>
+                    <div class="rank-thumb"><img
+                            src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=200"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">광마회귀</div>
+                        <div class="rank-desc">유진성 • 무협</div>
+                        <div class="rank-tags"><span class="tag-sm">먼치킨</span><span class="tag-sm">사이다</span></div>
+                    </div>
+                </a>
+                <a href="#" class="rank-item" style="padding:12px 16px;">
+                    <div class="rank-num">2</div>
+                    <div class="rank-thumb"><img
+                            src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=200"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">데뷔 못 하면 죽는 병</div>
+                        <div class="rank-desc">백덕수 • 아이돌</div>
+                        <div class="rank-tags"><span class="tag-sm">아이돌</span><span class="tag-sm">빙의</span></div>
+                    </div>
+                </a>
+                <a href="#" class="rank-item" style="padding:12px 16px;">
+                    <div class="rank-num">3</div>
+                    <div class="rank-thumb"><img
+                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=200"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">나노 마신</div>
+                        <div class="rank-desc">한중월야 • 무협</div>
+                        <div class="rank-tags"><span class="tag-sm">미래</span><span class="tag-sm">나노</span></div>
+                    </div>
+                </a>
+                <a href="#" class="rank-item" style="padding:12px 16px;">
+                    <div class="rank-num">4</div>
+                    <div class="rank-thumb"><img
+                            src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=200"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">비뢰도</div>
+                        <div class="rank-desc">검류혼 • 무협</div>
+                        <div class="rank-tags"><span class="tag-sm">학교</span><span class="tag-sm">개그</span></div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- BANNER -->
+        <div style="margin-bottom:56px; overflow:hidden; aspect-ratio:4/1; background:#000; position:relative;">
+            <img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=1200&q=80"
+                style="opacity:0.6; width:100%; height:100%; object-fit:cover;">
+            <div
+                style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
+                <div style="font-size:14px; font-weight:700; color:#ffdd59; margin-bottom:8px;">EVENT</div>
+                <div style="font-size:20px; font-weight:900;">매일 10시 무료 대방출</div>
+            </div>
+        </div>
+
+        <!-- Section 4: Romance -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">💕 로맨스 기대작</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1516726817505-f5ed825624d8?w=300"></div>
+                    <div class="book-title">황제의 외동딸</div>
+                    <div class="book-meta">윤슬</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"></div>
+                    <div class="book-title">어느 날 공주가</div>
+                    <div class="book-meta">스푼</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300"></div>
+                    <div class="book-title">상수리나무 아래</div>
+                    <div class="book-meta">김수지</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300"></div>
+                    <div class="book-title">악녀는 오늘도</div>
+                    <div class="book-meta">헤이</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300"></div>
+                    <div class="book-title">재혼 황후</div>
+                    <div class="book-meta">알파타르트</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300"></div>
+                    <div class="book-title">이번 생은 가주</div>
+                    <div class="book-meta">김로아</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 5: Fantasy -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">⚔️ 판타지 명작</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=300"></div>
+                    <div class="book-title">나노 마신</div>
+                    <div class="book-meta">한중월야</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300"></div>
+                    <div class="book-title">두 번 사는 랭커</div>
+                    <div class="book-meta">사도연</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=300"></div>
+                    <div class="book-title">템빨</div>
+                    <div class="book-meta">박새날</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=300"></div>
+                    <div class="book-title">SSS급 자살헌터</div>
+                    <div class="book-meta">신노아</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=300"></div>
+                    <div class="book-title">전생검신</div>
+                    <div class="book-meta">구로수번</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 6: Now Free -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">🎁 지금만 무료!</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=300">
+                        <div
+                            style="position:absolute; top:0; left:0; background:#f00; color:white; font-size:10px; padding:2px 4px; font-weight:700;">
+                            10화 무료</div>
+                    </div>
+                    <div class="book-title">달빛 조각사</div>
+                    <div class="book-meta">남희성</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300">
+                        <div
+                            style="position:absolute; top:0; left:0; background:#f00; color:white; font-size:10px; padding:2px 4px; font-weight:700;">
+                            10화 무료</div>
+                    </div>
+                    <div class="book-title">슬라임 전생</div>
+                    <div class="book-meta">퓨즈</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=300">
+                        <div
+                            style="position:absolute; top:0; left:0; background:#f00; color:white; font-size:10px; padding:2px 4px; font-weight:700;">
+                            20화 무료</div>
+                    </div>
+                    <div class="book-title">나 혼자만 레벨업</div>
+                    <div class="book-meta">추공</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 7: Wait Free -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">⏰ 기다리면 무료</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item">
+                    <div class="book-cover"><img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300">
+                        <div
+                            style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:white; font-size:10px; text-align:center; padding:2px 0;">
+                            3시간마다 무료</div>
+                    </div>
+                    <div class="book-title">나를 잡아먹지 말아요</div>
+                    <div class="book-meta">로맨스</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300">
+                        <div
+                            style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:white; font-size:10px; text-align:center; padding:2px 0;">
+                            12시간마다 무료</div>
+                    </div>
+                    <div class="book-title">황녀님이 돌아오셨다</div>
+                    <div class="book-meta">로판</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=300">
+                        <div
+                            style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:white; font-size:10px; text-align:center; padding:2px 0;">
+                            24시간마다 무료</div>
+                    </div>
+                    <div class="book-title">검술명가 막내아들</div>
+                    <div class="book-meta">판타지</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section 8: Completed -->
+        <section class="section">
+            <div class="section-head">
+                <h2 class="sec-title">📚 주말 순삭 완결작</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="h-scroll-view">
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=300"></div>
+                    <div class="book-title">화산귀환</div>
+                    <div class="book-meta">500화 완결</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1463171379577-7f9923021716?w=300"></div>
+                    <div class="book-title">전지적 독자 시점</div>
+                    <div class="book-meta">551화 완결</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300"></div>
+                    <div class="book-title">재벌집 막내아들</div>
+                    <div class="book-meta">326화 완결</div>
+                </a>
+                <a href="#" class="item">
+                    <div class="book-cover"><img
+                            src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=300"></div>
+                    <div class="book-title">템빨</div>
+                    <div class="book-meta">1000화+</div>
+                </a>
+            </div>
+        </section>
+
+
+        <footer>
+            (주)크라픽 | 사업자 정보 확인 | 이용약관<br>
+            Copyight © CRAFIQ Corp. All rights reserved.
+        </footer>
     </main>
 
-    <!-- Bottom Nav -->
+    <!-- ACTIVE STATE: HOME -->
     <nav class="bottom-nav mobile-only">
         <a href="index.html" class="nav-btn active"><svg viewBox="0 0 24 24" fill="currentColor">
-                <path
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <path d="M12 3L4 9v12h5v-7h6v7h5V9z" />
             </svg><span>홈</span></a>
         <a href="discover.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
