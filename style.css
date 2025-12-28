@@ -1,30 +1,17 @@
 :root {
-    /* --- BRANDING (Ridi Blue + Novelpia Vibes) --- */
     --color-primary: #1f8ce6;
-    /* Ridi Blue: Trustworthy, Premium */
     --color-primary-dark: #1273c4;
-    --color-accent: #6c5ce7;
-    /* Novelpia-ish Violet for tags */
-
     --color-text-main: #1a1b1c;
-    --color-text-sub: #525458;
-    --color-text-hint: #888d95;
-
+    --color-text-sub: #636c76;
+    --color-text-hint: #999;
     --bg-main: #ffffff;
-    --bg-secondary: #f7f7fa;
-    --bg-line: #ececec;
+    --bg-gray: #f2f4f5;
+    --border: #ececec;
 
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-    --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.08);
-
-    /* --- LAYOUT --- */
-    --header-h: 54px;
-    --tab-h: 56px;
-    --max-w: 768px;
-    /* Mobile-first container max width for 'App View' on Desktop */
+    --header-h-mobile: 56px;
+    --header-h-pc: 70px;
 }
 
-/* Base Reset */
 * {
     margin: 0;
     padding: 0;
@@ -33,413 +20,408 @@
 }
 
 body {
-    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    background-color: #f2f2f5;
-    /* Desktop Background */
+    font-family: "Pretendard Variable", Pretendard, sans-serif;
     color: var(--color-text-main);
+    background-color: var(--bg-main);
     font-size: 15px;
-    letter-spacing: -0.03em;
     line-height: 1.5;
-    padding-bottom: var(--tab-h);
+    padding-bottom: 60px;
+    /* Mobile Nav space */
 }
 
-/* --- APP CONTAINER (The "Phone" view on Desktop) --- */
-.app-container {
-    max-width: var(--max-w);
-    margin: 0 auto;
-    background: var(--bg-main);
-    min-height: 100vh;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
-    position: relative;
-    padding-bottom: 40px;
-}
-
-@media (max-width: 768px) {
-    .app-container {
-        max-width: 100%;
-        box-shadow: none;
+@media (min-width: 1024px) {
+    body {
+        padding-bottom: 0;
+        background-color: #fff;
     }
 }
 
-/* --- TYPOGRAPHY UTILS --- */
-.txt-title-lg {
-    font-size: 20px;
-    font-weight: 800;
-    color: #000;
-    letter-spacing: -0.5px;
+/* --- LAYOUT WRAPPERS --- */
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
 }
 
-.txt-title-md {
-    font-size: 17px;
-    font-weight: 700;
-    color: #111;
-}
-
-.txt-sub {
-    font-size: 13px;
-    color: var(--color-text-sub);
-}
-
-.txt-hint {
-    font-size: 12px;
-    color: var(--color-text-hint);
-}
-
-.txt-primary {
-    color: var(--color-primary);
-    font-weight: 700;
+@media (min-width: 1024px) {
+    .wrapper {
+        max-width: 1100px;
+        padding: 0 40px;
+    }
 }
 
 /* --- HEADER --- */
 .header-main {
-    height: var(--header-h);
+    height: var(--header-h-mobile);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    background: var(--bg-main);
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 50;
-    /* Subtle blur removed for solid crisp look, preferred by Ridi */
-    border-bottom: 1px solid var(--bg-line);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
 }
 
-.header-logo {
-    font-family: 'Montserrat', sans-serif;
+@media (min-width: 1024px) {
+    .header-main {
+        height: var(--header-h-pc);
+        padding: 0 40px;
+    }
+}
+
+.brand {
+    font-size: 20px;
     font-weight: 900;
-    font-size: 18px;
     color: var(--color-primary);
 }
 
-.header-actions {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-}
-
-.btn-icon {
-    width: 24px;
-    height: 24px;
+.header-nav-pc {
+    display: none;
+    gap: 30px;
+    font-weight: 700;
     color: #333;
+    margin-left: 40px;
 }
 
-/* --- SUB-NAVIGATION (Home | Realtime | Event) --- */
-.sub-nav {
+.header-nav-pc a:hover {
+    color: var(--color-primary);
+}
+
+@media (min-width: 1024px) {
+    .header-nav-pc {
+        display: flex;
+    }
+
+    .header-title-center {
+        display: none;
+    }
+}
+
+/* --- MOBILE SUB-TABS (Home/Realtime...) --- */
+.mobile-tabs {
     display: flex;
-    padding: 10px 16px;
     gap: 20px;
+    padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
-    background: white;
+    overflow-x: auto;
 }
 
-.sub-nav-item {
+.m-tab {
     font-size: 15px;
     font-weight: 600;
-    color: var(--color-text-hint);
-    position: relative;
+    color: #888;
+    white-space: nowrap;
     cursor: pointer;
 }
 
-.sub-nav-item.active {
+.m-tab.active {
     color: #000;
     font-weight: 800;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
 }
 
-.sub-nav-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #000;
+@media (min-width: 1024px) {
+    .mobile-tabs {
+        display: none;
+    }
 }
 
-/* --- HERO SLIDER --- */
-.hero-slider-wrap {
+/* --- HERO --- */
+.hero-wrap {
     width: 100%;
-    aspect-ratio: 16/9;
-    background: #e0e0e0;
     position: relative;
     overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    .hero-wrap {
+        border-radius: 12px;
+        margin-top: 24px;
+        height: 400px;
+    }
 }
 
 .hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    aspect-ratio: 16/9;
 }
 
-.hero-gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 40%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px;
+@media (min-width: 1024px) {
+    .hero-img {
+        aspect-ratio: auto;
+    }
 }
 
-.hero-badge {
-    background: white;
-    color: black;
-    font-size: 11px;
+/* --- SECTIONS & GRIDS --- */
+.section-title {
+    font-size: 19px;
     font-weight: 800;
-    padding: 4px 8px;
-    border-radius: 4px;
-    align-self: flex-start;
-    margin-bottom: 8px;
-}
-
-.hero-title {
-    color: white;
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.3;
-}
-
-/* --- SECTIONS --- */
-.section {
-    padding: 32px 0 0;
-}
-
-.section-head {
-    padding: 0 16px 16px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
 }
 
-.more-btn {
+.more-link {
     font-size: 13px;
-    color: var(--color-text-hint);
+    color: #888;
+    font-weight: 400;
 }
 
-/* --- HORIZONTAL BOOK STRIP --- */
-.h-scroll-view {
+/* Responsive Grid for "New" (Horizontal on Mobile, Grid on PC) */
+.book-list {
     display: flex;
-    overflow-x: auto;
     gap: 12px;
-    padding: 0 16px;
+    overflow-x: auto;
+    padding-right: 16px;
     scroll-snap-type: x mandatory;
-    padding-bottom: 20px;
-    /* Space for shadow */
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
-.h-scroll-view::-webkit-scrollbar {
-    display: none;
-}
-
-.book-card-sm {
-    flex: 0 0 108px;
+.book-item {
+    flex: 0 0 110px;
     scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
 }
 
-.cover-sm {
-    width: 108px;
-    height: 160px;
+.book-cover {
+    width: 100%;
+    aspect-ratio: 1/1.5;
     border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    position: relative;
-    margin-bottom: 8px;
     overflow: hidden;
-    background: #f0f0f0;
+    margin-bottom: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.cover-sm img {
+.book-cover img {
     width: 100%;
     height: 100%;
     transition: transform 0.3s;
 }
 
-.book-card-sm:hover img {
+.book-item:hover .book-cover img {
     transform: scale(1.05);
 }
 
-/* --- RANKING LIST --- */
-.ranking-wrap {
-    padding: 0 16px;
+@media (min-width: 1024px) {
+    .book-list {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 24px 16px;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .book-item {
+        width: auto;
+        flex: none;
+    }
 }
 
-.rank-item {
+/* Ranking Grid */
+.rank-list {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+    .rank-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px 40px;
+    }
+}
+
+.rank-row {
+    display: flex;
     padding: 12px 0;
     border-bottom: 1px solid #f5f5f5;
-    cursor: pointer;
+    align-items: center;
 }
 
-.rank-num {
-    font-size: 18px;
+.rank-idx {
+    font-size: 20px;
     font-weight: 900;
-    color: #000;
-    width: 28px;
+    width: 32px;
+    text-align: center;
     margin-right: 8px;
-    line-height: 1;
-    margin-top: 4px;
 }
 
-.rank-cover {
-    width: 60px;
-    height: 88px;
+.rank-thumb {
+    width: 50px;
+    height: 75px;
     border-radius: 4px;
     overflow: hidden;
     background: #eee;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    margin-right: 16px;
+    margin-right: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.rank-info {
-    flex: 1;
-}
-
-.rank-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    line-height: 1.4;
-}
-
-.rank-meta {
-    font-size: 12px;
-    color: var(--color-text-hint);
-    margin-bottom: 4px;
-}
-
-.rank-tags {
-    display: flex;
-    gap: 4px;
-}
-
-.tag {
-    font-size: 11px;
-    background: #f0f0f5;
-    color: #666;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-/* --- STUDIO / DASHBOARD --- */
-.studio-head {
-    padding: 20px 16px;
-    background: #fcfcfc;
-    border-bottom: 1px solid #eee;
-}
-
-.studio-list {
-    padding: 0 16px;
-}
-
-.project-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.project-info h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.project-info p {
-    font-size: 12px;
-    color: #999;
-}
-
-.project-acts button {
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
-/* --- BOTTOM NAV (Visible Mobile Only via logic, but styled for all if needed by user req?) 
-   User said "PC doesn't need it", so we hide on large screens but for this 'App View' container approach,
-   we usually keep it inside the container to simulate the app experience. 
-   But user strictly said "Why PC?". So we hide it if window > mobile, 
-   OR we treat the "App Container" as the mobile device itself. 
-   Let's stick to strict media query.
-*/
+/* --- BOTTOM NAV (Mobile Only) --- */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    max-width: var(--max-w);
-    margin: 0 auto;
-    /* Keep inside app width */
-    height: var(--tab-h);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    height: 60px;
+    background: white;
     border-top: 1px solid #eee;
+    z-index: 100;
     display: flex;
     justify-content: space-around;
-    z-index: 100;
 }
 
-@media (min-width: 769px) {
-    .bottom-nav {
-        display: none;
-    }
-
-    /* User strict request: No bottom nav on PC */
-    body {
-        padding-bottom: 0;
-    }
-}
-
-.tab-btn {
+.nav-btn {
     flex: 1;
-    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #ccc;
+    color: #aaa;
+    gap: 4px;
 }
 
-.tab-btn.active {
-    color: var(--color-text-main);
+.nav-btn.active {
+    color: #000;
 }
 
-.tab-btn svg {
+.nav-btn svg {
     width: 24px;
     height: 24px;
-    margin-bottom: 2px;
-}
-
-.tab-btn span {
-    font-size: 10px;
-    font-weight: 500;
-}
-
-/* Icons */
-.icon-active {
-    fill: currentColor;
-}
-
-.icon-outline {
-    stroke: currentColor;
-    fill: none;
     stroke-width: 2px;
 }
 
-/* Helper */
-.badge-up {
-    color: #eb3b5a;
+.nav-btn span {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+    .bottom-nav {
+        display: none;
+    }
+}
+
+/* --- EDITOR STYLES (Restored) --- */
+.editor-layout {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    background: #fff;
+}
+
+/* PC Flex Layout for Editor */
+@media (min-width: 800px) {
+    .editor-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .col-scenes {
+        width: 240px;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        background: #fcfcfc;
+    }
+
+    .col-canvas {
+        flex: 1;
+        background: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .col-props {
+        width: 300px;
+        border-left: 1px solid #eee;
+        background: white;
+        padding: 0;
+        overflow-y: auto;
+    }
+}
+
+/* Mobile Stack Layout for Editor */
+@media (max-width: 799px) {
+    .editor-body {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .col-scenes {
+        display: none;
+    }
+
+    /* Hide list on mobile for simplicity, or use modal */
+    .col-canvas {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+    }
+
+    .col-props {
+        padding: 20px;
+    }
+}
+
+.editor-header {
+    height: 56px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+.inp-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.inp-field:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+.scene-item {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.scene-item.active {
+    background: #e3f2fd;
+    color: var(--color-primary);
     font-weight: 700;
-    font-size: 11px;
-    margin-left: 4px;
-    background: #ffebee;
-    padding: 2px 4px;
-    border-radius: 3px;
+}
+
+/* --- BUTTONS --- */
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.btn-outline {
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
 }
