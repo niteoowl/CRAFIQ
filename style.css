@@ -2,12 +2,14 @@
     --primary: #1f8ce6;
     --text-main: #333;
     --text-sub: #767676;
-    --bg-body: #ffffff;
+    --bg-body: #f2f4f5;
+    /* Light Gray Background */
+    --bg-box: #ffffff;
     --border: #eaebef;
 
     --header-h: 56px;
-    --btm-nav-h: 60px;
-    --max-w: 1140px;
+    --max-w: 1200px;
+    /* Requested 1000-1200px */
 }
 
 * {
@@ -24,7 +26,8 @@ body {
     background: var(--bg-body);
     font-size: 15px;
     letter-spacing: -0.02em;
-    padding-bottom: var(--btm-nav-h);
+    padding-bottom: 60px;
+    /* Mobile Btm Spacer */
 }
 
 a {
@@ -55,40 +58,67 @@ a {
     }
 }
 
+/* LAYOUT CONTAINER (Center Focus) */
+.layout-center {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+
+@media (min-width: 1024px) {
+    .layout-center {
+        max-width: var(--max-w);
+        padding: 0 20px;
+    }
+}
+
 /* HEADER */
 header {
-    height: var(--header-h);
-    border-bottom: 1px solid var(--border);
+    background: #fff;
+    border-bottom: 1px solid #e6e6e6;
+    height: 60px;
     position: sticky;
     top: 0;
     z-index: 99;
-    background: rgba(255, 255, 255, 0.96);
+    width: 100%;
+}
+
+.header-inner {
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    /* consistent padding */
 }
 
 @media (min-width: 1024px) {
+    .header-inner {
+        padding: 0;
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
     header {
-        padding: 0 40px;
         height: 70px;
     }
 }
 
 .brand {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     color: var(--primary);
+    letter-spacing: -0.5px;
 }
 
+/* PC NAV */
 .nav-pc {
     display: flex;
-    gap: 30px;
+    gap: 32px;
     margin-left: 40px;
     font-weight: 700;
-    color: #999;
+    font-size: 16px;
+    color: #555;
 }
 
 .nav-pc a:hover,
@@ -96,119 +126,175 @@ header {
     color: var(--primary);
 }
 
-/* SUB NAV (Mobile Only) */
-.sub-nav {
+/* SEARCH (Rounded) */
+.search-bar {
+    width: 320px;
+    height: 40px;
+    background: #f2f4f5;
+    /* Light Gray inside */
+    border-radius: 20px;
+    /* Rounded Oval */
     display: flex;
-    gap: 20px;
-    padding: 0 16px;
-    border-bottom: 1px solid #f0f0f0;
-    overflow-x: auto;
-    height: 44px;
     align-items: center;
+    padding: 0 16px;
 }
 
-.sub-nav a {
+.search-bar input {
+    border: none;
+    background: transparent;
     font-size: 14px;
-    font-weight: 600;
+    width: 100%;
+    margin-left: 8px;
+    outline: none;
+}
+
+/* MAIN CONTENT AREAS (White Boxes) */
+.content-box {
+    background: var(--bg-box);
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .content-box {
+        border-radius: 0;
+        margin-bottom: 0;
+        background: transparent;
+    }
+
+    /* Desktop: Sections can be transparent or specifically boxed if needed. User asked for specific sections on white.
+       Actually, Ridi has a white background for the whole inner area or sections. 
+       Let's keep sections transparent on desktop but utilize the centered layout. */
+}
+
+/* GENRE TABS (Top of Home) */
+.genre-tabs {
+    display: flex;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 24px;
+    overflow-x: auto;
+}
+
+.genre-tab {
+    font-size: 16px;
+    font-weight: 700;
     color: #999;
     white-space: nowrap;
+    cursor: pointer;
 }
 
-.sub-nav a.current {
+.genre-tab.active {
     color: #000;
-    font-weight: 800;
 }
 
-/* LAYOUT CONTAINER */
-.container {
+/* HERO BANNER (Boxed) */
+.hero-wrap {
+    position: relative;
     width: 100%;
+    overflow: hidden;
+    margin-bottom: 40px;
 }
 
-@media (min-width: 1024px) {
-    .container {
-        max-width: var(--max-w);
-        margin: 0 auto;
-        padding: 0 40px;
-    }
-}
-
-/* HERO */
-.hero {
+.hero-img {
     width: 100%;
     aspect-ratio: 16/9;
-    background: #eee;
-}
-
-.hero img {
-    width: 100%;
-    height: 100%;
     object-fit: cover;
+    background: #ddd;
 }
 
 @media (min-width: 1024px) {
-    .hero {
+    .hero-img {
         border-radius: 12px;
-        margin-top: 24px;
-        aspect-ratio: 21/9;
+        aspect-ratio: 2.4/1;
     }
+}
+
+/* QUICK MENU (Icons) */
+.quick-menu {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 60px;
+    padding: 0 10px;
+}
+
+.quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.quick-icon {
+    width: 56px;
+    height: 56px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.quick-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
 }
 
 /* SECTIONS */
 .section {
-    padding: 32px 16px 0;
+    margin-bottom: 80px;
 }
 
-@media (min-width: 1024px) {
-    .section {
-        padding: 40px 0 0;
-    }
-}
-
+/* Increased Spacing */
 .head-title {
-    font-size: 19px;
+    font-size: 22px;
     font-weight: 800;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
 }
 
 .head-link {
-    font-size: 13px;
+    font-size: 14px;
     color: #999;
     font-weight: 500;
 }
 
-/* HORIZONTAL SCROLL (Mobile) / GRID (PC) */
-.list-scroll {
+/* GRID SYSTEMS */
+.grid-list {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
     padding-bottom: 10px;
-    padding-right: 16px;
-    /* End padding for scroll */
-    margin-right: -16px;
-    /* Offset parent padding */
+    scroll-snap-type: x mandatory;
 }
 
-.list-scroll::-webkit-scrollbar {
+.grid-list::-webkit-scrollbar {
     display: none;
 }
 
-.list-scroll .item {
-    flex: 0 0 110px;
+.grid-item {
+    flex: 0 0 130px;
     scroll-snap-align: start;
+    cursor: pointer;
 }
 
 .cover {
     width: 100%;
-    aspect-ratio: 1/1.5;
-    border-radius: 6px;
+    aspect-ratio: 1/1.45;
+    border-radius: 8px;
     overflow: hidden;
-    background: #f4f4f4;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    margin-bottom: 6px;
+    background: #f8f8f8;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    margin-bottom: 10px;
+    transition: transform 0.2s;
 }
 
 .cover img {
@@ -217,81 +303,35 @@ header {
     object-fit: cover;
 }
 
+.grid-item:hover .cover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .meta-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    color: #000;
 }
 
 .meta-sub {
-    font-size: 12px;
+    font-size: 13px;
     color: #888;
 }
 
 @media (min-width: 1024px) {
-    .list-scroll {
+    .grid-list {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
-        gap: 24px;
+        gap: 30px 24px;
         overflow: visible;
-        margin-right: 0;
-        padding-right: 0;
     }
 
-    .list-scroll .item {
-        width: auto;
+    .grid-item {
         flex: none;
-    }
-}
-
-/* RANKING */
-.rank-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.rank-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f5f5f5;
-}
-
-.rank-num {
-    width: 32px;
-    font-size: 18px;
-    font-weight: 800;
-    color: #333;
-    text-align: center;
-    margin-right: 8px;
-}
-
-.rank-cover {
-    width: 44px;
-    height: 64px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    overflow: hidden;
-    margin-right: 12px;
-}
-
-.rank-info {
-    flex: 1;
-    min-width: 0;
-}
-
-@media (min-width: 1024px) {
-    .rank-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 40px;
-    }
-
-    .rank-item {
-        padding: 16px 0;
+        width: auto;
     }
 }
 
@@ -301,7 +341,7 @@ header {
     bottom: 0;
     left: 0;
     right: 0;
-    height: var(--btm-nav-h);
+    height: 60px;
     background: #fff;
     border-top: 1px solid #eee;
     display: flex;
@@ -322,34 +362,4 @@ header {
 .btm-item.current {
     color: #000;
     font-weight: 700;
-}
-
-/* TAGS */
-.tag-btn {
-    padding: 8px 14px;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #555;
-}
-
-/* SEARCH BAR */
-.search-bar {
-    width: 240px;
-    height: 36px;
-    background: #f2f4f5;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-}
-
-.search-bar input {
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    width: 100%;
-    margin-left: 8px;
 }

@@ -4,103 +4,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRAFIQ 홈 - 창작을 위한 오픈 플랫폼</title>
-    <meta name="description" content="누구나 자유롭게 연재하고 감상하는 웹소설 오픈 플랫폼. 판타지, 로맨스, 무협 신작을 만나보세요.">
-    <!-- Font -->
+    <title>CRAFIQ 홈 - 프리미엄 웹소설</title>
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
-
-    <!-- Turbo Router for SPA Feel -->
     <script type="module" src="js/turbo-router.js"></script>
 </head>
 
 <body>
 
-    <!-- Header -->
+    <!-- HEADER (Full width white bg, inner centered) -->
     <header>
-        <div style="display:flex; align-items:center;">
-            <a href="index.html" class="brand">CRAFIQ</a>
-            <nav class="nav-pc desktop-only">
-                <a href="index.html" class="active">홈</a>
-                <a href="discover.html">탐색</a>
-                <a href="best.html">베스트</a>
-                <a href="my.html">보관함</a>
-            </nav>
-        </div>
+        <div class="header-inner">
+            <div style="display:flex; align-items:center;">
+                <a href="index.html" class="brand">CRAFIQ</a>
+                <nav class="nav-pc desktop-only">
+                    <a href="index.html" class="active">홈</a>
+                    <a href="discover.html">탐색</a>
+                    <a href="best.html">베스트</a>
+                    <a href="my.html">보관함</a>
+                </nav>
+            </div>
 
-        <div class="search-bar desktop-only">
-            <svg width="18" height="18" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21L16.65 16.65" />
-            </svg>
-            <input placeholder="작품 검색">
-        </div>
-
-        <div style="display:flex; gap:16px; align-items:center;">
-            <a href="dashboard.html" style="display:flex; align-items:center; gap:6px; color:#333; font-weight:700;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+            <div class="search-bar desktop-only">
+                <svg width="18" height="18" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21L16.65 16.65" />
                 </svg>
-                <span class="desktop-only" style="font-size:14px;">스튜디오</span>
-            </a>
-            <div style="width:32px; height:32px; background:#ddd; border-radius:50%;"></div>
+                <input placeholder="제목, 작가, 태그 검색">
+            </div>
+
+            <div style="display:flex; gap:16px; align-items:center;">
+                <a href="dashboard.html"
+                    style="display:flex; align-items:center; gap:6px; color:#333; font-weight:700;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    <span class="desktop-only" style="font-size:14px;">스튜디오</span>
+                </a>
+                <div style="width:32px; height:32px; background:#ddd; border-radius:50%;"></div>
+            </div>
         </div>
     </header>
 
-    <!-- Mobile Sub Tabs -->
-    <div class="sub-nav mobile-only">
-        <a href="index.html" class="current">홈</a>
-        <a href="best.html">실시간</a>
-        <a href="#">이벤트</a>
+    <!-- MOBILE SUB TABS (Sticky below header on mobile) -->
+    <div class="mobile-only" style="background:#fff; border-bottom:1px solid #f0f0f0; padding:0 16px;">
+        <div style="display:flex; gap:20px; padding:12px 0; overflow-x:auto;">
+            <a href="#" style="font-weight:800; border-bottom:2px solid #000;">홈</a>
+            <a href="#" style="color:#999;">실시간</a>
+            <a href="#" style="color:#999;">이벤트</a>
+            <a href="#" style="color:#999;">신작</a>
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Hero -->
-        <div class="hero">
-            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80" alt="Hero">
+    <!-- MAIN CENTER LAYOUT -->
+    <main class="layout-center" style="padding-top:20px;">
+
+        <!-- GENRE TABS (PC Top) -->
+        <div class="genre-tabs desktop-only">
+            <div class="genre-tab active">추천</div>
+            <div class="genre-tab">로맨스</div>
+            <div class="genre-tab">판타지</div>
+            <div class="genre-tab">무협</div>
+            <div class="genre-tab">BL</div>
+            <div class="genre-tab">라이트노벨</div>
         </div>
 
-        <!-- New Section -->
+        <!-- HERO BANNER -->
+        <div class="hero-wrap">
+            <img class="hero-img" src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80">
+            <!-- Arrows (Visual) -->
+            <div class="desktop-only"
+                style="position:absolute; top:50%; left:20px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                &lt;</div>
+            <div class="desktop-only"
+                style="position:absolute; top:50%; right:20px; transform:translateY(-50%); width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                &gt;</div>
+        </div>
+
+        <!-- QUICK MENU (Icons) -->
+        <div class="quick-menu">
+            <div class="quick-item">
+                <div class="quick-icon">🔥</div>
+                <div class="quick-label">베스트</div>
+            </div>
+            <div class="quick-item">
+                <div class="quick-icon">✨</div>
+                <div class="quick-label">신작</div>
+            </div>
+            <div class="quick-item">
+                <div class="quick-icon">🎁</div>
+                <div class="quick-label">이벤트</div>
+            </div>
+            <div class="quick-item">
+                <div class="quick-icon">💎</div>
+                <div class="quick-label">완결작</div>
+            </div>
+            <div class="quick-item">
+                <div class="quick-icon">📚</div>
+                <div class="quick-label">무료</div>
+            </div>
+        </div>
+
+        <!-- SECTION: New Books -->
         <section class="section">
             <div class="head-title">
-                <span>🔥 지금 뜨는 신작</span>
-                <a href="discover.html" class="head-link">더보기</a>
+                <span>🔥 화제의 신작</span>
+                <a href="discover.html" class="head-link">더보기 &gt;</a>
             </div>
-            <div class="list-scroll">
-                <a href="#" class="item">
+            <div class="grid-list">
+                <!-- Items -->
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=400">
                     </div>
                     <div class="meta-title">달빛 조각사</div>
                     <div class="meta-sub">게임판타지</div>
                 </a>
-                <a href="#" class="item">
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400">
                     </div>
                     <div class="meta-title">슬라임 전생</div>
                     <div class="meta-sub">이세계</div>
                 </a>
-                <a href="#" class="item">
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=400">
                     </div>
                     <div class="meta-title">나 혼자만 레벨업</div>
                     <div class="meta-sub">헌터물</div>
                 </a>
-                <a href="#" class="item">
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400">
                     </div>
                     <div class="meta-title">화산귀환</div>
                     <div class="meta-sub">무협</div>
                 </a>
-                <a href="#" class="item">
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1463171379577-7f9923021716?w=400">
                     </div>
                     <div class="meta-title">전지적 독자 시점</div>
                     <div class="meta-sub">판타지</div>
                 </a>
-                <a href="#" class="item">
+                <a href="#" class="grid-item">
                     <div class="cover"><img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400">
                     </div>
                     <div class="meta-title">재벌집 막내아들</div>
@@ -109,56 +154,56 @@
             </div>
         </section>
 
-        <!-- Rank Section -->
+        <!-- SECTION: Ranking -->
         <section class="section">
             <div class="head-title">
                 <span>🏆 실시간 랭킹</span>
-                <a href="best.html" class="head-link">전체</a>
+                <a href="best.html" class="head-link">전체보기 &gt;</a>
             </div>
-            <div class="rank-list">
-                <a href="#" class="rank-item">
-                    <div class="rank-num" style="color:var(--primary)">1</div>
-                    <div class="rank-cover"><img
-                            src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=200"></div>
-                    <div class="rank-info">
-                        <div class="meta-title">광마회귀</div>
-                        <div class="meta-sub">유진성 • 무협</div>
+            <!-- Reusing grid for consistent card look as requested "White boxes" implies cards maybe? 
+                 Let's stick to the list/grid duality handled by CSS but ensure it looks premium. -->
+            <div class="grid-list">
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=300">
                     </div>
+                    <div class="meta-title"><span style="color:var(--primary)">1.</span> 광마회귀</div>
+                    <div class="meta-sub">유진성</div>
                 </a>
-                <a href="#" class="rank-item">
-                    <div class="rank-num" style="color:var(--primary)">2</div>
-                    <div class="rank-cover"><img
-                            src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=200"></div>
-                    <div class="rank-info">
-                        <div class="meta-title">데뷔 못 하면 죽는 병</div>
-                        <div class="meta-sub">백덕수 • 아이돌</div>
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=300">
                     </div>
+                    <div class="meta-title"><span style="color:var(--primary)">2.</span> 데못죽</div>
+                    <div class="meta-sub">백덕수</div>
                 </a>
-                <a href="#" class="rank-item">
-                    <div class="rank-num" style="color:var(--primary)">3</div>
-                    <div class="rank-cover"><img
-                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=200"></div>
-                    <div class="rank-info">
-                        <div class="meta-title">나노 마신</div>
-                        <div class="meta-sub">한중월야 • 무협</div>
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=300">
                     </div>
+                    <div class="meta-title"><span style="color:var(--primary)">3.</span> 나노 마신</div>
+                    <div class="meta-sub">한중월야</div>
                 </a>
-                <a href="#" class="rank-item">
-                    <div class="rank-num">4</div>
-                    <div class="rank-cover"><img
-                            src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=200"></div>
-                    <div class="rank-info">
-                        <div class="meta-title">비뢰도</div>
-                        <div class="meta-sub">검류혼 • 무협</div>
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=300">
                     </div>
+                    <div class="meta-title">4. 비뢰도</div>
+                    <div class="meta-sub">검류혼</div>
+                </a>
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=300">
+                    </div>
+                    <div class="meta-title">5. 달빛 조각사</div>
+                    <div class="meta-sub">남희성</div>
+                </a>
+                <a href="#" class="grid-item">
+                    <div class="cover"><img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300">
+                    </div>
+                    <div class="meta-title">6. 재벌집...</div>
+                    <div class="meta-sub">산경</div>
                 </a>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer
-            style="padding:40px 0; text-align:center; font-size:12px; color:#aaa; margin-top:50px; border-top:1px solid #eee;">
-            (주)크라픽 | 누구나 작가가 되는 곳
+        <footer style="padding:60px 0; text-align:center; color:#999; font-size:12px;">
+            (주)크라픽 | 사업자 정보 | 이용약관
         </footer>
     </main>
 
