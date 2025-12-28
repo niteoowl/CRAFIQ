@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRAFIQ 베스트</title>
+    <title>CRAFIQ 홈</title>
+    <meta name="description" content="프리미엄 웹소설 오픈 플랫폼">
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
@@ -12,25 +13,28 @@
 </head>
 
 <body>
+
     <header>
         <div class="inner header-content">
             <div style="display:flex; align-items:center;">
                 <a href="index.html" class="brand">CRAFIQ</a>
                 <nav class="nav-pc desktop-only">
-                    <a href="index.html">홈</a>
+                    <a href="index.html" class="active">홈</a>
                     <a href="discover.html">탐색</a>
-                    <a href="best.html" class="active">베스트</a>
+                    <a href="best.html">베스트</a>
                     <a href="my.html">보관함</a>
                 </nav>
             </div>
+
             <div class="search-wrap desktop-only">
                 <svg width="18" height="18" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24"
-                    style="flex:none; margin-right:4px;">
+                    style="flex:none;">
                     <circle cx="11" cy="11" r="8" />
                     <path d="M21 21L16.65 16.65" />
                 </svg>
                 <input class="search-input" placeholder="작품 검색">
             </div>
+
             <div style="display:flex; align-items:center; gap:16px;">
                 <a href="dashboard.html" class="btn-studio">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -45,13 +49,77 @@
     </header>
 
     <main class="inner">
+        <!-- Mobile Sub Tabs -->
+        <div class="sub-tabs mobile-only">
+            <div class="sub-tab on">홈</div>
+            <div class="sub-tab">실시간</div>
+            <div class="sub-tab">NEW</div>
+            <div class="sub-tab">이벤트</div>
+        </div>
+
+        <!-- HERO -->
+        <div class="hero">
+            <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80" alt="Hero">
+        </div>
+
+        <!-- NEW -->
         <section class="section">
-            <h2 class="sec-title" style="margin-bottom:24px;">🏆 실시간 종합 랭킹</h2>
+            <div class="sec-head">
+                <h2 class="sec-title">🔥 화제의 신작</h2>
+                <a href="discover.html" class="sec-more">더보기</a>
+            </div>
+            <div class="scroll-grid">
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=400"></div>
+                    <div class="item-title">달빛 조각사</div>
+                    <div class="item-sub">게임판타지</div>
+                </a>
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400"></div>
+                    <div class="item-title">슬라임 전생</div>
+                    <div class="item-sub">이세계</div>
+                </a>
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=400"></div>
+                    <div class="item-title">나 혼자만 레벨업</div>
+                    <div class="item-sub">헌터물</div>
+                </a>
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400"></div>
+                    <div class="item-title">화산귀환</div>
+                    <div class="item-sub">무협</div>
+                </a>
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1463171379577-7f9923021716?w=400"></div>
+                    <div class="item-title">전지적 독자 시점</div>
+                    <div class="item-sub">판타지</div>
+                </a>
+                <a href="#" class="scroll-item">
+                    <div class="cover-box"><img
+                            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400"></div>
+                    <div class="item-title">재벌집 막내아들</div>
+                    <div class="item-sub">현대판타지</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- RANKING -->
+        <section class="section">
+            <div class="sec-head">
+                <h2 class="sec-title">🏆 실시간 랭킹</h2>
+                <a href="best.html" class="sec-more">전체</a>
+            </div>
             <div class="rank-grid">
                 <a href="#" class="rank-item">
                     <div class="rank-badge top">1</div>
                     <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=200"></div>
+                            src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=200"
+                            style="width:100%;height:100%;object-fit:cover;"></div>
                     <div class="rank-info">
                         <div class="rank-title">광마회귀</div>
                         <div class="rank-desc">유진성 • 무협</div>
@@ -60,16 +128,18 @@
                 <a href="#" class="rank-item">
                     <div class="rank-badge top">2</div>
                     <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=200"></div>
+                            src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=200"
+                            style="width:100%;height:100%;object-fit:cover;"></div>
                     <div class="rank-info">
                         <div class="rank-title">데뷔 못 하면 죽는 병</div>
-                        <div class="rank-desc">백덕수 • 현판</div>
+                        <div class="rank-desc">백덕수 • 아이돌</div>
                     </div>
                 </a>
                 <a href="#" class="rank-item">
                     <div class="rank-badge top">3</div>
                     <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=200"></div>
+                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=200"
+                            style="width:100%;height:100%;object-fit:cover;"></div>
                     <div class="rank-info">
                         <div class="rank-title">나노 마신</div>
                         <div class="rank-desc">한중월야 • 무협</div>
@@ -78,27 +148,24 @@
                 <a href="#" class="rank-item">
                     <div class="rank-badge">4</div>
                     <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=200"></div>
+                            src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=200"
+                            style="width:100%;height:100%;object-fit:cover;"></div>
                     <div class="rank-info">
                         <div class="rank-title">비뢰도</div>
                         <div class="rank-desc">검류혼 • 무협</div>
                     </div>
                 </a>
-                <a href="#" class="rank-item">
-                    <div class="rank-badge">5</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">달빛 조각사</div>
-                        <div class="rank-desc">남희성 • 게임판타지</div>
-                    </div>
-                </a>
             </div>
         </section>
+
+        <footer>
+            (주)크라픽 | 사업자 정보 확인 | 이용약관
+        </footer>
     </main>
 
+    <!-- MOBILE BTM NAV -->
     <nav class="btm-bar mobile-only">
-        <a href="index.html" class="btm-item"><svg width="24" height="24" fill="none" stroke="currentColor"
+        <a href="index.html" class="btm-item active"><svg width="24" height="24" fill="none" stroke="currentColor"
                 stroke-width="2" viewBox="0 0 24 24">
                 <path
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -108,7 +175,7 @@
                 <circle cx="12" cy="12" r="10" />
                 <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
             </svg><span>탐색</span></a>
-        <a href="best.html" class="btm-item active"><svg width="24" height="24" fill="none" stroke="currentColor"
+        <a href="best.html" class="btm-item"><svg width="24" height="24" fill="none" stroke="currentColor"
                 stroke-width="2" viewBox="0 0 24 24">
                 <path
                     d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
