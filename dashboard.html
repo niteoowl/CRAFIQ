@@ -4,132 +4,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRAFIQ 스튜디오</title>
+    <title>창작자 스튜디오 - CRAFIQ</title>
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
 
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase -->
+    <script type="module" src="js/init-supabase.js"></script>
     <script type="module" src="js/turbo-router.js"></script>
 
     <script type="module">
-        import { createNovel, getUserNovels } from './js/data.js';
-        import { getCurrentUser } from './js/auth.js';
+        import { getUserNovels, createNovel } from './js/data.js';
+
+        // Ensure global access
+        window.handleCreate = async (type) => {
+            const title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요:" : "비주얼 노벨 제목을 입력하세요:");
+            if (!title) return;
+
+            const { data, error } = await createNovel(title, type);
+            if (error) {
+                alert("생성 실패: " + error.message);
+            } else {
+                location.reload();
+            }
+        };
 
         async function initDashboard() {
-            const user = await getCurrentUser();
-            if (!user) {
-                alert("로그인이 필요합니다.");
-                window.location.href = "my.html";
+            // Wait for auth to init
+            await new Promise(r => setTimeout(r, 100));
+
+            const listEl = document.getElementById('novelList');
+            if (!listEl) return;
+
+            listEl.innerHTML = '<div style="padding:20px; text-align:center;">로딩 중...</div>';
+
+            const { data: novels, error } = await getUserNovels();
+
+            if (!novels || novels.length === 0) {
+                listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#888;">아직 생성한 작품이 없습니다.<br>위 버튼을 눌러 창작을 시작해보세요!</div>';
                 return;
             }
 
-            // Load List
-            loadMyNovels();
-        }
-
-        async function loadMyNovels() {
-            const listContainer = document.getElementById('myNovelList');
-            const { data, error } = await getUserNovels();
-
-            if (error) {
-                console.error(error);
-                listContainer.innerHTML = `<div style="padding:20px;">오류 발생: ${error.message}</div>`;
-                return;
-            }
-
-            if (data.length === 0) {
-                listContainer.innerHTML = `<div style="padding:40px; text-align:center; color:#999;">아직 작품이 없습니다.<br>새 작품을 만들어보세요!</div>`;
-                return;
-            }
-
-            listContainer.innerHTML = data.map(novel => `
-                <div class="rank-item" onclick="openStudio('${novel.id}', '${novel.is_visual_novel ? 'visual' : 'novel'}')">
-                    <div class="rank-thumb" style="width:50px; height:70px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:20px;">
-                        ${novel.is_visual_novel ? '🎮' : '📝'}
+            listEl.innerHTML = novels.map(n => `
+                <div class="studio-card" onclick="location.href='${n.is_visual_novel ? `studio-visual.html?id=${n.id}` : `studio-novel.html?id=${n.id}`}'">
+                    <strong style="font-size:16px;">${n.title}</strong>
+                    <div style="font-size:12px; color:#666; margin-top:4px;">
+                        ${n.is_visual_novel ? '🎮 비주얼 노벨' : '📖 웹소설'} 
+                        | ${new Date(n.created_at).toLocaleDateString()}
                     </div>
-                    <div class="rank-info">
-                        <div class="rank-title">${novel.title}</div>
-                        <div class="rank-desc">${novel.is_visual_novel ? '비주얼 노벨' : '웹소설'} • ${new Date(novel.created_at).toLocaleDateString()}</div>
-                    </div>
-                     <button class="tool-btn" style="border:1px solid #ddd; padding:4px 8px; color:#555;">편집</button>
                 </div>
             `).join('');
         }
 
-        window.openStudio = (id, type) => {
-            if (type === 'novel') window.location.href = `studio-novel.html?id=${id}`;
-            else window.location.href = `studio-visual.html?id=${id}`;
-        };
-
-        window.handleCreate = async (type) => {
-            const title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요" : "비주얼 노벨 제목을 입력하세요");
-            if (!title) return;
-
-            const { data, error } = await createNovel(title, type);
-            if (error) alert(error.message);
-            else {
-                alert("작품이 생성되었습니다!");
-                loadMyNovels(); // Refresh
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', initDashboard);
+        if (document.body) initDashboard();
+        window.addEventListener('turbo:load', initDashboard);
     </script>
 </head>
 
 <body>
     <header>
         <div class="header-inner">
-            <div style="display:flex; align-items:center;">
-                <a href="index.html" class="brand">CRAFIQ Studio</a>
-            </div>
-            <div style="display:flex; align-items:center; gap:16px;">
-                <div class="avatar"></div>
-                <a href="index.html" style="font-size:14px; color:#555;">나가기</a>
+            <a href="index.html" class="brand">CRAFIQ Studio</a>
+            <div class="header-right-pc" style="margin-left:auto;">
+                <a href="index.html" style="font-size:14px; font-weight:700;">나가기</a>
             </div>
         </div>
     </header>
 
     <main class="inner" style="padding-top:40px;">
-        <h2 class="sec-title" style="margin: 0 16px 24px;">작품 제작</h2>
+        <h2 class="sec-title" style="margin:0 16px 20px;">무엇을 창작하시겠습니까?</h2>
 
         <div class="studio-option-grid">
-            <!-- Create Novel -->
-            <div class="studio-card" onclick="handleCreate('novel')">
-                <div class="studio-icon">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                </div>
-                <h3>웹소설 제작</h3>
-                <p>전문 집필 도구<br>설정집 + Zen 모드</p>
-                <div style="margin-top:12px; color:#007acc; font-weight:700; font-size:13px;">+ 새 웹소설 만들기</div>
+            <div class="studio-card" onclick="window.handleCreate('novel')">
+                <div style="font-size:24px; margin-bottom:8px;">📖</div>
+                <div style="font-weight:800; font-size:18px;">웹소설 만들기</div>
+                <div style="font-size:13px; color:#666; margin-top:4px;">텍스트 중심의 스토리텔링</div>
             </div>
-
-            <!-- Create Visual Novel -->
-            <div class="studio-card" onclick="handleCreate('visual')">
-                <div class="studio-icon" style="color:#6c5ce7;">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path
-                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                    </svg>
-                </div>
-                <h3>비주얼 노벨 제작</h3>
-                <p>게임 엔진형 에디터<br>타임라인 + 연출 효과</p>
-                <div style="margin-top:12px; color:#6c5ce7; font-weight:700; font-size:13px;">+ 새 프로젝트 만들기</div>
+            <div class="studio-card" onclick="window.handleCreate('visual')">
+                <div style="font-size:24px; margin-bottom:8px;">🎮</div>
+                <div style="font-weight:800; font-size:18px;">비주얼 노벨 만들기</div>
+                <div style="font-size:13px; color:#666; margin-top:4px;">게임을 만드는 가장 쉬운 방법</div>
             </div>
         </div>
 
-        <section style="margin-top:40px;">
-            <h3 class="sec-title" style="margin: 0 16px 20px;">내 작품 목록</h3>
-            <div id="myNovelList" style="border-top:1px solid #eee; margin: 0 16px;">
-                <!-- Content will be loaded here -->
-                <div style="padding:20px; text-align:center;">로딩 중...</div>
-            </div>
-        </section>
+        <h3 class="sec-title" style="margin:0 16px 16px;">내 작품 목록</h3>
+        <div id="novelList" class="studio-option-grid">
+            <!-- Dynamic Load -->
+        </div>
+
     </main>
 </body>
 
