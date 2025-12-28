@@ -5,73 +5,73 @@ export function renderEditor(params) {
     const projectId = params.get('id');
     const project = appStore.getProject(projectId);
 
-    if (!project) return document.createTextNode('Project not found');
+    if (!project) return document.createTextNode('Load Error');
 
     const container = document.createElement('div');
-    container.className = 'editor-shell';
-
-    // Use new style logic, simplified inline styles for speed but reliable
-    // New Studio Style: White header, Grey bg
+    container.className = 'editor-wrap';
 
     let currentScene = project.scenes[0];
     let currentStepIndex = 0;
 
     container.innerHTML = `
-        <div style="height:100vh; display:flex; flex-direction:column; background:#f4f5f7;">
-            <!-- Header -->
-            <div style="height:50px; background:white; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; align-items:center; padding:0 20px;">
-                <div style="display:flex; align-items:center; gap:20px;">
-                    <button id="back-btn" style="border:none; background:none; cursor:pointer; font-weight:bold; color:#666;">&larr;</button>
-                    <span style="font-weight:bold; color:#333;">${project.title} - 에디터</span>
-                </div>
-                <div>
-                     <button id="save-btn" class="btn-primary" style="font-size:13px; padding:6px 12px;">임시저장</button>
-                     <button id="play-btn" class="btn-outline" style="font-size:13px; padding:6px 12px;">미리보기</button>
+        <header class="editor-header">
+            <div style="display:flex; align-items:center; gap:16px;">
+                 <button id="back-btn" style="color:var(--gray-700); font-weight:600;">&larr; 나가기</button>
+                 <span class="editor-title">${project.title}</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button id="play-btn" class="btn-secondary">미리보기</button>
+                <button id="save-btn" class="btn-primary">저장하기</button>
+            </div>
+        </header>
+
+        <div class="editor-body">
+            <!-- Scene List Panel -->
+            <div class="panel-left">
+                <div style="padding:12px 16px; border-bottom:1px solid var(--gray-200); font-size:12px; font-weight:700; color:var(--gray-500);">SCENES</div>
+                <div id="scene-list" style="flex:1; overflow-y:auto;"></div>
+                <div style="padding:12px; border-top:1px solid var(--gray-200);">
+                    <button id="add-scene" class="btn-secondary" style="width:100%; border-style:dashed;">+ 장면 추가</button>
                 </div>
             </div>
 
-            <!-- Body -->
-            <div style="flex:1; display:flex; overflow:hidden;">
-                <!-- Left: Scene List -->
-                <div style="width:240px; background:white; border-right:1px solid #ddd; display:flex; flex-direction:column;">
-                    <div style="padding:15px; font-weight:bold; border-bottom:1px solid #eee; font-size:13px; color:#888;">SCENES</div>
-                    <div id="scene-list" style="flex:1; overflow-y:auto;"></div>
-                    <div style="padding:10px; border-top:1px solid #eee;">
-                        <button id="add-scene" style="width:100%; border:1px dashed #ccc; background:#f9f9f9; padding:8px; border-radius:4px; font-size:12px; cursor:pointer;">+ 씬 추가</button>
-                    </div>
+            <!-- Canvas Area -->
+            <div class="canvas-wrap">
+                 <!-- 16:9 Aspect Ratio Container -->
+                 <div style="width:100%; max-width:1024px; aspect-ratio:16/9; background:#000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-radius:4px; overflow:hidden;">
+                    <div id="preview" style="width:100%; height:100%;"></div>
+                 </div>
+            </div>
+
+            <!-- Properties Panel -->
+            <div class="panel-right">
+                <div style="padding:16px; border-bottom:1px solid var(--gray-200);">
+                    <h3 style="font-size:14px; margin-bottom:4px;">대사 편집</h3>
+                    <div style="font-size:12px; color:var(--gray-500);">Step <span id="step-idx">1</span></div>
                 </div>
 
-                <!-- Center: Canvas -->
-                <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:20px;">
-                     <div style="width:100%; max-width:1000px; aspect-ratio:16/9; background:#000; position:relative; box-shadow:0 5px 20px rgba(0,0,0,0.1);">
-                        <div id="preview" style="width:100%; height:100%;"></div>
-                     </div>
+                <div class="form-group">
+                    <label class="form-label">화자 (Speaker)</label>
+                    <input id="inp-speaker" class="form-input" placeholder="이름을 입력하세요">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">대사 (Text)</label>
+                    <textarea id="inp-text" class="form-input form-textarea" placeholder="대사를 입력하세요"></textarea>
                 </div>
 
-                <!-- Right: Properties -->
-                <div style="width:300px; background:white; border-left:1px solid #ddd; padding:20px; display:flex; flex-direction:column; gap:15px; overflow-y:auto;">
-                    <h3 style="font-size:14px; margin-bottom:10px;">대사 편집 (Step <span id="step-idx">1</span>)</h3>
-                    
-                    <div>
-                        <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">화자 이름</label>
-                        <input id="inp-speaker" type="text" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">배경 이미지 (URL)</label>
+                    <input id="inp-bg" class="form-input" placeholder="URL 입력">
+                </div>
 
-                    <div>
-                        <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">대사 내용</label>
-                        <textarea id="inp-text" style="width:100%; height:100px; padding:8px; border:1px solid #ddd; border-radius:4px; resize:none; font-size:13px;"></textarea>
-                    </div>
+                <div style="padding:16px; display:flex; gap:8px;">
+                    <button id="btn-prev" class="btn-secondary" style="flex:1;">&larr; 이전</button>
+                    <button id="btn-next" class="btn-secondary" style="flex:1;">다음 &rarr;</button>
+                </div>
 
-                    <div>
-                        <label style="font-size:12px; color:#888; display:block; margin-bottom:4px;">배경 이미지 링크</label>
-                        <input id="inp-bg" type="text" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
-                    </div>
-
-                    <div style="margin-top:20px; border-top:1px solid #eee; pt:20px; display:flex; gap:5px;">
-                        <button id="btn-prev" class="btn-outline" style="flex:1;">&larr; 이전</button>
-                        <button id="btn-next" class="btn-outline" style="flex:1;">다음 &rarr;</button>
-                    </div>
-                    <button id="btn-add-line" class="btn-primary" style="width:100%; margin-top:10px;">+ 다음 대사 추가</button>
+                 <div style="padding:0 16px 16px 16px;">
+                    <button id="btn-add-line" class="btn-primary" style="width:100%;">+ 다음 대사장 추가</button>
                 </div>
             </div>
         </div>
@@ -97,16 +97,8 @@ export function renderEditor(params) {
         list.innerHTML = '';
         project.scenes.forEach((s, i) => {
             const el = document.createElement('div');
+            el.className = 'scene-item' + (s === currentScene ? ' active' : '');
             el.textContent = `${i + 1}. ${s.name || 'Scene'}`;
-            el.style.padding = '10px';
-            el.style.borderBottom = '1px solid #f0f0f0';
-            el.style.fontSize = '13px';
-            el.style.cursor = 'pointer';
-            if (s === currentScene) {
-                el.style.background = '#e8fbf0';
-                el.style.color = '#00dc64';
-                el.style.fontWeight = 'bold';
-            }
             el.onclick = () => { currentScene = s; currentStepIndex = 0; updateUI(); };
             list.appendChild(el);
         });
@@ -116,7 +108,7 @@ export function renderEditor(params) {
     container.querySelector('#inp-speaker').oninput = (e) => {
         if (currentScene.dialogues[currentStepIndex]) {
             currentScene.dialogues[currentStepIndex].speaker = e.target.value;
-            updateUI(); // re-render canvas immediately
+            updateUI();
         }
     };
     container.querySelector('#inp-text').oninput = (e) => {
@@ -133,7 +125,7 @@ export function renderEditor(params) {
     container.querySelector('#back-btn').onclick = () => window.navigateTo('#/dashboard');
     container.querySelector('#save-btn').onclick = () => {
         appStore.updateProject(projectId, { scenes: project.scenes });
-        alert('저장 완료');
+        alert('저장되었습니다.');
     };
     container.querySelector('#play-btn').onclick = () => window.open('#/play?id=' + projectId, '_blank');
 
