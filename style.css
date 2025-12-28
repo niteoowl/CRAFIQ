@@ -1,15 +1,10 @@
 :root {
-    /* --- BRANDING (Ridi Blue + Novelpia Vibes) --- */
     --color-primary: #1f8ce6;
-    /* Ridi Blue */
     --color-primary-dark: #1273c4;
     --color-accent: #6c5ce7;
-    /* Novelpia Violet */
-
     --color-text-main: #1a1b1c;
     --color-text-sub: #525458;
     --color-text-hint: #888d95;
-
     --bg-main: #ffffff;
     --bg-secondary: #f7f7fa;
     --bg-line: #ececec;
@@ -17,7 +12,6 @@
     --header-h: 60px;
     --nav-h: 56px;
     --max-w: 1080px;
-    /* User Requested 1000-1200px */
 }
 
 /* Base Reset */
@@ -39,7 +33,6 @@ body {
     letter-spacing: -0.03em;
     line-height: 1.5;
     padding-bottom: var(--nav-h);
-    /* Mobile Nav Space */
     overflow-y: scroll;
 }
 
@@ -61,7 +54,6 @@ img {
     object-fit: cover;
 }
 
-/* UTILS */
 .mobile-only {
     display: flex !important;
 }
@@ -80,16 +72,14 @@ img {
     }
 }
 
-/* --- LAYOUT WRAPPER --- */
+/* LAYOUT */
 .inner {
     width: 100%;
     margin: 0 auto;
     max-width: var(--max-w);
-    /* Mobile padding handled by sections usually, but global padding is safer */
-    /* padding: 0 16px; removed to allow full-bleed scrolls, sections will handle padding */
 }
 
-/* --- HEADER --- */
+/* HEADER */
 header {
     height: var(--header-h);
     border-bottom: 1px solid var(--bg-line);
@@ -162,20 +152,43 @@ header {
     margin-left: 8px;
 }
 
-/* --- HERO SLIDER --- */
+/* SHARED COMPONENTS */
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ccc;
+}
+
+.btn-studio {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.btn-studio:hover {
+    background: #f0f0f0;
+}
+
+/* HERO SLIDER */
 .hero-wrap {
     width: 100%;
     aspect-ratio: 16/9;
     position: relative;
     overflow: hidden;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
     background: #eee;
 }
 
 @media (min-width: 1024px) {
     .hero-wrap {
         aspect-ratio: 2.5/1;
-        border-radius: 16px;
+        border-radius: 12px;
         margin-top: 24px;
     }
 }
@@ -193,12 +206,12 @@ header {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 20px;
+    padding: 24px;
 }
 
-/* --- SECTIONS --- */
+/* SECTIONS */
 .section {
-    margin-bottom: 48px;
+    margin-bottom: 56px;
 }
 
 .section-head {
@@ -215,7 +228,7 @@ header {
 }
 
 .sec-title {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 800;
     color: #000;
 }
@@ -225,13 +238,12 @@ header {
     color: var(--color-text-hint);
 }
 
-/* --- BOOK DISPLAY (User's Pick: h-scroll-view) --- */
+/* BOOK DISPLAY (Zoom Effect Only) */
 .h-scroll-view {
     display: flex;
     overflow-x: auto;
-    gap: 12px;
+    gap: 16px;
     padding: 0 16px;
-    scroll-snap-type: x mandatory;
     padding-bottom: 20px;
     margin-bottom: -20px;
     /* Hide scrollbar spacing */
@@ -242,13 +254,11 @@ header {
     display: none;
 }
 
-.h-scroll-view .item {
-    flex: 0 0 108px;
-    scroll-snap-align: start;
+.item {
+    flex: 0 0 110px;
     cursor: pointer;
 }
 
-/* Desktop Grid Override */
 @media (min-width: 1024px) {
     .h-scroll-view {
         display: grid;
@@ -258,7 +268,7 @@ header {
         padding: 0;
     }
 
-    .h-scroll-view .item {
+    .item {
         width: auto;
         flex: none;
     }
@@ -268,28 +278,27 @@ header {
     width: 100%;
     aspect-ratio: 1/1.48;
     border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     background: #f0f0f0;
     margin-bottom: 8px;
     overflow: hidden;
     position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
+    /* Removed transition: transform here to stop lifting */
 }
 
 .book-cover img {
     width: 100%;
     height: 100%;
-    transition: transform 0.3s;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Smooth zoom */
 }
 
-.item:hover .book-cover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
+/* ZOOM ONLY, NO LIFT */
 .item:hover .book-cover img {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
+
+/* .item:hover .book-cover { box-shadow: ... removed floating shadow too if 'chon-seureo-um' } */
 
 .book-title {
     font-size: 15px;
@@ -307,7 +316,7 @@ header {
     color: var(--color-text-hint);
 }
 
-/* --- RANKING LIST (User's Pick) --- */
+/* RANKING */
 .rank-list {
     padding: 0 16px;
     display: flex;
@@ -319,7 +328,7 @@ header {
         padding: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0 50px;
+        gap: 0 40px;
     }
 }
 
@@ -341,10 +350,9 @@ header {
     font-weight: 900;
     color: #000;
     width: 32px;
-    margin-right: 4px;
-    line-height: 1;
-    margin-top: 4px;
     text-align: center;
+    margin-right: 4px;
+    margin-top: 4px;
 }
 
 .rank-thumb {
@@ -361,7 +369,6 @@ header {
     font-size: 16px;
     font-weight: 700;
     margin-bottom: 4px;
-    line-height: 1.4;
     color: #000;
 }
 
@@ -371,28 +378,97 @@ header {
     margin-bottom: 6px;
 }
 
-.rank-tags {
-    display: flex;
-    gap: 4px;
-}
-
 .tag-sm {
     font-size: 11px;
     background: #f0f0f5;
     color: #666;
     padding: 3px 6px;
     border-radius: 4px;
+    margin-right: 4px;
 }
 
-/* --- BOTTOM NAV (User's Pick) --- */
+/* STUDIO & MY PAGE FIXES */
+.studio-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 40px;
+    min-height: 80vh;
+    padding-top: 40px;
+}
+
+@media (max-width: 1023px) {
+    .studio-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-top: 20px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+.side-menu {
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+
+.side-item {
+    display: block;
+    padding: 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #888;
+}
+
+.side-item.active {
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+.studio-content h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.work-item {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.work-info h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.work-info p {
+    font-size: 13px;
+    color: #888;
+}
+
+.work-act {
+    padding: 6px 14px;
+    border-radius: 4px;
+    background: #f8f8f8;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* BOTTOM NAV */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     height: var(--nav-h);
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.98);
     border-top: 1px solid #eee;
     z-index: 1000;
     display: flex;
@@ -422,57 +498,4 @@ header {
 .nav-btn span {
     font-size: 10px;
     font-weight: 500;
-}
-
-/* STUDIO / AVA */
-.avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #ccc;
-}
-
-.btn-studio {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 700;
-    font-size: 13px;
-    color: #333;
-    padding: 6px 12px;
-    border-radius: 6px;
-}
-
-.btn-studio:hover {
-    background: #f0f0f0;
-}
-
-/* DISCOVER TAGS */
-.tags-wrap {
-    padding: 0 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 30px;
-}
-
-@media (min-width: 1024px) {
-    .tags-wrap {
-        padding: 0;
-    }
-}
-
-.tag-lg {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid #e0e0e0;
-    font-size: 14px;
-    background: white;
-    color: #555;
-    transition: 0.2s;
-}
-
-.tag-lg:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
 }

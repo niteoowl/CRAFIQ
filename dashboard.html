@@ -5,30 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRAFIQ 스튜디오</title>
-    <link rel="stylesheet" as="style" crossorigin
+    <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="js/turbo-router.js"></script>
 </head>
 
 <body>
     <header>
-        <div style="display:flex; align-items:center;">
-            <a href="index.html" style="font-size:20px; font-weight:700; margin-right:12px;">&larr;</a>
-            <div class="brand" style="color:#333; font-size:18px;">크리에이터 스튜디오</div>
+        <div class="header-inner">
+            <div style="display:flex; align-items:center;">
+                <a href="index.html" class="brand">CRAFIQ Studio</a>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px;">
+                <a href="index.html" class="btn-studio" style="background:#333; color:white;">나가기</a>
+            </div>
         </div>
     </header>
 
-    <div id="app" class="container" style="padding-top:20px;">
-        <!-- JS will render list here -->
-        <div style="text-align:center; padding:40px; color:#999;">로딩중...</div>
-    </div>
-
-    <script type="module">
-        import { renderDashboard } from './js/components/dashboard.js';
-        const root = document.getElementById('app');
-        root.innerHTML = '';
-        root.appendChild(renderDashboard());
-    </script>
+    <main class="inner">
+        <div class="studio-grid">
+            <aside class="side-menu">
+                <a href="#" class="side-item active">작품 관리</a>
+                <a href="#" class="side-item">통계</a>
+                <a href="#" class="side-item">정산</a>
+                <a href="#" class="side-item">설정</a>
+            </aside>
+            <section class="studio-content">
+                <h2>내 작품</h2>
+                <div class="work-item">
+                    <div class="work-info">
+                        <h3>회귀한 천재 마법사</h3>
+                        <p>최근수정: 2024.12.28 | 연재중 (24화)</p>
+                    </div>
+                    <button class="work-act">이어쓰기</button>
+                </div>
+                <div class="work-item">
+                    <div class="work-info">
+                        <h3>(새 작품)</h3>
+                        <p>아직 등록된 원고가 없습니다.</p>
+                    </div>
+                    <button class="work-act" style="background:var(--color-primary); color:white;">새 작품 등록</button>
+                </div>
+            </section>
+        </div>
+    </main>
 </body>
 
 </html>
