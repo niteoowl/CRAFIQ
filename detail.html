@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작품 상세 - CRAFIQ</title>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <style>
+        .detail-hero {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .detail-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.5);
+            transform: scale(1.1);
+        }
+
+        .detail-info-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 30px 16px;
+            display: flex;
+            gap: 24px;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .detail-cover {
+            width: 160px;
+            height: 230px;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            background: #eee;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .detail-text {
+            flex: 1;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .detail-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .detail-meta {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .action-bar {
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .btn-read {
+            background: #1f8ce6;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-weight: 700;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background: #333;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 24px;
+            font-weight: 700;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .chapter-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chapter-item:hover {
+            background: #fafafa;
+        }
+
+        .ch-num {
+            width: 40px;
+            font-weight: 700;
+            color: #1f8ce6;
+            font-size: 16px;
+        }
+
+        .ch-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .ch-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            background: white;
+            width: 400px;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .modal textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+    </style>
+
+    <script type="module">
+        import { getNovelById, getChapters, getScenes, updateNovel } from './js/data.js';
+        import { getCurrentUser } from './js/auth.js';
+
+        let currentNovel = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) return alert("작품 정보가 없습니다.");
+
+            // Load Novel and User
+            const [user, { data: novel }] = await Promise.all([
+                getCurrentUser(),
+                getNovelById(id)
+            ]);
+
+            currentNovel = novel;
+            renderNovelInfo(novel);
+
+            // Check Ownership
+            if (user && user.id === novel.creator_id) {
+                document.getElementById('editBtn').style.display = 'inline-block';
+            }
+
+            // Load Content List
+            if (novel.is_visual_novel) {
+                loadScenes(id);
+                document.getElementById('readBtnText').innerText = "게임 플레이";
+            } else {
+                loadChapters(id);
+            }
+        });
+
+        function renderNovelInfo(novel) {
+            document.getElementById('bg').style.backgroundImage = `url('${novel.cover_url}')`;
+            document.getElementById('cover').src = novel.cover_url;
+            document.getElementById('title').innerText = novel.title;
+            document.getElementById('author').innerText = novel.profiles?.username || '작가';
+            document.getElementById('desc').innerText = novel.description || "작품 소개가 없습니다.";
+
+            // Set Read Button Action
+            const btn = document.getElementById('readStartBtn');
+            const targetHtml = novel.is_visual_novel ? 'play.html' : 'read.html';
+            btn.onclick = () => location.href = `${targetHtml}?id=${novel.id}`;
+        }
+
+        async function loadChapters(id) {
+            const { data: chapters } = await getChapters(id);
+            renderList(chapters, 'read.html');
+        }
+
+        async function loadScenes(id) {
+            const { data: scenes } = await getScenes(id);
+            renderList(scenes, 'play.html');
+        }
+
+        function renderList(list, targetPage) {
+            const container = document.getElementById('listContainer');
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">아직 등록된 화가 없습니다.</div>';
+                return;
+            }
+            container.innerHTML = list.map((item, idx) => `
+                <div class="chapter-item" onclick="location.href='${targetPage}?id=${currentNovel.id}'">
+                    <div class="ch-num">${idx + 1}</div>
+                    <div class="ch-title">${item.title}</div>
+                    <div class="ch-date">${new Date(item.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Edit Logic
+        window.openEdit = () => {
+            document.getElementById('editModal').style.display = 'flex';
+            document.getElementById('editTitle').value = currentNovel.title;
+            document.getElementById('editDesc').value = currentNovel.description || '';
+            document.getElementById('editCover').value = currentNovel.cover_url || '';
+        };
+        window.closeEdit = () => document.getElementById('editModal').style.display = 'none';
+
+        window.saveEdit = async () => {
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "저장 중...";
+
+            const updates = {
+                title: document.getElementById('editTitle').value,
+                description: document.getElementById('editDesc').value,
+                cover_url: document.getElementById('editCover').value
+            };
+
+            const { error } = await updateNovel(currentNovel.id, updates);
+            if (error) alert(error.message);
+            else location.reload();
+        };
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="brand">CRAFIQ</a>
+            <div class="header-right-pc" style="margin-left:auto;">
+                <a href="index.html" style="font-size:14px; font-weight:700;">홈으로</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="bg" class="detail-bg"></div>
+
+    <div class="detail-hero">
+        <div class="detail-info-wrap">
+            <img id="cover" class="detail-cover">
+            <div class="detail-text">
+                <div style="font-size:13px; font-weight:700; color:#66cdff; margin-bottom:4px;">독점 연재</div>
+                <h1 id="title" class="detail-title">Loading...</h1>
+                <div id="author" class="detail-meta">Loading...</div>
+                <div style="margin-top:10px; display:flex; gap:4px;">
+                    <div class="tag-sm" style="background:rgba(255,255,255,0.2); color:white; border:none;">판타지</div>
+                    <div class="tag-sm" style="background:rgba(255,255,255,0.2); color:white; border:none;">먼치킨</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="inner" style="padding: 0 16px 80px;">
+        <div class="action-bar">
+            <button id="readStartBtn" class="btn-read">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+                <span id="readBtnText">첫화 보기</span>
+            </button>
+            <button id="editBtn" class="btn-edit" style="display:none;" onclick="openEdit()">작품 정보 수정</button>
+        </div>
+
+        <div style="max-width:800px;">
+            <p id="desc" style="color:#555; line-height:1.6; margin-bottom:40px;">
+                작품 소개가 없습니다.
+            </p>
+
+            <h3 class="sec-title">회차 목록</h3>
+            <div id="listContainer" class="chapter-list">
+                <!-- List -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal">
+            <h3 style="margin-bottom:16px;">작품 정보 수정</h3>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:700; color:#888;">제목</label>
+                <input id="editTitle" type="text" class="input-field" style="height:36px;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:700; color:#888;">표지 이미지 URL</label>
+                <input id="editCover" type="text" class="input-field" style="height:36px;">
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:12px; font-weight:700; color:#888;">줄거리 소개</label>
+                <textarea id="editDesc"></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button onclick="closeEdit()"
+                    style="padding:8px 16px; border:1px solid #ddd; background:white; border-radius:4px; cursor:pointer;">취소</button>
+                <button id="saveBtn" onclick="saveEdit()"
+                    style="padding:8px 16px; border:none; background:#1f8ce6; color:white; border-radius:4px; cursor:pointer;">저장</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

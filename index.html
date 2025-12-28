@@ -17,23 +17,30 @@
     <script type="module">
         import { getRecentPublishedNovels } from './js/data.js';
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        // Load Dynamic Content
+        const loadDynamic = async () => {
             const { data: novels, error } = await getRecentPublishedNovels();
 
             if (novels && novels.length > 0) {
                 const container = document.getElementById('homeContentGrid');
-                container.innerHTML = novels.map(n => `
-                    <div class="item" onclick="location.href='${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}'">
-                        <div class="book-cover">
-                            <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
-                            ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
+                if (container) {
+                    container.innerHTML = novels.map(n => `
+                        <div class="item" onclick="location.href='detail.html?id=${n.id}'">
+                            <div class="book-cover">
+                                <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
+                                ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
+                            </div>
+                            <div class="book-title">${n.title}</div>
+                            <div class="book-meta">${n.profiles?.username || '작가'}</div>
                         </div>
-                        <div class="book-title">${n.title}</div>
-                        <div class="book-meta">${n.profiles?.username || '작가'}</div>
-                    </div>
-                `).join('');
+                    `).join('');
+                }
             }
-        });
+        };
+
+        loadDynamic();
+        // Also listen for turbo loads
+        // window.addEventListener('DOMContentLoaded', loadDynamic); // Handled by script exec
     </script>
 </head>
 
@@ -60,7 +67,6 @@
                 <a href="dashboard.html" class="btn-studio">스튜디오</a>
             </div>
 
-            <!-- Mobile Search Icon -->
             <button class="mobile-search-btn mobile-only" onclick="toggleSearchOverlay(true)">
                 <svg width="24" height="24" fill="none" stroke="#000" stroke-width="2" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8" />
@@ -70,7 +76,6 @@
         </div>
     </header>
 
-    <!-- Mobile Search Overlay (Unchanged) -->
     <div id="searchOverlay" class="search-overlay">
         <div class="search-overlay-header">
             <button onclick="toggleSearchOverlay(false)" style="background:none; border:none; margin-right:8px;"><svg
@@ -92,7 +97,7 @@
     </script>
 
     <main class="inner">
-        <!-- Hero Banner (Static for Style) -->
+        <!-- Main Banner Carousel -->
         <div class="hero-wrap">
             <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=1600" class="hero-img">
             <div class="hero-overlay">
@@ -105,24 +110,86 @@
             </div>
         </div>
 
-        <!-- NEW UPLOADS -->
+        <!-- Home Sub Nav -->
+        <div class="h-scroll-view" style="margin-bottom:30px; border-bottom:1px solid #eee; padding-bottom:0;">
+            <div style="padding:10px 16px; font-weight:700; border-bottom:2px solid #000; color:#000;">홈</div>
+            <div style="padding:10px 16px; font-weight:500; color:#888;">실시간 랭킹</div>
+            <div style="padding:10px 16px; font-weight:500; color:#888;">이벤크</div>
+            <div style="padding:10px 16px; font-weight:500; color:#888;">무료</div>
+        </div>
+
+        <!-- 1. DYNAMIC: Recent Uploads -->
         <section class="section">
             <div class="section-head">
-                <h3 class="sec-title">실시간 신작</h3>
+                <h3 class="sec-title">🔥 방금 올라온 신작</h3>
                 <span class="sec-more">더보기 ></span>
             </div>
-            <!-- Dynamic Grid -->
             <div id="homeContentGrid" class="h-scroll-view">
-                <!-- Fallback Content in case DB is empty -->
+                <!-- Data Loaded by JS -->
                 <div class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=400"></div>
-                    <div class="book-title">서버 연결 중...</div>
+                    <div
+                        style="width:100%; aspect-ratio:1/1.48; background:#eee; display:flex; align-items:center; justify-content:center;">
+                        로딩 중...</div>
                 </div>
             </div>
         </section>
 
-        <!-- Static Banner for Variety -->
+        <!-- 2. STATIC: Weekly Best -->
+        <section class="section">
+            <div class="section-head">
+                <h3 class="sec-title">🏆 주간 베스트</h3>
+            </div>
+            <div class="rank-list">
+                <div class="rank-item">
+                    <div class="rank-num">1</div>
+                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/100x150?fantasy"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">나 혼자만 레벨업 (예시)</div>
+                        <div class="rank-desc">판타지 • 추공</div>
+                        <div class="rank-tags"><span class="tag-sm">먼치킨</span><span class="tag-sm">헌터물</span></div>
+                    </div>
+                </div>
+                <div class="rank-item">
+                    <div class="rank-num">2</div>
+                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/101x150?romance"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">황녀님은 파업 중</div>
+                        <div class="rank-desc">로맨스판타지 • 작가명</div>
+                    </div>
+                </div>
+                <div class="rank-item">
+                    <div class="rank-num">3</div>
+                    <div class="rank-thumb"><img src="https://source.unsplash.com/random/102x150?magic"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">마법학교의 천재가 되었다</div>
+                        <div class="rank-desc">판타지 • 글쟁이</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. STATIC: Keyword Recommendations -->
+        <section class="section">
+            <div class="section-head">
+                <h3 class="sec-title">키워드 추천: #아카데미</h3>
+            </div>
+            <div class="h-scroll-view">
+                <div class="item">
+                    <div class="book-cover"><img src="https://source.unsplash.com/random/103x150?school"></div>
+                    <div class="book-title">아카데미의 고인물</div>
+                </div>
+                <div class="item">
+                    <div class="book-cover"><img src="https://source.unsplash.com/random/104x150?student"></div>
+                    <div class="book-title">낙제 기사의 회귀</div>
+                </div>
+                <div class="item">
+                    <div class="book-cover"><img src="https://source.unsplash.com/random/105x150?book"></div>
+                    <div class="book-title">교수님이 흑막임</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. STATIC: Event Banner -->
         <section class="section">
             <div class="wide-cover">
                 <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800">

@@ -1,80 +1,68 @@
-// PJAX Router (Hybrid SPA/MPA)
-// 1. Intercepts clicks on <a href>
-// 2. Fetches the static HTML file
-// 3. Swaps the <main> content and title
-// 4. Updates URL without reload
+// TURBO ROUTER (Vanilla SPA Linker)
+// Intercepts clicks, fetches HTML, replaces body, and EXECUTES SCRIPTS.
 
-document.body.addEventListener('click', e => {
-    const link = e.target.closest('a');
-    if (!link) return;
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle initial navigation (if back/forward button is used)
+    window.addEventListener('popstate', (e) => loadPage(window.location.href, false));
 
-    const href = link.getAttribute('href');
-    // Ignore external links, anchors, or new tab
-    if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank') return;
+    // Intercept clicks
+    document.body.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.href && link.host === window.location.host) {
+            // Ignore hash links or special targets
+            if (link.getAttribute('target') === '_blank' || link.href.includes('#')) return;
 
-    // Check if it's a known page
-    if (href.endsWith('.html') || href === '/') {
-        e.preventDefault();
-        navigateTo(href);
-    }
+            e.preventDefault();
+            loadPage(link.href, true);
+        }
+    });
 });
 
-window.addEventListener('popstate', () => {
-    loadContent(location.pathname);
-});
-
-async function navigateTo(url) {
-    history.pushState(null, null, url);
-    await loadContent(url);
-}
-
-async function loadContent(url) {
+async function loadPage(url, pushState = true) {
     try {
-        // Show lightweight loading state if needed (optional)
-        // document.querySelector('main').style.opacity = '0.5';
-
+        // Fetch the new page
         const response = await fetch(url);
         const html = await response.text();
 
-        // Parse new DOM
+        // Parse HTML
         const parser = new DOMParser();
-        const newDoc = parser.parseFromString(html, 'text/html');
+        const doc = parser.parseFromString(html, 'text/html');
 
-        // Swap Core Content
-        const newMain = newDoc.querySelector('main');
-        const currentMain = document.querySelector('main');
-        if (newMain && currentMain) {
-            currentMain.innerHTML = newMain.innerHTML;
-            currentMain.className = newMain.className; // Maintain container classes
-            // Re-run any scripts in main if necessary (usually static content doesn't need this)
-        }
+        // Update Head (Title, Meta) - Optional but good for SEO/Context
+        document.title = doc.title;
 
-        // Update active states in Nav
-        updateNavState(url);
+        // Update Body
+        const newBody = doc.body;
+        document.body.className = newBody.className; // Keep body classes (e.g. reader theme)
+        document.body.innerHTML = newBody.innerHTML;
 
-        // Update Title
-        document.title = newDoc.title;
+        // EXECUTE SCRIPTS (Crucial fix)
+        // Browsers do not execute <script> tags in innerHTML. We must manually recreate them.
+        const scripts = document.body.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
 
-        // Reset scroll
-        window.scrollTo(0, 0);
+            // Copy attributes
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
 
-        // document.querySelector('main').style.opacity = '1';
+            // Copy content
+            newScript.textContent = oldScript.textContent;
+
+            // Replace
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+
+        // Update URL
+        if (pushState) window.history.pushState({}, '', url);
+
+        // Re-trigger DOMContentLoaded listeners manually (since the event already fired once)
+        // We can't dispatch the real event again easily, so we rely on the scripts running immediately.
+        // However, if scripts rely on 'DOMContentLoaded', they might miss it.
+        // Quick fix: Dispatch a custom 'turbo:load' event or just rely on immediate execution.
+        window.dispatchEvent(new Event('DOMContentLoaded'));
 
     } catch (err) {
-        console.error('Nav Error:', err);
-        window.location.href = url; // Fallback to hard reload
+        console.error("Turbo Nav Error:", err);
+        window.location.href = url; // Fallback to full reload
     }
-}
-
-function updateNavState(url) {
-    // Normalize URL
-    const cleanUrl = url.split('/').pop() || 'index.html';
-
-    document.querySelectorAll('.nav-pc a, .btm-nav a').forEach(a => {
-        a.classList.remove('active', 'current');
-        const href = a.getAttribute('href');
-        if (href === cleanUrl || (cleanUrl === 'index.html' && href === 'index.html')) {
-            a.classList.add('active', 'current');
-        }
-    });
 }

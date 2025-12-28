@@ -13,7 +13,6 @@ export const createNovel = async (title, type) => {
                 creator_id: user.id,
                 title: title,
                 is_visual_novel: type === 'visual',
-                // Default cover for now
                 cover_url: type === 'visual'
                     ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400'
                     : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400'
@@ -22,6 +21,16 @@ export const createNovel = async (title, type) => {
         .select()
         .single();
 
+    return { data, error };
+};
+
+export const updateNovel = async (novelId, updates) => {
+    // updates: { title, description, cover_url }
+    const { data, error } = await getSupabase()
+        .from('novels')
+        .update(updates)
+        .eq('id', novelId)
+        .select();
     return { data, error };
 };
 
@@ -53,7 +62,6 @@ export const getNovelById = async (novelId) => {
 // --- PUBLIC FETCHING (HOME PAGE) ---
 
 export const getRecentPublishedNovels = async () => {
-    // For now, fetch ALL. In real app, filter by is_published = true
     const { data, error } = await getSupabase()
         .from('novels')
         .select(`
