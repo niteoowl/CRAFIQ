@@ -3,24 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CRAFIQ INFINITY ENGINE</title>
+    <!-- FORCE PC LAYOUT ON MOBILE -->
+    <meta name="viewport" content="width=1600, user-scalable=yes">
+    <title>CRAFIQ DIRECTOR</title>
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/init-supabase.js"></script>
 
     <style>
-        /* --- INFINITY THEME (Flat, Clean, Dark) --- */
+        /* --- DIRECTOR THEME --- */
         :root {
-            --bg-body: #111;
-            --bg-panel: #1e1e1e;
-            --bg-header: #252525;
-            --bg-input: #111;
-            --main: #3b82f6;
-            /* Blue for Pro */
-            --easy: #10b981;
-            /* Green for Easy */
+            --bg-dark: #121212;
+            --bg-panel: #1a1a1a;
+            --bg-header: #222;
             --border: #333;
+            --primary: #3b82f6;
+            --accent: #f59e0b;
             --text: #e5e5e5;
             --text-dim: #888;
         }
@@ -31,408 +36,427 @@
             user-select: none;
         }
 
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            width: 100vw;
+            min-width: 1600px;
+            /* Force Min Width */
+            min-height: 900px;
             height: 100vh;
-            background: var(--bg-body);
+            background: var(--bg-dark);
             color: var(--text);
-            font-family: 'Gulim', 'Pretendard', sans-serif;
-            /* Requested Gulim */
+            font-family: 'Pretendard', sans-serif;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
 
-        /* ZOOM CONTAINER */
-        #app-scale-wrap {
-            width: 1600px;
-            height: 900px;
-            /* Fixed Base Resolution */
-            background: var(--bg-panel);
-            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            transform-origin: center center;
-            overflow: hidden;
-            border: 1px solid #444;
-        }
-
-        /* COMMON UI */
-        .btn {
-            background: #2a2a2a;
-            color: #ccc;
-            border: 1px solid #3a3a3a;
-            padding: 6px 14px;
-            font-size: 12px;
-            cursor: pointer;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Gulim', sans-serif;
-        }
-
-        .btn:hover {
-            background: #3a3a3a;
-            color: white;
-        }
-
-        .btn.primary {
-            background: var(--main);
-            border-color: var(--main);
-            color: white;
-        }
-
-        .btn.easy {
-            background: var(--easy);
-            border-color: var(--easy);
-            color: white;
-        }
-
-        .inp {
-            background: var(--bg-input);
-            border: 1px solid #333;
-            color: white;
-            padding: 6px;
-            font-size: 12px;
-            border-radius: 4px;
-            width: 100%;
-            font-family: 'Gulim', sans-serif;
-        }
-
-        .inp:focus {
-            border-color: var(--main);
-        }
-
-        .panel-head {
-            height: 36px;
-            background: var(--bg-header);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            font-weight: bold;
-            font-size: 12px;
-            justify-content: space-between;
-            color: #ddd;
-        }
-
-        /* LAYOUT */
-        #topbar {
-            height: 48px;
-            background: #181818;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
-        }
-
-        /* CONTENT SPLIT */
-        #main-content {
-            flex: 1;
+            /* DIRECTOR LAYOUT: 3 COLUMNS */
             display: grid;
             grid-template-columns: 280px 1fr 340px;
-            overflow: hidden;
+            grid-template-rows: 40px 1fr;
         }
 
-        /* LEFT: MANAGER */
-        #left-col {
+        /* TOPBAR (Span all cols) */
+        #header {
+            grid-column: 1 / -1;
+            background: #000;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-weight: 900;
+            letter-spacing: 1px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        /* PANELS */
+        .panel {
             background: var(--bg-panel);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        /* CENTER: STAGE */
-        #center-col {
-            background: #000;
+        .panel-right {
+            border-right: none;
+            border-left: 1px solid var(--border);
+        }
+
+        .p-head {
+            height: 32px;
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border);
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #ccc;
+            justify-content: space-between;
         }
 
-        #stage-area {
+        .p-body {
             flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* CENTER AREA (Canvas + Timeline) */
+        #center-area {
+            display: grid;
+            grid-template-rows: 1fr 300px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* CANVAS WRAPPER */
+        #viewport {
+            position: relative;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-image: radial-gradient(#222 1px, transparent 1px);
             background-size: 20px 20px;
-            position: relative;
         }
 
         #game-canvas {
             width: 1280px;
             height: 720px;
             background: #000;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
             position: relative;
-            box-shadow: 0 0 50px black;
-            overflow: hidden;
         }
 
-        /* TIMELINE (PRO MODE) */
-        #timeline-area {
-            height: 280px;
-            background: #161616;
+        /* TIMELINE */
+        #timeline {
+            background: #151515;
             border-top: 1px solid var(--border);
             display: flex;
             flex-direction: column;
         }
 
-        /* SCRIPT EDITOR (EASY MODE) */
-        #script-area {
-            flex: 1;
-            background: #111;
-            padding: 20px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .script-line {
+        .tl-toolbar {
+            height: 32px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 10px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 8px;
             align-items: center;
+            gap: 8px;
+            background: #1a1a1a;
         }
 
-        .s-name {
-            width: 100px;
-            text-align: right;
-            color: #f1c40f;
+        .track-list {
+            flex: 1;
+            overflow: auto;
+            padding-bottom: 20px;
+        }
+
+        .track {
+            display: flex;
+            height: 30px;
+            border-bottom: 1px solid #222;
+        }
+
+        .t-head {
+            width: 120px;
+            padding: 0 10px;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            background: #1e1e1e;
+            border-right: 1px solid #333;
+        }
+
+        .t-lane {
+            flex: 1;
+            position: relative;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTAwJSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZSB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMTAwJSIgc3Ryb2tlPSIjMjIyIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=');
+        }
+
+        .clip {
+            position: absolute;
+            top: 3px;
+            height: 24px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: white;
+            padding: 0 6px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .clip.sel {
+            border: 1px solid white;
+            z-index: 10;
+            box-shadow: 0 0 4px white;
+        }
+
+        /* INSPECTOR */
+        .prop-group {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prop-head {
+            padding: 8px 10px;
+            background: #252525;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .prop-body {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .prop-full {
+            grid-column: 1 / -1;
+        }
+
+        .lbl {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .inp {
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 4px 6px;
+            width: 100%;
+            font-size: 11px;
+            border-radius: 3px;
+        }
+
+        .inp:focus {
+            border-color: var(--primary);
+        }
+
+        /* UI HELPERS */
+        .btn {
+            background: #333;
+            border: 1px solid #444;
+            color: #ddd;
+            padding: 4px 10px;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #444;
+            color: white;
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .btn.accent {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: black;
             font-weight: bold;
         }
 
-        .s-text {
-            flex: 1;
-            background: #222;
-            border: 1px solid #333;
-            color: #eee;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        /* RIGHT: INSPECTOR */
-        #right-col {
-            background: var(--bg-panel);
-            border-left: 1px solid var(--border);
-            overflow-y: auto;
-        }
-
-        /* TAB BAR */
-        .tabs {
-            display: flex;
-            background: #222;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            cursor: pointer;
-            color: #777;
-            border-bottom: 2px solid transparent;
+        /* RESOURCE LIST */
+        .res-item {
+            padding: 6px 10px;
             font-size: 11px;
+            color: #aaa;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .tab.active {
+        .res-item:hover {
+            background: #222;
             color: white;
-            border-bottom-color: var(--main);
-            background: #2a2a2a;
         }
 
-        /* HELPERS */
-        .modal-over {
+        .res-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* MODAL */
+        .modal-wrap {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.8);
             z-index: 999;
             display: none;
-            justify-content: center;
-            align-items: center;
+            justifyContent: center;
+            alignItems: center;
         }
 
         .modal {
-            width: 500px;
+            width: 400px;
             background: #222;
             border: 1px solid #444;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 20px 50px black;
-        }
-
-        /* CLASSES */
-        .t-bg {
-            color: #2ecc71;
-        }
-
-        .t-char {
-            color: #3498db;
-        }
-
-        .t-txt {
-            color: #f1c40f;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="app-scale-wrap">
+    <!-- HEADER -->
+    <div id="header">
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div class="logo">CRAFIQ <span>DIRECTOR</span></div>
+            <div style="font-size:11px; color:#666;">Pro Edition (Mobile Optimized)</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="btn" onclick="Settings.open()"><i class="fa-solid fa-gear"></i> 프로젝트 설정</button>
+            <button class="btn" onclick="Project.save()"><i class="fa-solid fa-cloud"></i> 저장</button>
+            <button class="btn primary" onclick="Project.play()"><i class="fa-solid fa-play"></i> 실행</button>
+        </div>
+    </div>
 
-        <!-- HEADER -->
-        <div id="topbar">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <span style="font-size:18px; font-weight:900; color:white;"><i class="fa-solid fa-infinity"></i>
-                    INFINITY ENGINE</span>
-                <div style="background:#333; padding:4px; border-radius:20px; display:flex;">
-                    <button id="mode-easy" class="btn easy" style="border-radius:16px;"
-                        onclick="Engine.setMode('EASY')">✨ 초보자 모드</button>
-                    <button id="mode-pro" class="btn"
-                        style="border-radius:16px; border:none; background:transparent; opacity:0.5;"
-                        onclick="Engine.setMode('PRO')">🛠️ 전문가 모드</button>
+    <!-- LEFT: ASSETS -->
+    <div class="panel">
+        <div class="p-head">
+            <span>SCENE HIERARCHY</span>
+            <button onclick="Scene.add()" style="background:none; border:none; color:#ccc; cursor:pointer;"><i
+                    class="fa-solid fa-plus"></i></button>
+        </div>
+        <div id="list-scenes" class="p-body" style="border-bottom:1px solid #333; flex: 0.4;"></div>
+
+        <div class="p-head">
+            <span>SOUND LIBRARY</span>
+            <span style="font-size:9px; opacity:0.5;">40+ Tracks</span>
+        </div>
+        <div id="list-sounds" class="p-body">
+            <!-- Sounds Injected Here -->
+        </div>
+
+        <div style="padding:10px; border-top:1px solid #333;">
+            <button class="btn" style="width:100%;" onclick="Utils.modal('import')"><i class="fa-solid fa-link"></i> 외부
+                URL 가져오기</button>
+        </div>
+    </div>
+
+    <!-- CENTER: STAGE & TIMELINE -->
+    <div id="center-area">
+        <!-- VIEWPORT -->
+        <div id="viewport">
+            <div id="game-canvas">
+                <div id="r-bg" style="position:absolute; inset:0; background-size:cover; background-position:center;">
+                </div>
+                <div id="r-chars" style="position:absolute; inset:0;"></div>
+                <div id="r-ui" style="display:none; position:absolute; inset:0;">
+                    <div id="r-box"
+                        style="position:absolute; bottom:40px; left:50px; right:50px; height:180px; background:rgba(0,0,0,0.8); border:2px solid #555; border-radius:8px; padding:20px;">
+                        <div id="r-name" style="color:#f1c40f; font-weight:bold; font-size:22px; margin-bottom:8px;">
+                        </div>
+                        <div id="r-text" style="color:#eee; font-size:18px;"></div>
+                    </div>
                 </div>
             </div>
-
-            <div style="display:flex; gap:10px;">
-                <button class="btn" onclick="Nav.exit()"><i class="fa-solid fa-house"></i> 나가기</button>
-                <button class="btn" onclick="Project.save()"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
-                <button class="btn primary" onclick="Project.play()"><i class="fa-solid fa-play"></i> 실행</button>
+            <div style="position:absolute; top:10px; left:10px; font-family:monospace; color:rgba(255,255,255,0.4);">
+                1280x720 HD
             </div>
         </div>
 
-        <!-- MAIN -->
-        <div id="main-content">
-
-            <!-- 1. LEFT: ASSETS & SCENES -->
-            <div id="left-col">
-                <div class="tabs">
-                    <div id="tab-scene" class="tab active" onclick="UI.tab('scene')">장면 (Scenes)</div>
-                    <div id="tab-asset" class="tab" onclick="UI.tab('asset')">자산 (Assets)</div>
-                    <div id="tab-ui" class="tab" onclick="UI.tab('ui')">UI 설정</div>
-                </div>
-
-                <!-- SCENE LIST -->
-                <div id="p-scene" class="flex-col" style="flex:1;">
-                    <div class="panel-head">
-                        <span>장면 목록</span>
-                        <button class="btn" style="padding:2px 8px;" onclick="Scene.add()"><i
-                                class="fa-solid fa-plus"></i> 추가</button>
-                    </div>
-                    <div id="list-scenes" style="padding:10px; overflow-y:auto; flex:1;"></div>
-                </div>
-
-                <!-- ASSET LIST -->
-                <div id="p-asset" class="flex-col" style="flex:1; display:none;">
-                    <div style="padding:10px;">
-                        <button class="btn primary" style="width:100%; justify-content:center; margin-bottom:10px;"
-                            onclick="Utils.modal('import')">
-                            <i class="fa-solid fa-cloud-arrow-down"></i> 이미지/오디오 링크 가져오기
-                        </button>
-                        <div style="color:#666; font-size:11px; text-align:center;">
-                            PostImages 등의 URL을 입력하세요.<br>
-                            드래그 앤 드롭으로 넣을 수도 있습니다.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- UI EDIT -->
-                <div id="p-ui" class="flex-col" style="flex:1; display:none; padding:10px;">
-                    <label style="color:#888; display:block; margin-bottom:4px;">대화창 스타일</label>
-                    <select class="inp" style="margin-bottom:10px;">
-                        <option>기본 (Dark)</option>
-                        <option>밝음 (Light)</option>
-                        <option>판타지 (Fantasy)</option>
-                        <option>SF (Cyber)</option>
-                    </select>
-
-                    <label style="color:#888; display:block; margin-bottom:4px;">폰트</label>
-                    <select class="inp" style="margin-bottom:10px;">
-                        <option>굴림체 (Gulim)</option>
-                        <option>프리텐다드 (Pretendard)</option>
-                        <option>나눔고딕 (Nanum)</option>
-                        <option>바탕체 (Batang)</option>
-                    </select>
-                </div>
+        <!-- TIMELINE -->
+        <div id="timeline">
+            <div class="tl-toolbar">
+                <button class="btn" onclick="Timeline.addClip('bg')"><i class="fa-solid fa-image"></i> BG</button>
+                <button class="btn" onclick="Timeline.addClip('char')"><i class="fa-solid fa-user"></i> Char</button>
+                <button class="btn" onclick="Timeline.addClip('text')"><i class="fa-solid fa-comment"></i> Text</button>
+                <button class="btn" onclick="Timeline.addClip('sfx')"><i class="fa-solid fa-music"></i> Audio</button>
+                <button class="btn" onclick="Timeline.addClip('fx')"><i class="fa-solid fa-bolt"></i> FX</button>
+                <div style="flex:1;"></div>
+                <span id="time-display" style="font-family:monospace; color:#666;">00:00</span>
             </div>
+            <div id="tl-body" class="track-list"></div>
+        </div>
+    </div>
 
-            <!-- 2. CENTER: STAGE -->
-            <div id="center-col">
-
-                <!-- SCRIPT EDITOR (EASY) -->
-                <div id="script-area">
-                    <h2 style="color:var(--easy); margin-top:0;">📜 시나리오 모드</h2>
-                    <p style="color:#666; font-size:12px;">복잡한 타임라인 없이, 대본 쓰듯이 게임을 만드세요.</p>
-                    <div id="script-lines">
-                        <!-- Generated Lines -->
-                    </div>
-                    <button class="btn easy" style="width:100%; justify-content:center; margin-top:20px;"
-                        onclick="EasyMode.addLine()">+ 대사 추가</button>
-                </div>
-
-                <!-- GAME STAGE (VISUAL) -->
-                <div id="stage-area">
-                    <div id="game-canvas">
-                        <div id="r-bg"
-                            style="position:absolute; inset:0; background-size:cover; background-position:center;">
-                        </div>
-                        <div id="r-chars" style="position:absolute; inset:0;"></div>
-
-                        <!-- UI PREVIEW -->
-                        <div id="r-ui" style="position:absolute; inset:0; pointer-events:none;">
-                            <div id="r-box"
-                                style="position:absolute; bottom:50px; left:100px; right:100px; height:180px; background:rgba(0,0,0,0.8); border:2px solid #555; border-radius:10px; padding:30px;">
-                                <div id="r-name"
-                                    style="color:#f1c40f; font-weight:bold; font-size:24px; margin-bottom:10px;">이름
-                                </div>
-                                <div id="r-text" style="color:#eee; font-size:20px; line-height:1.5;">대사 내용이 여기에 표시됩니다.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TIMELINE (PRO) -->
-                <div id="timeline-area" style="display:none;">
-                    <div class="panel-head">
-                        <span>타임라인 (Timeline)</span>
-                        <div style="display:flex; gap:4px;">
-                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('bg')"><i
-                                    class="fa-solid fa-image t-bg"></i> 배경</button>
-                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('char')"><i
-                                    class="fa-solid fa-user t-char"></i> 캐릭터</button>
-                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('text')"><i
-                                    class="fa-solid fa-comment t-txt"></i> 대사</button>
-                        </div>
-                    </div>
-                    <div id="tl-tracks" style="padding:10px; overflow:auto;">
-                        <!-- Tracks -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. RIGHT: INSPECTOR -->
-            <div id="right-col">
-                <div class="panel-head">속성 (Inspector)</div>
-                <div id="inspector-body" style="padding:10px;">
-                    <div style="text-align:center; color:#555; margin-top:50px;">선택된 항목 없음</div>
-                </div>
-            </div>
-
+    <!-- RIGHT: INSPECTOR -->
+    <div class="panel panel-right">
+        <div class="p-head">
+            <span>INSPECTOR</span>
+            <span style="opacity:0.5; font-weight:normal;">Detail View</span>
+        </div>
+        <div id="inspector" class="p-body">
+            <div style="padding:20px; text-align:center; color:#555;">클립을 선택하세요</div>
         </div>
     </div>
 
     <!-- MODAL IMPORT -->
-    <div id="modal-import" class="modal-over">
+    <div id="modal-import" class="modal-wrap" style="align-items:center; justify-content:center;">
         <div class="modal">
-            <h3>이미지/오디오 URL 입력</h3>
-            <input id="inp-url" class="inp" placeholder="https://..."
-                style="font-size:14px; padding:10px; margin:20px 0;">
-            <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
+            <h3>URL 입력</h3>
+            <input id="inp-url" class="inp" placeholder="https://..." style="margin:20px 0; padding:10px;">
+            <div style="text-align:right;">
                 <button class="btn" onclick="Utils.modalClose('import')">취소</button>
-                <button class="btn primary" onclick="Utils.applyUrl()">적용하기</button>
+                <button class="btn primary" onclick="Utils.applyUrl()">적용</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SETTINGS -->
+    <div id="modal-settings" class="modal-wrap" style="align-items:center; justify-content:center;">
+        <div class="modal">
+            <h3>프로젝트 설정 (Project Settings)</h3>
+            <div style="margin-bottom:15px;">
+                <label class="lbl">폰트 (Font)</label>
+                <select id="cfg-font" class="inp">
+                    <option value="Gulim">굴림체 (Gulim)</option>
+                    <option value="Nanum Gothic">나눔고딕</option>
+                    <option value="Noto Sans KR">노토산스</option>
+                </select>
+            </div>
+            <div style="margin-bottom:15px;">
+                <label class="lbl">대화창 스킨 URL</label>
+                <input id="cfg-skin" class="inp" placeholder="image url...">
+            </div>
+            <p style="color:var(--accent); font-size:11px;">* 저장 후 '실행'을 눌러 확인하세요.</p>
+            <div style="text-align:right;">
+                <button class="btn" onclick="Utils.modalClose('settings')">닫기</button>
+                <button class="btn primary" onclick="Settings.save()">저장 및 적용</button>
             </div>
         </div>
     </div>
@@ -440,16 +464,52 @@
     <script type="module">
         import { getNovelById, getScenes, saveScenes } from './js/data.js';
 
-        /* 
-            INFINITY ENGINE LOGIC
-            Supports both Easy (Linear List) and Pro (Timeline Tracks) data models.
-            Actually, Easy mode just abstracts the Timeline. 
-            Easy Mode = Auto-generates Tracks.
-        */
+        /* SOUND LIBRARY DATA */
+        const BGM_DB = [
+            { id: 'B001', meta: '경쾌 / 약간 어두운', url: 'https://t1.daumcdn.net/cfile/tistory/990D774B5DA925FD24' },
+            { id: 'B002', meta: '경쾌 / 어두운', url: 'https://t1.daumcdn.net/cfile/tistory/9932104A5DA92C792C' },
+            { id: 'B003', meta: '경쾌 / 피아노 / 재즈', url: 'https://t1.daumcdn.net/cfile/tistory/999201355DA98F741D' },
+            { id: 'B004', meta: '경쾌 / 빠른 / 디스코', url: 'https://t1.daumcdn.net/cfile/tistory/99E0B03D5DA9917738' },
+            { id: 'B005', meta: '경쾌 / 코메디 / 오락', url: 'https://t1.daumcdn.net/cfile/tistory/993B8C485DA9930A26' },
+            { id: 'B006', meta: '경쾌 / 빠른 / 왈츠', url: 'https://t1.daumcdn.net/cfile/tistory/9980B83A5DA994ED06' },
+            { id: 'B007', meta: '보통 / 조용한 / 피아노', url: 'https://t1.daumcdn.net/cfile/tistory/9939ED4D5DA997780C' },
+            { id: 'B008', meta: '긍정 / 진취적 / 피아노', url: 'https://t1.daumcdn.net/cfile/tistory/994C4C4B5DA99B9126' },
+            { id: 'B009', meta: '차분한 / 조용한 / 피아노', url: 'https://t1.daumcdn.net/cfile/tistory/99C3B0465DA99E4E2E' },
+            { id: 'B010', meta: '경쾌 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/9982654B5DA9BC9839' },
+            { id: 'B011', meta: '차분한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99B437335DA9BFD434' },
+            { id: 'B012', meta: '빠르게 / 디스코', url: 'https://t1.daumcdn.net/cfile/tistory/997C94435DA9D0EB0F' },
+            { id: 'B013', meta: '뛰는 느낌 / 불투명', url: 'https://t1.daumcdn.net/cfile/tistory/994BA5425DAA9A672E' },
+            { id: 'B014', meta: '빠르게 / 조용한', url: 'https://t1.daumcdn.net/cfile/tistory/99B8574C5DAAA2172E' },
+            { id: 'B015', meta: '빠르게 / 둔탁한', url: 'https://t1.daumcdn.net/cfile/tistory/99BA0B385DABEEE101' },
+            { id: 'B016', meta: '빠른 템포 / 뛰는 느낌', url: 'https://t1.daumcdn.net/cfile/tistory/9924503B5DABF24B08' },
+            { id: 'B017', meta: '둔탁한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99DBD74F5DAE064909' },
+            { id: 'B018', meta: '빠른 / 놀러가는 느낌', url: 'https://t1.daumcdn.net/cfile/tistory/99EBD3495DAF1CBF16' },
+            { id: 'B019', meta: '약간 빠른 / 행복', url: 'https://t1.daumcdn.net/cfile/tistory/9962B14A5DAF260C25' },
+            { id: 'B020', meta: '빠른 템포 / 북소리', url: 'https://t1.daumcdn.net/cfile/tistory/991F394C5DAF29B015' },
+            { id: 'B021', meta: '약간 빠른 / 여유', url: 'https://t1.daumcdn.net/cfile/tistory/99E4464E5DAF36960E' },
+            { id: 'B022', meta: '약간 시끄러운 / 타악기', url: 'https://t1.daumcdn.net/cfile/tistory/997FA84F5DAF37E332' },
+            { id: 'B023', meta: '힘찬 / 드럼', url: 'https://t1.daumcdn.net/cfile/tistory/99B2364C5DAFD85603' },
+            { id: 'B024', meta: '박진감 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99261E4C5DAFED0725' },
+            { id: 'B025', meta: '박력 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99400B3C5DB076032C' },
+            { id: 'B026', meta: '둔탁하게 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99CA0E385DB07B5E0D' },
+            { id: 'B027', meta: '보통 / 비교적 조용한', url: 'https://t1.daumcdn.net/cfile/tistory/99896A465DB1ABF921' },
+            { id: 'B028', meta: '보통 템포 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/992A9B485DB1ADC71A' },
+            { id: 'B029', meta: '조용한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/992FF7425DB1B3F11A' },
+            { id: 'B030', meta: '차분한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99FEC7335DB5A5CB33' },
+            { id: 'B031', meta: '차분한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99214F405DB5C57A10' },
+            { id: 'B032', meta: '부드러운 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99340A365DB5D4AA02' },
+            { id: 'B033', meta: '조용한 / 전자음', url: 'https://t1.daumcdn.net/cfile/tistory/99A46F445DB5DE7404' },
+            { id: 'B034', meta: '경쾌한 / 작은 북소리', url: 'https://t1.daumcdn.net/cfile/tistory/9917C53B5E90D86609' },
+            { id: 'B035', meta: '조용한 / 레게', url: 'https://t1.daumcdn.net/cfile/tistory/9942463F5E90DB3909' },
+            { id: 'B036', meta: '명랑 / 피아노', url: 'https://t1.daumcdn.net/cfile/tistory/9993AC435F68C2CC0D' },
+            { id: 'C037', meta: '즐거운 / 베이스', url: 'https://t1.daumcdn.net/cfile/tistory/997617475F68D72C11' },
+            { id: 'C038', meta: '빠른 / 북소리', url: 'https://t1.daumcdn.net/cfile/tistory/99787E375F68EC8002' },
+            { id: 'C039', meta: '차분한 / 희망', url: 'https://t1.daumcdn.net/cfile/tistory/99299C3A5F75A3812A' }
+        ];
 
+        /* DIRECTOR LOGIC */
         const State = {
-            mode: 'EASY', // EASY | PRO
-            project: { id: null },
+            project: { id: null, config: { font: 'Gulim', skin: '' } },
             scenes: [],
             sceneId: null,
             clipId: null
@@ -457,316 +517,288 @@
 
         const Engine = {
             init: async () => {
-                // 1. Auto Scale
-                Engine.resize();
-                window.addEventListener('resize', Engine.resize);
+                Utils.fitCanvas();
+                window.addEventListener('resize', Utils.fitCanvas);
 
-                // 2. Load
-                const p = new URLSearchParams(location.search);
-                const id = p.get('id');
-                if (!id) return alert("ID 없음");
+                const id = new URLSearchParams(location.search).get('id');
+                if (!id) return alert("ID Needed");
                 State.project.id = id;
 
-                const { data: scenes } = await getScenes(id);
-                if (scenes && scenes.length) {
-                    State.scenes = scenes.map(s => ({
-                        id: s.id,
-                        name: s.title,
-                        tracks: s.data.tracks || Timeline.defaultTracks()
+                const { data: s } = await getScenes(id);
+                if (s && s.length) {
+                    State.scenes = s.map(x => ({
+                        id: x.id, name: x.title, tracks: x.data.tracks || Timeline.defaultTracks(),
+                        config: x.data.config
                     }));
+                    if (State.scenes[0].config) State.project.config = State.scenes[0].config;
                 } else {
                     Scene.add();
                 }
 
                 Render.scenes();
+                Render.sounds();
+
                 if (State.scenes.length) Scene.select(State.scenes[0].id);
-            },
-
-            resize: () => {
-                const h = window.innerHeight;
-                const baseH = 900;
-                // Don't upscale too much, but downscale unlimited
-                let s = h / baseH;
-                if (s > 1) s = 1;
-                const el = document.getElementById('app-scale-wrap');
-                el.style.transform = `scale(${s})`;
-                // Compensate margin if needed
-            },
-
-            setMode: (m) => {
-                State.mode = m;
-                document.getElementById('mode-easy').className = `btn ${m === 'EASY' ? 'easy' : ''}`;
-                document.getElementById('mode-easy').style.opacity = m === 'EASY' ? 1 : 0.5;
-                document.getElementById('mode-pro').className = `btn ${m === 'PRO' ? 'primary' : ''}`;
-                document.getElementById('mode-pro').style.opacity = m === 'PRO' ? 1 : 0.5;
-
-                // Toggle UI
-                if (m === 'EASY') {
-                    document.getElementById('stage-area').style.display = 'none';
-                    document.getElementById('timeline-area').style.display = 'none';
-                    document.getElementById('script-area').style.display = 'block';
-                    EasyMode.render();
-                } else {
-                    document.getElementById('stage-area').style.display = 'flex';
-                    document.getElementById('timeline-area').style.display = 'flex';
-                    document.getElementById('script-area').style.display = 'none';
-                    Timeline.render();
-                }
+                Settings.apply();
             }
         };
 
         const Scene = {
             add: () => {
-                State.scenes.push({
-                    id: Math.random().toString(36).substr(2, 9),
-                    name: `장면 ${State.scenes.length + 1}`,
-                    tracks: Timeline.defaultTracks()
-                });
+                State.scenes.push({ id: Utils.uid(), name: `Scene ${State.scenes.length + 1}`, tracks: Timeline.defaultTracks() });
                 Render.scenes();
             },
-            select: (id) => {
-                State.sceneId = id;
-                Render.scenes();
-                if (State.mode === 'PRO') {
-                    Timeline.render();
-                    Preview.render();
-                } else {
-                    EasyMode.render();
-                }
-            },
+            select: (id) => { State.sceneId = id; State.clipId = null; Render.scenes(); Timeline.render(); Inspector.render(); Preview.render(); },
             active: () => State.scenes.find(s => s.id === State.sceneId)
         };
 
         const Timeline = {
             defaultTracks: () => [
-                { type: 'bg', name: '배경', clips: [] },
-                { type: 'char', name: '캐릭터', clips: [] },
-                { type: 'text', name: '대사', clips: [] }
+                { type: 'bg', name: '배경 (BG)', clips: [] },
+                { type: 'char', name: '캐릭터 (Char)', clips: [] },
+                { type: 'text', name: '대사 (Text)', clips: [] },
+                { type: 'sfx', name: '오디오 (Audio)', clips: [] },
+                { type: 'fx', name: '효과 (FX)', clips: [] }
             ],
-
-            addClip: (type) => {
-                const s = Scene.active();
-                const track = s.tracks.find(t => t.type === type);
-                if (!track) return;
-
-                // Find end time
-                let start = 0;
-                track.clips.forEach(c => { if (c.start + c.dur > start) start = c.start + c.dur; });
-
-                track.clips.push({
-                    id: Math.random().toString(36).substr(2, 9),
-                    type,
-                    start,
-                    dur: 2,
-                    data: Timeline.defaults(type)
-                });
-                Timeline.render();
-            },
-
-            defaults: (t) => {
-                if (t === 'bg') return { url: '' };
-                if (t === 'char') return { url: '', x: 0.5, y: 1, scale: 1 };
-                if (t === 'text') return { speaker: '이름', text: '내용을 입력하세요.' };
-                return {};
-            },
-
             render: () => {
                 const s = Scene.active();
                 if (!s) return;
-                const el = document.getElementById('tl-tracks');
+                const el = document.getElementById('tl-body');
                 el.innerHTML = '';
 
                 s.tracks.forEach(t => {
                     const row = document.createElement('div');
-                    row.style.marginBottom = '4px';
-                    row.innerHTML = `<div style="background:#222; padding:4px; font-size:11px; color:#888;">${t.name}</div>`;
+                    row.className = 'track';
+                    row.innerHTML = `<div class="t-head">${t.name}</div>`;
 
                     const lane = document.createElement('div');
-                    lane.style.background = '#111'; lane.style.height = '30px'; lane.style.position = 'relative';
-                    lane.style.border = '1px solid #333';
+                    lane.className = 't-lane';
 
                     t.clips.forEach(c => {
-                        const clip = document.createElement('div');
-                        clip.style.position = 'absolute';
-                        clip.style.left = (c.start * 30) + 'px'; // 1s = 30px
-                        clip.style.width = (c.dur * 30) + 'px';
-                        clip.style.height = '100%';
-                        clip.style.border = '1px solid black';
+                        const div = document.createElement('div');
+                        div.className = `clip ${c.id === State.clipId ? 'sel' : ''}`;
+                        div.style.left = (c.start * 30) + 'px';
+                        div.style.width = (c.dur * 30) + 'px';
+                        div.innerText = c.data.text || c.type;
 
-                        let col = '#555';
-                        if (c.type === 'bg') col = '#27ae60';
-                        if (c.type === 'char') col = '#2980b9';
-                        if (c.type === 'text') col = '#e67e22';
+                        // Color
+                        if (t.type === 'bg') div.style.background = '#27ae60';
+                        if (t.type === 'char') div.style.background = '#2980b9';
+                        if (t.type === 'text') div.style.background = '#d35400';
+                        if (t.type === 'sfx') div.style.background = '#e67e22';
+                        if (t.type === 'fx') div.style.background = '#8e44ad';
 
-                        clip.style.background = col;
-                        clip.style.opacity = 0.8;
-                        if (c.id === State.clipId) clip.style.border = '2px solid white';
-
-                        clip.onclick = (e) => {
-                            e.stopPropagation();
-                            State.clipId = c.id;
-                            Timeline.render();
-                            Inspector.render();
-                            Preview.render(); // Update visual to show chosen clip
-                        };
-                        lane.appendChild(clip);
+                        div.onclick = (e) => { e.stopPropagation(); State.clipId = c.id; Inspector.render(); Preview.render(); Timeline.render(); };
+                        lane.appendChild(div);
                     });
+
                     row.appendChild(lane);
                     el.appendChild(row);
                 });
-            }
-        };
-
-        const EasyMode = {
-            render: () => {
+            },
+            addClip: (type, dataOverride = {}) => {
                 const s = Scene.active();
-                // We primarily allow editing "Text" tracks here, 
-                // maybe simple cues for BG/Char?
-                // For simplicity, just list all clips sorted by time.
+                const tr = s.tracks.find(t => t.type === type);
+                if (!tr) return;
 
-                const all = [];
-                s.tracks.forEach(t => t.clips.forEach(c => all.push(c)));
-                all.sort((a, b) => a.start - b.start);
+                let start = 0;
+                tr.clips.forEach(c => { if (c.start + c.dur > start) start = c.start + c.dur; });
 
-                const el = document.getElementById('script-lines');
-                el.innerHTML = all.map(c => `
-                    <div class="script-line" onclick="State.clipId='${c.id}'; Inspector.render();">
-                        <div style="width:60px; font-size:10px; color:#555;">${c.type.toUpperCase()}</div>
-                        ${EasyMode.content(c)}
-                        <button class="btn" onclick="Timeline.remove('${c.id}')">X</button>
-                    </div>
-                `).join('');
-            },
+                const clip = { id: Utils.uid(), type, start, dur: 2, data: {} };
+                // Defaults
+                if (type === 'bg') clip.data = { url: '' };
+                if (type === 'char') clip.data = { url: '', x: 0.5, y: 1, scale: 1, opacity: 1 };
+                if (type === 'text') clip.data = { speaker: '???', text: '...' };
+                if (type === 'sfx') clip.data = { url: '' };
+                if (type === 'fx') clip.data = { type: 'shake', power: 10 };
 
-            content: (c) => {
-                if (c.type === 'text') return `<input class="inp s-name" value="${c.data.speaker}"><input class="inp s-text" value="${c.data.text}">`;
-                if (c.type === 'bg') return `<div style="flex:1; color:#2ecc71;">배경 변경: ${c.data.url ? '설정됨' : '비어있음'}</div>`;
-                if (c.type === 'char') return `<div style="flex:1; color:#3498db;">캐릭터 등장: ${c.data.url ? '설정됨' : '비어있음'}</div>`;
-                return '';
-            },
+                // Override
+                Object.assign(clip.data, dataOverride);
 
-            addLine: () => {
-                // Add text clip at end
-                Timeline.addClip('text');
-                EasyMode.render();
+                tr.clips.push(clip);
+                State.clipId = clip.id;
+                Timeline.render(); Inspector.render(); Preview.render();
             }
         };
 
         const Inspector = {
             render: () => {
                 const s = Scene.active();
+                if (!s) return;
                 let clip = null;
                 s.tracks.forEach(t => { const f = t.clips.find(x => x.id === State.clipId); if (f) clip = f; });
 
-                const el = document.getElementById('inspector-body');
-                if (!clip) return el.innerHTML = '<div style="text-align:center;color:#555;">선택 없음</div>';
+                const el = document.getElementById('inspector');
+                if (!clip) return el.innerHTML = '<div style="padding:20px; text-align:center; color:#555;">선택된 클립 없음</div>';
 
-                let h = `<h3 style="margin-top:0">${clip.type} 속성</h3>`;
+                let h = `<div style="padding:10px; background:#222; font-weight:bold; border-bottom:1px solid #333;">${clip.type.toUpperCase()} Properties</div>`;
 
-                const field = (l, k) => `<div style="margin-bottom:8px;"><label style="font-size:11px; color:#888;">${l}</label><input class="inp" value="${clip.data[k] || ''}" oninput="Inspector.update('${k}', this.value)"></div>`;
+                const group = (title, body) => `
+                    <div class="prop-group">
+                        <div class="prop-head">${title}</div>
+                        <div class="prop-body">${body}</div>
+                    </div>`;
 
-                if (clip.type === 'text') {
-                    h += field('화자 이름', 'speaker');
-                    h += field('대사 내용', 'text');
-                }
-                if (clip.type === 'bg' || clip.type === 'char') {
-                    h += field('이미지 URL', 'url');
-                    h += `<button class="btn primary" style="width:100%;" onclick="Utils.modal('import')">이미지 붙여넣기</button>`;
-                }
+                const field = (l, k, type = 'text') => `
+                    <div>
+                        <label class="lbl">${l}</label>
+                        <input class="inp" type="${type}" value="${clip.data[k] || ''}" oninput="Inspector.update('${k}', this.value)">
+                    </div>`;
+
+                const num = (l, k, step = 0.1) => `
+                    <div>
+                        <label class="lbl">${l}</label>
+                        <input class="inp" type="number" step="${step}" value="${clip.data[k] || 0}" oninput="Inspector.update('${k}', parseFloat(this.value))">
+                    </div>`;
+
+                // 1. TRANSFORM
                 if (clip.type === 'char') {
-                    h += field('X 좌표 (0~1)', 'x');
-                    h += field('Y 좌표 (0~1)', 'y');
-                    h += field('크기 (Scale)', 'scale');
+                    h += group('TRANSFORM',
+                        num('X (0~1)', 'x', 0.05) + num('Y (0~1)', 'y', 0.05) +
+                        num('Scale', 'scale', 0.1) + num('Opacity', 'opacity', 0.1)
+                    );
                 }
+
+                // 2. CONTENT
+                let content = '';
+                if (clip.type === 'text') {
+                    content += field('Speaker', 'speaker');
+                    content += `<div class="prop-full"><label class="lbl">Text</label><textarea class="inp" style="height:60px;" oninput="Inspector.update('text', this.value)">${clip.data.text}</textarea></div>`;
+                }
+                if (clip.type === 'bg' || clip.type === 'char' || clip.type === 'sfx') {
+                    content += `<div class="prop-full"><label class="lbl">Asset URL</label><input class="inp" value="${clip.data.url || ''}" oninput="Inspector.update('url', this.value)"></div>`;
+                    if (clip.type !== 'sfx') content += `<div class="prop-full"><button class="btn" style="width:100%; justify-content:center;" onclick="Utils.modal('import')">이미지 가져오기</button></div>`;
+                }
+                if (clip.type === 'fx') {
+                    content += `<div class="prop-full"><label class="lbl">Type</label>
+                        <select class="inp" onchange="Inspector.update('type', this.value)">
+                            <option value="shake" ${clip.data.type === 'shake' ? 'selected' : ''}>Shake</option>
+                            <option value="flash" ${clip.data.type === 'flash' ? 'selected' : ''}>Flash</option>
+                        </select></div>`;
+                }
+                h += group('CONTENT', content);
 
                 el.innerHTML = h;
             },
             update: (k, v) => {
                 const s = Scene.active();
-                let clip = null;
-                s.tracks.forEach(t => { const f = t.clips.find(x => x.id === State.clipId); if (f) clip = f; });
-                if (clip) {
-                    clip.data[k] = v;
-                    if (State.mode === 'PRO') Preview.render();
-                }
+                s.tracks.forEach(t => { const f = t.clips.find(x => x.id === State.clipId); if (f) f.data[k] = v; });
+                Preview.render();
             }
         };
 
         const Preview = {
             render: () => {
                 const s = Scene.active();
-                // Simple snapshot of all clips
                 document.getElementById('r-bg').style.backgroundImage = '';
                 document.getElementById('r-chars').innerHTML = '';
+                document.getElementById('r-ui').style.display = 'none';
 
-                s.tracks.forEach(t => {
-                    t.clips.forEach(c => {
-                        if (c.type === 'bg') document.getElementById('r-bg').style.backgroundImage = `url('${c.data.url}')`;
-                        if (c.type === 'char') {
-                            const img = document.createElement('img');
-                            img.src = c.data.url;
-                            img.style.position = 'absolute';
-                            img.style.left = (c.data.x * 100) + '%';
-                            img.style.top = (c.data.y * 100) + '%';
-                            img.style.transform = `translate(-50%, -100%) scale(${c.data.scale})`;
-                            document.getElementById('r-chars').appendChild(img);
-                        }
-                    })
-                });
+                s.tracks.forEach(t => t.clips.forEach(c => {
+                    if (c.type === 'bg') document.getElementById('r-bg').style.backgroundImage = `url('${c.data.url}')`;
+                    if (c.type === 'char') {
+                        const img = document.createElement('img');
+                        img.src = c.data.url;
+                        img.style.position = 'absolute';
+                        img.style.left = (c.data.x * 100) + '%'; img.style.top = (c.data.y * 100) + '%';
+                        img.style.transform = `translate(-50%, -100%) scale(${c.data.scale})`;
+                        img.style.opacity = (c.data.opacity !== undefined) ? c.data.opacity : 1;
+                        document.getElementById('r-chars').appendChild(img);
+                    }
+                    if (c.type === 'text' && c.id === State.clipId) {
+                        document.getElementById('r-ui').style.display = 'block';
+                        document.getElementById('r-name').innerText = c.data.speaker;
+                        document.getElementById('r-text').innerText = c.data.text;
+                    }
+                }));
+            }
+        };
+
+        const Settings = {
+            open: () => {
+                const c = State.project.config;
+                document.getElementById('cfg-font').value = c.font;
+                document.getElementById('cfg-skin').value = c.skin || '';
+                Utils.modal('settings');
+            },
+            save: () => {
+                State.project.config.font = document.getElementById('cfg-font').value;
+                State.project.config.skin = document.getElementById('cfg-skin').value;
+                Settings.apply();
+                Utils.modalClose('settings');
+            },
+            apply: () => {
+                const c = State.project.config;
+                // Font
+                document.getElementById('viewport').style.fontFamily = `"${c.font}", sans-serif`;
+                // Skin
+                const box = document.getElementById('r-box');
+                if (c.skin) {
+                    box.style.background = `url('${c.skin}')`;
+                    box.style.backgroundSize = '100% 100%';
+                } else box.style.background = 'rgba(0,0,0,0.8)';
             }
         };
 
         const Render = {
             scenes: () => {
                 document.getElementById('list-scenes').innerHTML = State.scenes.map(s => `
-                    <div style="padding:8px; cursor:pointer; background:${s.id === State.sceneId ? '#333' : 'transparent'}; color:${s.id === State.sceneId ? 'white' : '#888'};" onclick="Scene.select('${s.id}')">
+                    <div style="padding:6px 15px; cursor:pointer; color:${s.id === State.sceneId ? 'white' : '#888'}; background:${s.id === State.sceneId ? '#2a2a2a' : 'transparent'};" onclick="Scene.select('${s.id}')">
                         <i class="fa-solid fa-film"></i> ${s.name}
                     </div>
                 `).join('');
+            },
+            sounds: () => {
+                document.getElementById('list-sounds').innerHTML = BGM_DB.map(s => `
+                    <div class="res-item" onclick="Timeline.addClip('sfx', { url:'${s.url}' })">
+                        <i class="fa-solid fa-music"></i>
+                        <div style="flex:1; margin-left:8px;">
+                            <div style="color:#ddd;">${s.id}</div>
+                            <div style="font-size:9px; color:#777;">${s.meta}</div>
+                        </div>
+                        <i class="fa-solid fa-plus-circle"></i>
+                    </div>
+                 `).join('');
             }
         };
 
         const Utils = {
+            uid: () => Math.random().toString(36).substr(2, 9),
+            fitCanvas: () => {
+                const wrap = document.getElementById('viewport');
+                const canvas = document.getElementById('game-canvas');
+                const w = wrap.clientWidth;
+                const h = wrap.clientHeight;
+
+                // Scale 1280x720 to fit
+                const scale = Math.min(w / 1280, h / 720) * 0.9;
+                canvas.style.transform = `scale(${scale})`;
+            },
             modal: (id) => document.getElementById(`modal-${id}`).style.display = 'flex',
             modalClose: (id) => document.getElementById(`modal-${id}`).style.display = 'none',
             applyUrl: () => {
-                const url = document.getElementById('inp-url').value;
-                if (url) Inspector.update('url', url);
+                const u = document.getElementById('inp-url').value;
+                if (u) Inspector.update('url', u);
                 Utils.modalClose('import');
-                // Refresh
-                if (State.mode === 'PRO') Preview.render();
-                Inspector.render();
-            }
-        }
+            },
+            exit: () => location.href = 'dashboard.html'
+        };
 
-        const Nav = { exit: () => location.href = 'dashboard.html' };
         const Project = {
             save: async () => {
-                const payload = State.scenes.map((s, i) => ({ novel_id: State.project.id, title: s.name, order_index: i, data: { tracks: s.tracks } }));
-                await saveScenes(State.project.id, payload);
-                alert("저장되었습니다!");
+                const pl = State.scenes.map((s, i) => ({ novel_id: State.project.id, title: s.name, order_index: i, data: { tracks: s.tracks, config: State.project.config } }));
+                await saveScenes(State.project.id, pl);
+                alert("Saved!");
             },
             play: () => window.open(`play.html?id=${State.project.id}`)
         };
 
-        // EXPORTS
-        window.Engine = Engine;
+        window.Settings = Settings;
+        window.Utils = Utils;
         window.Scene = Scene;
         window.Timeline = Timeline;
-        window.EasyMode = EasyMode;
         window.Inspector = Inspector;
-        window.Preview = Preview;
-        window.Utils = Utils;
-        window.Nav = Nav;
         window.Project = Project;
-        window.UI = {
-            tab: (id) => {
-                ['scene', 'asset', 'ui'].forEach(x => {
-                    document.getElementById(`tab-${x}`).className = `tab ${x === id ? 'active' : ''}`;
-                    document.getElementById(`p-${x}`).style.display = x === id ? 'flex' : 'none';
-                })
-            }
-        };
 
         window.addEventListener('DOMContentLoaded', Engine.init);
     </script>
