@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지 - CRAFIQ</title>
+    <!-- Common CSS -->
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
 
-    <!-- Supabase Init MUST come first -->
     <script type="module" src="js/init-supabase.js"></script>
+    <script type="module" src="js/turbo-router.js"></script>
 </head>
 
 <body>
@@ -35,62 +36,87 @@
         </div>
     </header>
 
-    <div class="my-container">
-        <!-- Profile Card -->
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                        <path
-                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                </div>
-                <div class="profile-info">
-                    <div id="userName" class="profile-name">로딩 중...</div>
-                    <div id="guestMsg" class="profile-bio">잠시만 기다려주세요</div>
-                </div>
+    <div class="my-container" style="padding-top:0;">
+        <!-- PROFILE SECTION -->
+        <div class="profile-section">
+            <div class="profile-img-box">
+                <!-- Ridi style default avatar -->
+                <svg width="100%" height="100%" viewBox="0 0 24 24" fill="#ccc"
+                    style="transform:scale(1.2) translateY(2px);">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
             </div>
-
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <div class="num" id="recentCount">0</div>
-                    <div class="label">최근 본</div>
-                </div>
-                <div class="stat-item">
-                    <div class="num" id="likeCount">0</div>
-                    <div class="label">관심</div>
-                </div>
-                <div class="stat-item">
-                    <div class="num" id="purchaseCount">0</div>
-                    <div class="label">구매</div>
-                </div>
-            </div>
-
-            <button id="loginBtn" class="btn-full">로그인</button>
-        </div>
-
-        <!-- Menu List -->
-        <div class="menu-list">
-            <div class="menu-item" onclick="alert('알림이 없습니다.')">
-                <span>🔔 알림 센터</span>
-                <span class="m-arrow">›</span>
-            </div>
-            <div class="menu-item" onclick="location.href='dashboard.html'">
-                <span>🖊️ 창작자 스튜디오</span>
-                <span class="m-arrow">›</span>
-            </div>
-            <div class="menu-item" onclick="alert('구매 내역이 없습니다.')">
-                <span>💳 구매 내역</span>
-                <span class="m-arrow">›</span>
-            </div>
-            <div class="menu-item" onclick="alert('준비 중입니다.')">
-                <span>🎧 고객센터</span>
-                <span class="m-arrow">›</span>
+            <div class="profile-txt">
+                <h2 id="userName" onclick="location.href='login.html'">로그인하세요</h2>
+                <p id="guestMsg" onclick="location.href='login.html'">로그인 후 이용하기 ></p>
             </div>
         </div>
 
-        <div style="text-align:center; font-size:12px; color:#aaa; margin-top:40px;">
-            CRAFIQ v1.0.3
+        <!-- STATS BAR -->
+        <div class="my-stats-bar">
+            <div class="m-stat">
+                <span class="val">0</span>
+                <span class="lbl">캐시</span>
+            </div>
+            <div class="m-stat">
+                <span class="val">0</span>
+                <span class="lbl">포인트</span>
+            </div>
+            <div class="m-stat">
+                <span class="val">0</span>
+                <span class="lbl">쿠폰</span>
+            </div>
+        </div>
+
+        <!-- MENU GROUP 1: WORKS -->
+        <div class="my-menu-group">
+            <div class="my-menu-item">
+                <div class="my-menu-label">
+                    <span class="my-menu-icon">📚</span>
+                    <span>내 서재 (최근 본 작품)</span>
+                </div>
+                <span class="arr">›</span>
+            </div>
+            <div class="my-menu-item">
+                <div class="my-menu-label">
+                    <span class="my-menu-icon">⭐</span>
+                    <span>관심 작품</span>
+                </div>
+                <span class="arr">›</span>
+            </div>
+        </div>
+
+        <!-- MENU GROUP 2: SETTINGS -->
+        <div class="my-menu-group">
+            <div class="my-menu-item" onclick="location.href='dashboard.html'">
+                <div class="my-menu-label">
+                    <span class="my-menu-icon">🖊️</span>
+                    <span>창작 스튜디오</span>
+                </div>
+                <span class="arr">›</span>
+            </div>
+            <div class="my-menu-item">
+                <div class="my-menu-label">
+                    <span class="my-menu-icon">🔔</span>
+                    <span>알림 설정</span>
+                </div>
+                <span class="arr">›</span>
+            </div>
+            <div class="my-menu-item">
+                <div class="my-menu-label">
+                    <span class="my-menu-icon">🎧</span>
+                    <span>고객센터</span>
+                </div>
+                <span class="arr">›</span>
+            </div>
+        </div>
+
+        <div class="my-footer-info">
+            <button id="logoutBtn"
+                style="background:none; border:none; color:#888; text-decoration:underline; display:none; cursor:pointer; margin-bottom:10px;">로그아웃</button>
+            <br>
+            CRAFIQ Corp.
         </div>
     </div>
 
@@ -115,41 +141,40 @@
             </svg><span>MY</span></a>
     </nav>
 
-    <!-- INLINE SCRIPT FOR RELIABILITY -->
+    <!-- INLINE SCRIPT to ensure no "undefined" errors -->
     <script type="module">
         import { getCurrentUser, signOut } from './js/auth.js';
 
-        async function initMyPage() {
-            // Small delay to ensure Supabase is ready
-            await new Promise(r => setTimeout(r, 150));
-
+        async function initMy() {
+            await new Promise(r => setTimeout(r, 100));
             const user = await getCurrentUser();
+
             const nameEl = document.getElementById('userName');
-            const bioEl = document.getElementById('guestMsg');
-            const btn = document.getElementById('loginBtn');
+            const msgEl = document.getElementById('guestMsg');
+            const logoutBtn = document.getElementById('logoutBtn');
 
             if (!nameEl) return;
 
             if (user) {
-                nameEl.textContent = (user.email ? user.email.split('@')[0] : "독자") + " 님";
-                bioEl.textContent = "나만의 서재에 오신 걸 환영합니다!";
-                btn.textContent = "로그아웃";
-                btn.onclick = async () => {
-                    if (confirm("로그아웃 하시겠습니까?")) {
+                // Logged In
+                const emailId = user.email.split('@')[0];
+                nameEl.textContent = emailId;
+                nameEl.onclick = null; // Remove Login Link
+
+                msgEl.textContent = '내 정보 수정 >';
+                msgEl.onclick = () => alert('준비 중');
+
+                logoutBtn.style.display = 'inline-block';
+                logoutBtn.onclick = async () => {
+                    if (confirm('로그아웃 하시겠습니까?')) {
                         await signOut();
                         location.reload();
                     }
                 };
-            } else {
-                nameEl.textContent = "로그인이 필요합니다";
-                bioEl.textContent = "로그인하고 서재를 연동하세요";
-                btn.textContent = "로그인하기";
-                btn.onclick = () => location.href = 'login.html';
             }
         }
 
-        // Run immediately
-        initMyPage();
+        initMy();
     </script>
 </body>
 
