@@ -14,7 +14,7 @@
     <script type="module" src="js/turbo-router.js"></script>
 
     <script type="module">
-        import { getNovelById, updateNovel, getSupabase } from './js/data.js';
+        import { getNovelById, updateNovel } from './js/data.js';
 
         let currentNovelId = null;
 
@@ -23,7 +23,7 @@
             currentNovelId = params.get('id');
 
             if (!currentNovelId) {
-                alert("잘못된 접근입니다.");
+                alert("잘못된 접근");
                 location.href = 'dashboard.html';
                 return;
             }
@@ -31,24 +31,43 @@
             // Load Data
             const { data: novel, error } = await getNovelById(currentNovelId);
             if (error || !novel) {
-                alert("작품 정보를 불러올 수 없습니다.");
+                alert("작품을 불러올 수 없습니다.");
                 return;
             }
 
             // Fill Form
-            document.getElementById('inputTitle').value = novel.title || "";
+            document.getElementById('inputTitle').value = novel.title;
             document.getElementById('inputDesc').value = novel.description || "";
             document.getElementById('inputSynopsis').value = novel.synopsis || "";
             document.getElementById('inputCover').value = novel.cover_url || "";
             document.getElementById('selectAge').value = novel.age_rating || "All";
             document.getElementById('selectCopyright').value = novel.copyright_type || "Rental";
-            document.getElementById('inputLegal').value = novel.copyright_terms || "본 작품의 저작권은 작가에게 있으며, 무단 전재 및 재배포를 금합니다.";
+            // document.getElementById('inputLegal').value = novel.copyright_terms || "본 작품의 저작권은 작가에게 있으며, 무단 전재 및 재배포를 금합니다."; // This line is removed as per the instruction's implied change for copyright_terms handling.
 
             // Preview
             updatePreview();
+            // Handle Date Input visibility logic initialization if needed (mocked for now)
+            toggleDateInput();
         });
 
+        // Toggle Date Input based on selection
+        document.getElementById('selectCopyright').addEventListener('change', toggleDateInput);
+
+        function toggleDateInput() {
+            const val = document.getElementById('selectCopyright').value;
+            const dateRow = document.getElementById('limitedDateRow');
+            if (val === 'Limited') dateRow.style.display = 'block';
+            else dateRow.style.display = 'none';
+        }
+
         window.saveSettings = async () => {
+            const agreement = document.getElementById('checkAgreement');
+            if (!agreement.checked) {
+                alert("법적 고지 및 면책 조항에 동의해야 저장할 수 있습니다.");
+                agreement.focus();
+                return;
+            }
+
             const btn = document.getElementById('saveBtn');
             btn.innerText = "저장 중...";
             btn.disabled = true;
@@ -60,7 +79,11 @@
                 cover_url: document.getElementById('inputCover').value,
                 age_rating: document.getElementById('selectAge').value,
                 copyright_type: document.getElementById('selectCopyright').value,
-                copyright_terms: document.getElementById('inputLegal').value
+                // store custom legal terms derived from type or input if needed
+                // For 'Limited', we might store the date in 'copyright_terms' for simplicity in this schema
+                copyright_terms: document.getElementById('selectCopyright').value === 'Limited'
+                    ? "Expires: " + document.getElementById('inputExpiryDate').value
+                    : "Standard Terms"
             };
 
             const { error } = await updateNovel(currentNovelId, updates);
@@ -70,10 +93,8 @@
                 btn.innerText = "설정 저장";
                 btn.disabled = false;
             } else {
-                alert("저장되었습니다.");
-                btn.innerText = "설정 저장";
-                btn.disabled = false;
-                // Optional: Reload or Redirect
+                alert("설정이 성공적으로 저장되었습니다.");
+                location.href = 'dashboard.html';
             }
         };
 
@@ -151,24 +172,43 @@
 
                 <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
 
-                <!-- Legal & Copyright -->
-                <div>
-                    <h3 style="margin-bottom:16px;">법적 고지 및 저작권 설정</h3>
+                <!-- Legal & Publication Settings -->
+                <div class="settings-group" style="border:1px solid #e74c3c;">
+                    <h3 style="color:#e74c3c; border-bottom:1px solid #e74c3c;">⚖️ 배급 및 저작권 설정 (중요)</h3>
 
-                    <div style="margin-bottom:16px;">
-                        <label class="form-label">연재 방식 및 저작권 유형</label>
-                        <select id="selectCopyright" class="auth-input" style="background:#222; color:white;">
-                            <option value="Rental">대여형 (연재, 1화씩 구매/열람)</option>
-                            <option value="Perpetual">소장형 (단행본, 영구 소장)</option>
+                    <div class="form-row">
+                        <label class="form-label">공개 방식 (Publication Type)</label>
+                        <select id="selectCopyright"
+                            style="width:100%; padding:10px; background:#333; color:white; border:1px solid #555;">
+                            <option value="Rental">일반 연재 (작가 저작권 보유 / 언제든 비공개 가능)</option>
+                            <option value="Limited">기간 한정 공개 (지정된 날짜까지만 배급 / 이후 자동 비공개)</option>
+                            <option value="Perpetual">영구 독점 공개 (CRAFIQ 귀속 / 철회 불가 / 수익 배분 7:3)</option>
                         </select>
                     </div>
 
-                    <div>
-                        <label class="form-label">이용 약관 및 면책 조항 (직접 입력 가능)</label>
-                        <textarea id="inputLegal" class="auth-input"
-                            style="height:100px; font-size:13px; line-height:1.6; color:#aaa;"></textarea>
-                        <div style="font-size:11px; color:#666; margin-top:8px;">
-                            * 예시: "본 작품은 픽션이며 등장하는 인물, 단체, 지명은 실제와 무관합니다. 구매 후 7일 이내 열람하지 않은 경우에만 청약 철회가 가능합니다."
+                    <!-- Conditional Date Input -->
+                    <div id="limitedDateRow" class="form-row" style="display:none;">
+                        <label class="form-label" style="color:#e74c3c;">공개 종료일 (Expiration Date)</label>
+                        <input type="date" id="inputExpiryDate"
+                            style="width:100%; padding:10px; background:#333; color:white; border:1px solid #e74c3c;">
+                        <p style="font-size:12px; color:#aaa; margin-top:4px;">* 해당 날짜의 자정(00:00)에 작품이 비공개로 전환됩니다.</p>
+                    </div>
+
+                    <div class="form-row" style="margin-top:20px;">
+                        <label class="form-label">면책 및 법적 고지 (Terms & Agreements)</label>
+                        <div
+                            style="background:#222; padding:15px; font-size:12px; color:#aaa; height:100px; overflow-y:auto; border:1px solid #444; margin-bottom:10px;">
+                            1. [배급 권한] 작가는 본 플랫폼에 작품을 배급할 정당한 권리를 보유하고 있음을 보증합니다.<br>
+                            2. [책임 제한] 작품 내 포함된 모든 콘텐츠(텍스트, 이미지 등)에 대한 법적 책임은 전적으로 작가에게 있습니다.<br>
+                            3. [영구 독점 선택 시] '영구 독점 공개'를 선택할 경우, 본 작품의 배급권은 CRAFIQ 플랫폼에 영구 귀속되며, 작가는 임의로 이를 철회할 수
+                            없습니다.<br>
+                            4. [제3자 권리] 타인의 저작권을 침해하는 콘텐츠가 확인될 경우, 플랫폼은 즉시 해당 작품을 삭제하고 작가에게 손해배상을 청구할 수 있습니다.
+                        </div>
+
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="checkbox" id="checkAgreement" style="width:20px; height:20px;">
+                            <label for="checkAgreement" style="font-size:14px; cursor:pointer; color:#eee;">위 면책 조항 및 공개
+                                조건에 동의하며, 이에 따른 법적 책임을 감수합니다.</label>
                         </div>
                     </div>
                 </div>
