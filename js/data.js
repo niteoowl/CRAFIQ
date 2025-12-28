@@ -1,4 +1,4 @@
-import { getSupabase, getCurrentUser } from './auth.js';
+import { getSupabase, getCurrentUser, ensureUserHasProfile } from './auth.js';
 
 // --- NOVELS ---
 
@@ -6,20 +6,37 @@ export const createNovel = async (title, type) => {
     const user = await getCurrentUser();
     if (!user) return { error: { message: "로그인이 필요합니다." } };
 
-    const { data, error } = await getSupabase()
-        .from('novels')
-        .insert([
-            {
-                creator_id: user.id,
-                title: title,
-                is_visual_novel: type === 'visual',
-                cover_url: type === 'visual'
-                    ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400'
-                    : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400'
-            }
-        ])
-        .select()
-        .single();
+    const insertNovel = async () => {
+        return await getSupabase()
+            .from('novels')
+            .insert([
+                {
+                    creator_id: user.id,
+                    title: title,
+                    is_visual_novel: type === 'visual',
+                    cover_url: type === 'visual'
+                        ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400'
+                        : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400'
+                }
+            ])
+            .select()
+            .single();
+    };
+
+    let { data, error } = await insertNovel();
+
+    // ERROR HANDLER
+    if (error) {
+        // 1. Missing Profile (FK Violation 23503)
+        if (error.code === '23503') {
+            await ensureUserHasProfile(user);
+            // Retry once
+            const retry = await insertNovel();
+            data = retry.data;
+            error = retry.error;
+        }
+        // 2. Duplicate Title (Unique Violation 23505) -> Pass to UI
+    }
 
     return { data, error };
 };

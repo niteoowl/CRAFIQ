@@ -93,3 +93,20 @@ export const signOut = async () => {
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
 };
+
+export const ensureUserHasProfile = async (user) => {
+    if (!user) return;
+    const sb = getSupabase();
+    // Check if profile exists
+    const { data: profile } = await sb.from('profiles').select('id').eq('id', user.id).single();
+    if (!profile) {
+        console.log("⚠️ Profile missing, creating now...");
+        await sb.from('profiles').insert([
+            {
+                id: user.id,
+                username: user.email.split('@')[0],
+                full_name: user.email.split('@')[0]
+            }
+        ]);
+    }
+};
