@@ -17,8 +17,8 @@ let supabaseInstance = null;
 export const getSupabase = () => {
     if (supabaseInstance) return supabaseInstance;
 
-    // Check global
-    if (window.supabase) {
+    // Check global (Must have .from method to be the Client, not just the SDK factory)
+    if (window.supabase && typeof window.supabase.from === 'function') {
         supabaseInstance = window.supabase;
         return supabaseInstance;
     }
