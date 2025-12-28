@@ -3,758 +3,784 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CRAFIQ Visual Studio Pro</title>
+    <title>CRAFIQ Engine Pro</title>
+    <!-- Pretendard & Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/init-supabase.js"></script>
-    <!-- Use FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* --- IDE THEME (VSCode/Unity Style) --- */
         :root {
-            --bg-dark: #121212;
-            --bg-panel: #1e1e1e;
-            --bg-hover: #2a2a2a;
-            --accent: #1f8ce6;
-            --text-main: #e0e0e0;
-            --text-sub: #a0a0a0;
-            --border: #333;
+            --ide-bg: #1e1e1e;
+            --ide-panel: #252526;
+            --ide-border: #333333;
+            --ide-header: #3c3c3c;
+            --ide-highlight: #007acc;
+            --ide-text: #cccccc;
+            --ide-accent: #0e639c;
+            --ide-input-bg: #3c3c3c;
+            --ide-hover: #2a2d2e;
         }
 
         body {
-            background: var(--bg-dark);
-            color: var(--text-main);
+            background: var(--ide-bg);
+            color: var(--ide-text);
+            font-family: 'Pretendard', sans-serif;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            font-family: 'Pretendard', sans-serif;
             margin: 0;
+            font-size: 13px;
         }
 
-        /* --- Header --- */
-        .studio-header {
-            height: 54px;
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--ide-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* HEADER */
+        .ide-toolbar {
+            height: 48px;
+            background: var(--ide-header);
+            border-bottom: 1px solid var(--ide-border);
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 0 16px;
-            z-index: 10;
+            justify-content: space-between;
+            user-select: none;
         }
 
-        .brand-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .studio-logo {
-            font-weight: 800;
-            font-size: 16px;
-            color: var(--accent);
-            letter-spacing: -0.5px;
-        }
-
-        .project-title {
-            font-size: 14px;
-            color: var(--text-sub);
-            padding-left: 12px;
-            border-left: 1px solid var(--border);
-        }
-
-        .header-actions {
+        .tool-group {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
-        .btn {
-            border: none;
-            border-radius: 4px;
-            padding: 8px 14px;
-            font-size: 13px;
+        .ide-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--ide-text);
+            padding: 6px 12px;
+            border-radius: 3px;
             cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
+            font-size: 12px;
+            display: flex;
             align-items: center;
             gap: 6px;
-            transition: 0.2s;
         }
 
-        .btn-primary {
-            background: var(--accent);
+        .ide-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .ide-btn.primary {
+            background: var(--ide-accent);
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #157ac5;
+        .ide-btn.primary:hover {
+            background: #1177bb;
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-sub);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-hover);
-            color: var(--text-main);
-        }
-
-        /* --- Layout --- */
+        /* MAIN WORKSPACE */
         .workspace {
             flex: 1;
             display: flex;
-            height: calc(100vh - 54px);
+            overflow: hidden;
         }
 
-        /* Left: Scene List */
-        .panel-left {
-            width: 260px;
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border);
+        /* PANELS */
+        .panel {
             display: flex;
             flex-direction: column;
+            background: var(--ide-panel);
+            border-right: 1px solid var(--ide-border);
         }
 
         .panel-header {
-            padding: 12px 16px;
-            font-size: 11px;
+            padding: 8px 12px;
             font-weight: 700;
-            color: var(--text-sub);
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.5px;
+            background: #2d2d2d;
+            border-bottom: 1px solid var(--ide-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .scene-list {
+        /* LEFT: HIERARCHY (Scenes & Resources) */
+        .panel.left {
+            width: 280px;
+            min-width: 200px;
+        }
+
+        .tree-view {
             flex: 1;
             overflow-y: auto;
-            padding: 8px;
+            padding-bottom: 20px;
         }
 
-        .scene-item {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 6px;
+        .tree-node {
+            padding: 4px 8px 4px 16px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             border: 1px solid transparent;
-            margin-bottom: 4px;
-            background: #252525;
-            transition: 0.2s;
         }
 
-        .scene-item:hover {
-            background: var(--bg-hover);
+        .tree-node:hover {
+            background: var(--ide-hover);
         }
 
-        .scene-item.active {
-            background: #2d3640;
-            border-color: var(--accent);
+        .tree-node.selected {
+            background: #094771;
+            color: white;
         }
 
-        .scene-thumb {
-            width: 48px;
-            height: 48px;
-            border-radius: 4px;
-            background: #000;
-            object-fit: cover;
-            flex-shrink: 0;
+        .tree-node i {
+            width: 16px;
+            text-align: center;
+            opacity: 0.7;
         }
 
-        .scene-info {
+        /* CENTER: STAGE */
+        .panel.center {
             flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .scene-idx {
-            font-size: 10px;
-            color: var(--accent);
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .scene-summary {
-            font-size: 12px;
-            color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Center: Stage */
-        .panel-center {
-            flex: 1;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
+            background: #181818;
             position: relative;
+            border-right: none;
         }
 
-        .stage-container {
+        .stage-area {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
             overflow: hidden;
+            background-image:
+                linear-gradient(45deg, #222 25%, transparent 25%),
+                linear-gradient(-45deg, #222 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #222 75%),
+                linear-gradient(-45deg, transparent 75%, #222 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
 
-        .stage-frame {
-            width: 960px;
-            height: 540px;
+        .game-canvas {
+            width: 1280px;
+            /* Base Resolution */
+            height: 720px;
             background: black;
             position: relative;
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+            transform-origin: center;
+            /* Scaled by JS */
         }
 
-        .preview-bg {
+        .game-object {
             position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
+            user-select: none;
+            /* Interactive borders for selection could go here */
         }
 
-        .preview-char {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 85%;
-            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+        .game-object.selected {
+            outline: 2px solid var(--ide-highlight);
         }
 
-        .dialog-overlay {
-            position: absolute;
-            bottom: 30px;
-            left: 40px;
-            right: 40px;
-            min-height: 150px;
-            background: rgba(0, 0, 0, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            backdrop-filter: blur(4px);
+        /* BOTTOM: TIMELINE (Events) */
+        .panel.bottom {
+            height: 250px;
+            border-top: 1px solid var(--ide-border);
+            border-right: none;
         }
 
-        .dialog-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffdd59;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .dialog-text {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #eee;
-        }
-
-        .choice-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            z-index: 20;
-        }
-
-        .choice-btn {
-            min-width: 320px;
-            padding: 14px 24px;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        /* Right: Inspector */
-        .panel-right {
-            width: 300px;
-            background: var(--bg-panel);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .inspector-content {
+        .event-list {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
         }
 
-        .inspector-group {
-            margin-bottom: 24px;
-        }
-
-        .group-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-sub);
-            text-transform: uppercase;
-            margin-bottom: 12px;
+        .event-row {
             display: flex;
-            align-items: center;
+            border-bottom: 1px solid #333;
+            background: var(--ide-panel);
+        }
+
+        .event-row:hover {
+            background: var(--ide-hover);
+        }
+
+        .event-row.selected {
+            background: #3a3d41;
+            border-left: 3px solid var(--ide-highlight);
+        }
+
+        .event-cell {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .cell-type {
+            width: 100px;
+            color: #4ec9b0;
+            font-weight: bold;
+            border-right: 1px solid #333;
+        }
+
+        .cell-desc {
+            flex: 1;
+            color: #d4d4d4;
+        }
+
+        .cell-action {
+            width: 40px;
+            text-align: center;
+            cursor: pointer;
+            color: #e06c75;
+        }
+
+        /* RIGHT: INSPECTOR */
+        .panel.right {
+            width: 320px;
+            min-width: 250px;
+            border-left: 1px solid var(--ide-border);
+        }
+
+        .prop-group {
+            border-bottom: 1px solid var(--ide-border);
+            padding: 12px;
+        }
+
+        .prop-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #888;
+            font-size: 11px;
+        }
+
+        .c-input,
+        .c-select,
+        .c-textarea {
+            width: 100%;
+            background: var(--ide-input-bg);
+            border: 1px solid var(--ide-border);
+            color: #eee;
+            padding: 6px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .c-input:focus {
+            border-color: var(--ide-highlight);
+            outline: none;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
 
-        .inp-row {
-            margin-bottom: 12px;
-        }
-
-        .inp-label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-sub);
-            margin-bottom: 6px;
-        }
-
-        .inp {
-            width: 100%;
-            background: #111;
-            border: 1px solid #444;
-            color: white;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .inp:focus {
-            outline: 1px solid var(--accent);
-            border-color: var(--accent);
-        }
-
-        textarea.inp {
-            resize: vertical;
-            height: 80px;
-            line-height: 1.4;
-        }
-
-        /* Asset Picker */
-        .asset-btn {
-            width: 100%;
-            padding: 8px;
-            background: #333;
-            border: 1px solid #444;
-            color: #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .asset-btn:hover {
-            background: #444;
-        }
-
-        /* BGM Selector */
-        select.inp {
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23cccccc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 8px;
-            padding-right: 30px;
-            appearance: none;
-        }
-
-        /* Image Helper Overlay */
-        .img-helper {
+        /* Helper Modal */
+        .modal-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #252525;
-            padding: 24px;
-            border-radius: 12px;
-            border: 1px solid #444;
-            width: 400px;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: var(--ide-panel);
+            border: 1px solid var(--ide-highlight);
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <header class="studio-header">
-        <div class="brand-area">
-            <button onclick="location.href='dashboard.html'" class="btn btn-secondary">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <span class="studio-logo"><i class="fa-solid fa-layer-group"></i> CRAFIQ STUDIO</span>
-            <span id="novelTitle" class="project-title">Loading...</span>
+    <!-- TOOLBAR -->
+    <div class="ide-toolbar">
+        <div class="tool-group">
+            <div style="font-weight:900; color:var(--ide-highlight); margin-right:12px;">CRAFIQ ENGINE</div>
+            <button class="ide-btn" onclick="location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i>
+                Home</button>
+            <div style="width:1px; height:20px; background:#444; margin:0 8px;"></div>
+            <button class="ide-btn" onclick="Engine.saveProject()"><i class="fa-solid fa-save"></i> Save
+                Project</button>
+            <button class="ide-btn" onclick="Engine.previewGame()"><i class="fa-solid fa-play"></i> Run Preview</button>
         </div>
-        <div class="header-actions">
-            <button onclick="window.open('https://postimages.org/ko/', '_blank')" class="btn btn-secondary">
-                <i class="fa-solid fa-image"></i> 이미지 업로드
-            </button>
-            <button onclick="saveAll()" class="btn btn-primary">
-                <i class="fa-solid fa-cloud-arrow-up"></i> 저장
-            </button>
+        <div class="tool-group">
+            <span id="projectName" style="color:#888; font-size:12px;">Untitled Project</span>
         </div>
-    </header>
+    </div>
 
+    <!-- MAIN GRID -->
     <div class="workspace">
-        <!-- LEFT: Scenes -->
-        <div class="panel-left">
+
+        <!-- LEFT: HIERARCHY -->
+        <div class="panel left">
             <div class="panel-header">
-                SCENES
-                <button onclick="addScene()"
-                    style="background:none; border:none; color:var(--text-sub); cursor:pointer;">
-                    <i class="fa-solid fa-plus-square"></i>
-                </button>
+                SCENES (CHAPTERS)
+                <button class="ide-btn" style="padding:2px 6px;" onclick="Engine.addScene()"><i
+                        class="fa-solid fa-plus"></i></button>
             </div>
-            <div id="sceneList" class="scene-list">
-                <!-- Injected -->
+            <div id="sceneTree" class="tree-view">
+                <!-- Scenes List -->
+            </div>
+
+            <div class="panel-header" style="border-top:1px solid #333;">GLOBAL VARIABLES</div>
+            <div style="padding:10px; height:150px; overflow-y:auto;">
+                <button class="ide-btn" style="width:100%; margin-bottom:8px;" onclick="Engine.addVariable()">+ Add
+                    Variable</button>
+                <div id="varList"></div>
             </div>
         </div>
 
-        <!-- CENTER: Preview -->
-        <div class="panel-center">
-            <div class="stage-container">
-                <div class="stage-frame">
-                    <div id="pBg" class="preview-bg"></div>
-                    <img id="pChar" class="preview-char" src="" style="display:none;">
-
-                    <div id="pDialogBox" class="dialog-overlay">
-                        <div id="pName" class="dialog-name">Name</div>
-                        <div id="pText" class="dialog-text">Text...</div>
+        <!-- CENTER: STAGE -->
+        <div style="display:flex; flex-direction:column; flex:1;">
+            <div class="panel center">
+                <div class="stage-area">
+                    <div id="gameStage" class="game-canvas">
+                        <!-- RENDER TARGET -->
+                        <div id="layer-bg" style="position:absolute; inset:0; z-index:0;"></div>
+                        <div id="layer-chars" style="position:absolute; inset:0; z-index:10;"></div>
+                        <div id="layer-ui" style="position:absolute; inset:0; z-index:20; pointer-events:none;">
+                            <!-- Dialog Box Container -->
+                            <div id="dialogBox"
+                                style="position:absolute; bottom:50px; left:100px; right:100px; height:180px; background:rgba(0,0,0,0.8); border:2px solid white; padding:20px; display:none;">
+                                <div id="dialogName"
+                                    style="color:yellow; font-weight:bold; font-size:24px; margin-bottom:10px;">Name
+                                </div>
+                                <div id="dialogText" style="color:white; font-size:20px;">Text...</div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <!-- Zoom Controls overlay -->
+                <div
+                    style="position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.5); padding:4px; border-radius:4px; font-size:11px;">
+                    1280x720 | 100%
+                </div>
+            </div>
 
-                    <div id="pChoices" class="choice-overlay" style="display:none;">
-                        <!-- Buttons -->
+            <!-- BOTTOM: EVENT SEQUENCER -->
+            <div class="panel bottom">
+                <div class="panel-header">
+                    <span>EVENT TIMELINE (Action Script)</span>
+                    <div class="tool-group">
+                        <button class="ide-btn" onclick="Engine.addEvent('dialog')"><i class="fa-solid fa-comment"></i>
+                            Text</button>
+                        <button class="ide-btn" onclick="Engine.addEvent('background')"><i
+                                class="fa-solid fa-image"></i> BG</button>
+                        <button class="ide-btn" onclick="Engine.addEvent('character')"><i class="fa-solid fa-user"></i>
+                            Char</button>
+                        <button class="ide-btn" onclick="Engine.addEvent('sound')"><i class="fa-solid fa-music"></i>
+                            Audio</button>
+                        <button class="ide-btn" onclick="Engine.addEvent('choice')"><i
+                                class="fa-solid fa-list-check"></i> Choice</button>
+                    </div>
+                </div>
+                <div class="event-list">
+                    <div class="event-row header" style="font-weight:bold; opacity:0.7;">
+                        <div class="event-cell cell-type">TYPE</div>
+                        <div class="event-cell cell-desc">PARAMETERS</div>
+                        <div class="event-cell cell-action">DEL</div>
+                    </div>
+                    <div id="eventContainer">
+                        <!-- Events go here -->
                     </div>
                 </div>
             </div>
-            <div style="padding:10px; text-align:center; color:#555; font-size:12px;">
-                1920x1080 HD Resolution Preview
-            </div>
         </div>
 
-        <!-- RIGHT: Inspector -->
-        <div class="panel-right">
+        <!-- RIGHT: INSPECTOR -->
+        <div class="panel right">
             <div class="panel-header">INSPECTOR</div>
-            <div id="inspector" class="inspector-content">
-                <!-- Group: BGM -->
-                <div class="inspector-group">
-                    <div class="group-label"><i class="fa-solid fa-music"></i> 배경음악 (BGM)</div>
-                    <select id="inBgm" class="inp" onchange="updateScene('bgm', this.value)">
-                        <option value="">없음</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/990D774B5DA925FD24">B001 - 경쾌/약간 어두운
-                        </option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/9932104A5DA92C792C">B002 - 경쾌/어두운</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/999201355DA98F741D">B003 - 경쾌/피아노/재즈
-                        </option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/99E0B03D5DA9917738">B004 - 경쾌/빠른/전자</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/993B8C485DA9930A26">B005 - 경쾌/오락</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/9980B83A5DA994ED06">B006 - 왈츠</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/9939ED4D5DA997780C">B007 - 보통/피아노</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/994C4C4B5DA99B9126">B008 - 긍정/진취적</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/99C3B0465DA99E4E2E">B009 - 차분/피아노</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/99896A465DB1ABF921">B027 - 비교적 조용한</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/99FEC7335DB5A5CB33">B030 - 차분한/전자음</option>
-                        <option value="https://t1.daumcdn.net/cfile/tistory/99299C3A5F75A3812A">C039 - 희망/차분</option>
-                        <!-- Added a selection of the provided list -->
-                    </select>
-                </div>
+            <div id="inspector" style="flex:1; overflow-y:auto;">
+                <div style="padding:20px; text-align:center; color:#666;">Select an Event or Scene specifically.</div>
+            </div>
+        </div>
 
-                <!-- Group: Background -->
-                <div class="inspector-group">
-                    <div class="group-label"><i class="fa-solid fa-image"></i> 배경 (Background)</div>
-                    <div class="inp-row">
-                        <label class="inp-label">이미지 URL</label>
-                        <input id="inBg" class="inp" oninput="updateScene('bg', this.value)" placeholder="https://...">
-                        <button onclick="openImgHelp('bg')" class="asset-btn">이미지 링크 가져오기</button>
-                    </div>
-                </div>
+    </div>
 
-                <!-- Group: Character -->
-                <div class="inspector-group">
-                    <div class="group-label"><i class="fa-solid fa-user"></i> 캐릭터 (Character)</div>
-                    <div class="inp-row">
-                        <label class="inp-label">이미지 URL (투명 배경 PNG 권장)</label>
-                        <input id="inChar" class="inp" oninput="updateScene('character', this.value)"
-                            placeholder="https://...">
-                        <button onclick="openImgHelp('char')" class="asset-btn">이미지 링크 가져오기</button>
-                    </div>
-                </div>
-
-                <!-- Group: Script -->
-                <div class="inspector-group">
-                    <div class="group-label"><i class="fa-solid fa-comment-dots"></i> 대사 (Script)</div>
-                    <div class="inp-row">
-                        <label class="inp-label">화자 (Speaker)</label>
-                        <input id="inSpeaker" class="inp" oninput="updateScene('speaker', this.value)">
-                    </div>
-                    <div class="inp-row">
-                        <label class="inp-label">내용 (Text)</label>
-                        <textarea id="inText" class="inp" style="height:100px;"
-                            oninput="updateScene('text', this.value)"></textarea>
-                    </div>
-                </div>
-
-                <!-- Group: Choices -->
-                <div class="inspector-group">
-                    <div class="group-label" style="justify-content:space-between;">
-                        <span><i class="fa-solid fa-list-ul"></i> 선택지 (Choices)</span>
-                        <button onclick="addChoice()"
-                            style="background:none; border:none; color:var(--accent); cursor:pointer;">+ 추가</button>
-                    </div>
-                    <div id="choiceEditor">
-                        <!-- Dynamic -->
-                    </div>
-                </div>
-
-                <div class="inspector-group" style="border-top:1px solid #333; padding-top:20px;">
-                    <button onclick="deleteScene()"
-                        style="width:100%; padding:10px; background:#e74c3c; border:none; color:white; border-radius:4px; font-weight:bold; cursor:pointer;">이
-                        장면 삭제</button>
-                </div>
+    <!-- HELPERS -->
+    <div id="imgHelper" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Image Asset Uploader</h3>
+            <p style="color:#888;">PostImages에서 'Direct Link'를 복사해오세요.</p>
+            <input id="imgPaste" class="c-input" placeholder="https://..." style="margin:10px 0;">
+            <div style="text-align:right;">
+                <button class="ide-btn"
+                    onclick="document.getElementById('imgHelper').style.display='none'">Close</button>
+                <button class="ide-btn primary" onclick="Engine.applyImage()">Apply</button>
             </div>
         </div>
     </div>
 
-    <!-- Image Helper Modal -->
-    <div id="imgHelper" class="img-helper">
-        <h3 style="color:white; margin-bottom:12px;">이미지 업로드 가이드</h3>
-        <p style="font-size:13px; color:#aaa; line-height:1.5; margin-bottom:20px;">
-            1. 상단 메뉴의 <b>'이미지 업로드'</b> 버튼을 눌러 PostImages 사이트를 여세요.<br>
-            2. 이미지를 업로드한 후, <b>'직접 링크(Direct Link)'</b> 주소를 복사하세요.<br>
-            3. 아래 칸에 붙여넣기 하면 자동으로 적용됩니다.
-        </p>
-        <input id="pasteImg" class="inp" placeholder="여기에 주소를 붙여넣으세요..." style="margin-bottom:12px;">
-        <div style="display:flex; justify-content:flex-end; gap:8px;">
-            <button onclick="document.getElementById('imgHelper').style.display='none'"
-                class="btn btn-secondary">닫기</button>
-            <button onclick="applyPastedImg()" class="btn btn-primary">적용하기</button>
-        </div>
-    </div>
-
+    <!-- ENGINE CORE (JAVASCRIPT) -->
     <script type="module">
         import { getNovelById, getScenes, saveScenes } from './js/data.js';
 
-        let novelId = null;
-        let scenes = [];
-        let activeIdx = 0;
-        let targetField = ''; // for img helper
+        // --- MODEL DEFINITION ---
+        /*
+           Data Structure (Ren'Py Style):
+           Novel -> Scenes[]
+           Scene -> Events[] (Linear execution flow)
+           
+           Event Types:
+           - dialog: { speaker, text, speed }
+           - background: { url, transition }
+           - character: { name, url, x, y, scale, transition }
+           - sound: { url, type: 'bgm'|'sfx', volume }
+           - choice: { options: [{label, jumpSceneId}] }
+           - variable: { key, op, val }
+        */
 
-        window.init = async () => {
-            const params = new URLSearchParams(window.location.search);
-            novelId = params.get('id');
-            if (!novelId) { alert("잘못된 접근입니다."); location.href = 'dashboard.html'; return; }
+        const State = {
+            novelId: null,
+            novel: null,
+            scenes: [],
+            activeSceneId: null, // internal uuid or index
+            selectedEventIndex: -1,
+            clipboard: null
+        };
 
-            // Load Text Data
-            const { data: novel } = await getNovelById(novelId);
-            if (novel) document.getElementById('novelTitle').innerText = novel.title;
+        window.Engine = {
 
-            // Load Scenes
-            const { data: list } = await getScenes(novelId);
-            if (list && list.length > 0) {
-                // Parse format
-                scenes = list.map(item => ({
-                    id: item.id,
-                    ...item.data
-                }));
-            } else {
-                // Init first scene
-                addScene();
-            }
+            async init() {
+                const params = new URLSearchParams(window.location.search);
+                State.novelId = params.get('id');
+                if (!State.novelId) return alert("No ID provided");
 
-            renderList();
-            selectScene(0);
-        }
+                // Load Data
+                const { data: novel } = await getNovelById(State.novelId);
+                State.novel = novel;
+                document.getElementById('projectName').innerText = novel.title;
 
-        /* --- LOGIC --- */
+                const { data: scenes } = await getScenes(State.novelId);
+                if (scenes && scenes.length > 0) {
+                    // Normalize Data: Ensure 'events' array exists
+                    State.scenes = scenes.map(s => ({
+                        id: s.id, // DB ID
+                        name: s.title || `Scene ${s.order_index}`,
+                        events: s.data.events || [] // The new event stream
+                    }));
+                } else {
+                    State.scenes = [];
+                    this.addScene();
+                }
 
-        window.addScene = () => {
-            scenes.push({
-                bg: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1000',
-                character: '',
-                speaker: '???',
-                text: '새로운 장면입니다.',
-                bgm: '',
-                choices: []
-            });
-            renderList();
-            selectScene(scenes.length - 1);
-        }
+                this.renderSceneTree();
+                this.selectScene(0);
+            },
 
-        window.selectScene = (idx) => {
-            if (idx < 0 || idx >= scenes.length) return;
-            activeIdx = idx;
-            renderList();
-            renderInspector();
-            renderStage();
-        }
+            // --- SCENE MANAGEMENT ---
 
-        window.updateScene = (key, val) => {
-            scenes[activeIdx][key] = val;
-            renderStage();
-            if (key === 'text') {
-                const el = document.getElementById(`desc-${activeIdx}`);
-                if (el) el.innerText = val;
-            }
-        }
+            addScene() {
+                State.scenes.push({
+                    id: 'temp-' + Date.now(),
+                    name: `Scene ${State.scenes.length + 1}`,
+                    events: []
+                });
+                this.renderSceneTree();
+                this.selectScene(State.scenes.length - 1);
+            },
 
-        window.deleteScene = () => {
-            if (!confirm("정말 삭제하시겠습니까?")) return;
-            scenes.splice(activeIdx, 1);
-            if (scenes.length === 0) addScene();
-            activeIdx = Math.max(0, activeIdx - 1);
-            renderList();
-            selectScene(activeIdx);
-        }
+            selectScene(index) {
+                State.activeSceneIndex = index;
+                State.selectedEventIndex = -1;
+                this.renderSceneTree();
+                this.renderEventList();
+                this.simulatePreview(); // Show end state of scene
+            },
 
-        window.saveAll = async () => {
-            // Transform to DB
-            const payload = scenes.map((s, i) => ({
-                novel_id: novelId,
-                title: s.text.substring(0, 20),
-                order_index: i,
-                data: s
-            }));
-            const { error } = await saveScenes(novelId, payload);
-            if (error) alert(error.message);
-            else alert("저장되었습니다.");
-        }
+            // --- EVENT SYSTEM ---
 
-        /* --- INSPECTOR & CHOICES --- */
+            addEvent(type) {
+                const scene = State.scenes[State.activeSceneIndex];
+                let newEvent = { type };
 
-        window.addChoice = () => {
-            if (!scenes[activeIdx].choices) scenes[activeIdx].choices = [];
-            scenes[activeIdx].choices.push({ text: "선택지 내용", jumpIndex: activeIdx + 1 });
-            renderInspector();
-            renderStage();
-        }
+                // Defaults
+                if (type === 'dialog') { newEvent.speaker = "Someone"; newEvent.text = "Hello World"; }
+                if (type === 'background') { newEvent.url = ""; newEvent.transition = "fade"; }
+                if (type === 'character') { newEvent.name = "Char1"; newEvent.url = ""; newEvent.x = 0.5; newEvent.y = 1.0; newEvent.scale = 1.0; }
+                if (type === 'sound') { newEvent.url = ""; newEvent.mode = "bgm"; }
+                if (type === 'choice') { newEvent.options = [{ label: "Next", jump: -1 }]; }
 
-        window.updateChoice = (cIdx, key, val) => {
-            scenes[activeIdx].choices[cIdx][key] = val;
-            renderStage();
-        }
+                scene.events.push(newEvent);
+                this.selectEvent(scene.events.length - 1);
+                this.renderEventList();
+            },
 
-        window.removeChoice = (cIdx) => {
-            scenes[activeIdx].choices.splice(cIdx, 1);
-            renderInspector();
-            renderStage();
-        }
+            selectEvent(index) {
+                State.selectedEventIndex = index;
+                this.renderEventList();
+                this.renderInspector();
+                this.simulatePreview(index); // Preview up to this event
+            },
 
-        /* --- RENDER --- */
+            deleteEvent(index, e) {
+                if (e) e.stopPropagation();
+                const scene = State.scenes[State.activeSceneIndex];
+                scene.events.splice(index, 1);
+                this.renderEventList();
+                this.selectEvent(Math.max(0, index - 1));
+            },
 
-        function renderList() {
-            const list = document.getElementById('sceneList');
-            list.innerHTML = scenes.map((s, i) => `
-                <div class="scene-item ${i === activeIdx ? 'active' : ''}" onclick="selectScene(${i})">
-                    <img class="scene-thumb" src="${s.bg || ''}">
-                    <div class="scene-info">
-                        <div class="scene-idx">SCENE ${i + 1}</div>
-                        <div id="desc-${i}" class="scene-summary">${s.text}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
+            updateEvent(key, val) {
+                const scene = State.scenes[State.activeSceneIndex];
+                const ev = scene.events[State.selectedEventIndex];
+                if (!ev) return;
+                ev[key] = val;
+                this.renderEventList(); // Update Grid description
+                this.simulatePreview(State.selectedEventIndex);
+            },
 
-        function renderInspector() {
-            const s = scenes[activeIdx];
-            document.getElementById('inBg').value = s.bg || '';
-            document.getElementById('inChar').value = s.character || '';
-            document.getElementById('inSpeaker').value = s.speaker || '';
-            document.getElementById('inText').value = s.text || '';
-            document.getElementById('inBgm').value = s.bgm || '';
+            // --- SIMULATION / RENDERER ---
 
-            // Choices
-            const cDiv = document.getElementById('choiceEditor');
-            if (!s.choices || s.choices.length === 0) {
-                cDiv.innerHTML = '<div style="font-size:12px; color:#666;">선택지가 없습니다 (자동 진행).</div>';
-            } else {
-                cDiv.innerHTML = s.choices.map((c, i) => `
-                    <div style="background:#1a1a1a; padding:10px; border-radius:4px; margin-bottom:8px;">
-                        <input class="inp" style="margin-bottom:4px;" value="${c.text}" oninput="updateChoice(${i}, 'text', this.value)" placeholder="선택지 텍스트">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                             <div style="font-size:11px; color:#888;">점프: SCENE ${c.jumpIndex + 1}</div>
-                             <input type="number" class="inp" style="width:60px; padding:4px;" value="${c.jumpIndex}" oninput="updateChoice(${i}, 'jumpIndex', parseInt(this.value))">
-                             <button onclick="removeChoice(${i})" style="color:#e74c3c; background:none; border:none; cursor:pointer;">삭제</button>
-                        </div>
+            simulatePreview(upToEventIndex = 9999) {
+                // Clear Stage
+                document.getElementById('layer-bg').style.backgroundImage = 'none';
+                document.getElementById('layer-chars').innerHTML = '';
+                document.getElementById('dialogBox').style.display = 'none';
+
+                const scene = State.scenes[State.activeSceneIndex];
+                if (!scene) return;
+
+                // Replay events from start to current selected
+                const limit = Math.min(upToEventIndex, scene.events.length - 1);
+
+                for (let i = 0; i <= limit; i++) {
+                    const ev = scene.events[i];
+
+                    if (ev.type === 'background') {
+                        document.getElementById('layer-bg').style.backgroundImage = `url('${ev.url}')`;
+                        document.getElementById('layer-bg').style.backgroundSize = 'cover';
+                    }
+
+                    if (ev.type === 'character') {
+                        // Creating/Updating DOM element for char
+                        let el = document.getElementById(`char-${ev.name}`);
+                        if (!el) {
+                            el = document.createElement('img');
+                            el.id = `char-${ev.name}`;
+                            el.style.position = 'absolute';
+                            el.style.bottom = '0';
+                            el.style.transition = '0.3s';
+                            document.getElementById('layer-chars').appendChild(el);
+                        }
+                        if (ev.url) el.src = ev.url;
+
+                        // Positioning (x: 0~1)
+                        // Canvas is 1280 wide.
+                        const leftPos = (ev.x * 100) + '%';
+                        el.style.left = leftPos;
+                        el.style.transform = `translateX(-50%) scale(${ev.scale})`;
+                        el.style.height = '90%'; // default height
+                    }
+
+                    if (ev.type === 'dialog' && i === limit) {
+                        // Only show dialog if it's the *current* active event (or last one)
+                        const box = document.getElementById('dialogBox');
+                        box.style.display = 'block';
+                        document.getElementById('dialogName').innerText = ev.speaker;
+                        document.getElementById('dialogText').innerText = ev.text;
+                    }
+                }
+            },
+
+            // --- UI RENDERERS ---
+
+            renderSceneTree() {
+                const container = document.getElementById('sceneTree');
+                container.innerHTML = State.scenes.map((s, i) => `
+                    <div class="tree-node ${i === State.activeSceneIndex ? 'selected' : ''}" onclick="Engine.selectScene(${i})">
+                        <i class="fa-solid fa-film"></i>
+                        <span>${s.name}</span>
                     </div>
                 `).join('');
+            },
+
+            renderEventList() {
+                const container = document.getElementById('eventContainer');
+                const scene = State.scenes[State.activeSceneIndex];
+                if (!scene) return;
+
+                container.innerHTML = scene.events.map((ev, i) => `
+                    <div class="event-row ${i === State.selectedEventIndex ? 'selected' : ''}" onclick="Engine.selectEvent(${i})">
+                        <div class="event-cell cell-type" style="color:${this.getTypeColor(ev.type)}">${ev.type.toUpperCase()}</div>
+                        <div class="event-cell cell-desc">${this.getEventDesc(ev)}</div>
+                        <div class="event-cell cell-action" onclick="Engine.deleteEvent(${i}, event)">×</div>
+                    </div>
+                `).join('');
+            },
+
+            getTypeColor(t) {
+                if (t === 'dialog') return '#4ec9b0';
+                if (t === 'background') return '#ce9178';
+                if (t === 'character') return '#dcdcaa';
+                if (t === 'choice') return '#c586c0';
+                return '#ccc';
+            },
+
+            getEventDesc(ev) {
+                if (ev.type === 'dialog') return `<b>${ev.speaker}</b>: "${ev.text.substring(0, 30)}..."`;
+                if (ev.type === 'background') return `Set BG: ...${ev.url.slice(-15)}`;
+                if (ev.type === 'character') return `Show <b>${ev.name}</b> at X:${ev.x}`;
+                if (ev.type === 'sound') return `Play ${ev.mode}`;
+                return JSON.stringify(ev);
+            },
+
+            renderInspector() {
+                const container = document.getElementById('inspector');
+                const scene = State.scenes[State.activeSceneIndex];
+                const ev = scene.events[State.selectedEventIndex];
+
+                if (!ev) {
+                    container.innerHTML = '<div style="padding:20px; color:#666;">No event selected. Select or Add an event to edit properties.</div>';
+                    return;
+                }
+
+                let html = `<div class="prop-group"><div class="prop-label">EVENT TYPE</div><div style="font-weight:bold; color:#fff;">${ev.type.toUpperCase()}</div></div>`;
+
+                if (ev.type === 'dialog') {
+                    html += `
+                    <div class="prop-group">
+                        <label class="prop-label">Speaker Name</label>
+                        <input class="c-input" value="${ev.speaker}" oninput="Engine.updateEvent('speaker', this.value)">
+                    </div>
+                    <div class="prop-group">
+                        <label class="prop-label">Dialog Text</label>
+                        <textarea class="c-textarea" style="height:80px;" oninput="Engine.updateEvent('text', this.value)">${ev.text}</textarea>
+                    </div>`;
+                }
+
+                if (ev.type === 'background') {
+                    html += `
+                    <div class="prop-group">
+                        <label class="prop-label">Image URL</label>
+                        <div style="display:flex; gap:4px;">
+                            <input class="c-input" id="inp-bg" value="${ev.url}" oninput="Engine.updateEvent('url', this.value)">
+                            <button class="ide-btn" onclick="Engine.openImgHelper('inp-bg')"><i class="fa-solid fa-image"></i></button>
+                        </div>
+                    </div>`;
+                }
+
+                if (ev.type === 'character') {
+                    html += `
+                    <div class="prop-group">
+                        <label class="prop-label">Character ID (Internal Name)</label>
+                        <input class="c-input" value="${ev.name}" oninput="Engine.updateEvent('name', this.value)">
+                    </div>
+                    <div class="prop-group">
+                        <label class="prop-label">Image URL</label>
+                         <div style="display:flex; gap:4px;">
+                            <input class="c-input" id="inp-char" value="${ev.url}" oninput="Engine.updateEvent('url', this.value)">
+                            <button class="ide-btn" onclick="Engine.openImgHelper('inp-char')"><i class="fa-solid fa-image"></i></button>
+                        </div>
+                    </div>
+                    <div class="prop-group row-2">
+                        <div>
+                            <label class="prop-label">Position X (0.0 - 1.0)</label>
+                            <input type="number" step="0.1" class="c-input" value="${ev.x}" oninput="Engine.updateEvent('x', parseFloat(this.value))">
+                        </div>
+                        <div>
+                            <label class="prop-label">Scale</label>
+                            <input type="number" step="0.1" class="c-input" value="${ev.scale}" oninput="Engine.updateEvent('scale', parseFloat(this.value))">
+                        </div>
+                    </div>`;
+                }
+
+                if (ev.type === 'sound') {
+                    html += `
+                    <div class="prop-group">
+                        <label class="prop-label">Select BGM</label>
+                        <select class="c-select" onchange="Engine.updateEvent('url', this.value)">
+                            <option value="">(Select Track)</option>
+                            <option value="https://t1.daumcdn.net/cfile/tistory/9939ED4D5DA997780C" ${ev.url.includes('9939ED') ? 'selected' : ''}>Light Piano</option>
+                            <option value="https://t1.daumcdn.net/cfile/tistory/9980B83A5DA994ED06" ${ev.url.includes('9980B8') ? 'selected' : ''}>Waltz</option>
+                            <!-- More can be added -->
+                        </select>
+                    </div>`;
+                }
+
+                container.innerHTML = html;
+            },
+
+            // --- SAVE ---
+
+            async saveProject() {
+                if (!State.novelId) return;
+
+                // Map scenes back to DB text/data
+                const payload = State.scenes.map((s, i) => ({
+                    novel_id: State.novelId,
+                    title: s.name,
+                    order_index: i,
+                    data: { events: s.events } // Wrapping actions inside 'events' key
+                }));
+
+                const { error } = await saveScenes(State.novelId, payload);
+                if (error) alert("Error: " + error.message);
+                else alert("Project Saved Successfully!");
+            },
+
+            previewGame() {
+                // Determine start scene (0) and go
+                const url = `play.html?id=${State.novelId}`;
+                window.open(url, '_blank');
+            },
+
+            // --- HELPERS ---
+            targetInputId: null,
+            openImgHelper(targetId) {
+                this.targetInputId = targetId;
+                document.getElementById('imgHelper').style.display = 'flex';
+            },
+            applyImage() {
+                const val = document.getElementById('imgPaste').value;
+                if (val && this.targetInputId) {
+                    const el = document.getElementById(this.targetInputId);
+                    el.value = val;
+                    // Trigger input event manually to update model
+                    el.dispatchEvent(new Event('input'));
+                }
+                document.getElementById('imgHelper').style.display = 'none';
+                document.getElementById('imgPaste').value = '';
             }
-        }
+        };
 
-        function renderStage() {
-            const s = scenes[activeIdx];
-            // BG & Char
-            document.getElementById('pBg').style.backgroundImage = `url('${s.bg}')`;
-            if (s.character) {
-                document.getElementById('pChar').style.display = 'block';
-                document.getElementById('pChar').src = s.character;
-            } else {
-                document.getElementById('pChar').style.display = 'none';
-            }
+        // Init
+        window.addEventListener('DOMContentLoaded', () => Engine.init());
 
-            // Dialog
-            document.getElementById('pName').innerText = s.speaker;
-            document.getElementById('pText').innerText = s.text;
-
-            // Choices
-            const cDiv = document.getElementById('pChoices');
-            if (s.choices && s.choices.length > 0) {
-                cDiv.style.display = 'flex';
-                cDiv.innerHTML = s.choices.map(c => `<div class="choice-btn">${c.text}</div>`).join('');
-                document.getElementById('pDialogBox').style.opacity = '0.3';
-            } else {
-                cDiv.style.display = 'none';
-                document.getElementById('pDialogBox').style.opacity = '1';
-            }
-        }
-
-        /* --- HELPERS --- */
-        window.openImgHelp = (target) => {
-            targetField = target;
-            document.getElementById('imgHelper').style.display = 'block';
-            document.getElementById('pasteImg').focus();
-        }
-
-        window.applyPastedImg = () => {
-            const val = document.getElementById('pasteImg').value;
-            if (!val) return;
-
-            if (targetField === 'bg') {
-                updateScene('bg', val);
-                document.getElementById('inBg').value = val;
-            } else {
-                updateScene('character', val);
-                document.getElementById('inChar').value = val;
-            }
-            document.getElementById('imgHelper').style.display = 'none';
-            document.getElementById('pasteImg').value = '';
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 

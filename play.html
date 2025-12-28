@@ -137,153 +137,132 @@
     </style>
 
     <script type="module">
-        import { getNovelById, getScenes, getComments, addComment, deleteComment } from './js/data.js';
-        import { getCurrentUser } from './js/auth.js';
+        import { getNovelById, getScenes } from './js/data.js';
 
-        let scenes = [];
-        let currentSceneIndex = 0;
-        let isPlaying = false;
-        let novelId = null; // Added
-        let currentUser = null; // Added
+        /* RUNTIME ENGINE */
+        const Runtime = {
+            scenes: [],
+            currentSceneIndex: 0,
+            currentEventIndex: 0,
+            autoPlay: false,
 
-        window.startGame = async () => {
-            document.querySelector('.start-screen').style.display = 'none';
-            playScene(0);
+            async init() {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                if (!id) return alert("No Game ID");
+
+                // Load Data
+                const { data: novel } = await getNovelById(id);
+                if (novel) document.getElementById('gameTitle').innerText = novel.title;
+
+                const { data: list } = await getScenes(id);
+                // Simplify structure
+                this.scenes = list.map(s => s.data);
+
+                if (this.scenes.length > 0) {
+                    document.querySelector('.start-screen').style.display = 'flex';
+                }
+            },
+
+            start() {
+                document.querySelector('.start-screen').style.display = 'none';
+                this.executeScene(0);
+            },
+
+            executeScene(index) {
+                if (index >= this.scenes.length) {
+                    alert("End of Game");
+                    return;
+                }
+                this.currentSceneIndex = index;
+                this.currentEventIndex = 0;
+                this.processEvent();
+            },
+
+            processEvent() {
+                const scene = this.scenes[this.currentSceneIndex];
+                if (!scene || !scene.events || this.currentEventIndex >= scene.events.length) {
+                    // End of Scene -> Go Next
+                    this.executeScene(this.currentSceneIndex + 1);
+                    return;
+                }
+
+                const ev = scene.events[this.currentEventIndex];
+
+                // --- EXECUTE EVENT ---
+
+                if (ev.type === 'background') {
+                    document.getElementById('bgLayer').style.backgroundImage = `url('${ev.url}')`;
+                    // Auto proceed
+                    this.next();
+                }
+
+                else if (ev.type === 'character') {
+                    this.renderCharacter(ev);
+                    this.next();
+                }
+
+                else if (ev.type === 'dialog') {
+                    // STOP and Wait for Click
+                    const box = document.querySelector('.dialogue-box');
+                    box.style.opacity = 1;
+                    document.getElementById('charName').innerText = ev.speaker;
+                    document.getElementById('dialogueText').innerText = ev.text;
+                    // Do NOT call next() automatically
+                }
+
+                else if (ev.type === 'sound') {
+                    // TODO: Play Sound
+                    this.next();
+                }
+
+                else {
+                    console.warn("Unknown Event", ev);
+                    this.next();
+                }
+            },
+
+            renderCharacter(ev) {
+                // Ensure char element exists
+                let el = document.getElementById(`actor-${ev.name}`);
+                if (!el) {
+                    el = document.createElement('img');
+                    el.id = `actor-${ev.name}`;
+                    el.className = 'actor';
+                    document.getElementById('actorLayer').appendChild(el);
+                }
+                if (ev.url) el.src = ev.url;
+
+                // Position
+                el.style.left = (ev.x * 100) + '%';
+                el.style.transform = `translateX(-50%) scale(${ev.scale || 1})`;
+            },
+
+            next() {
+                this.currentEventIndex++;
+                // Small delay for processing/visuals
+                setTimeout(() => this.processEvent(), 10);
+            },
+
+            // User Interaction
+            onClick() {
+                // Only proceed if we are waiting (i.e., currently showing dialog)
+                const scene = this.scenes[this.currentSceneIndex];
+                if (!scene) return;
+                const ev = scene.events[this.currentEventIndex];
+
+                if (ev && ev.type === 'dialog') {
+                    this.next();
+                }
+            }
         };
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            novelId = params.get('id'); // Capture into global variable
-            if (!novelId) return alert("게임 정보가 없습니다.");
+        window.Runtime = Runtime;
+        window.startGame = () => Runtime.start();
+        window.nextStep = () => Runtime.onClick();
 
-            const { data: novel } = await getNovelById(novelId);
-            if (novel) document.getElementById('gameTitle').innerText = novel.title;
+        window.addEventListener('DOMContentLoaded', () => Runtime.init());
 
-            const { data: list } = await getScenes(novelId);
-            scenes = list || [];
-
-            // Comments
-            currentUser = await getCurrentUser();
-            loadComments();
-        });
-
-        // Comment Functions
-        window.loadComments = async () => {
-            const { data: comments } = await getComments(novelId);
-            document.getElementById('commentCount').innerText = comments ? comments.length : 0;
-            const list = document.getElementById('commentList');
-
-            if (comments && comments.length > 0) {
-                list.innerHTML = comments.map(c => `
-                    <div style="display:flex; gap:12px;">
-                        <div style="width:40px; height:40px; background:#444; border-radius:50%; flex-shrink:0; overflow:hidden;">
-                             <img src="${c.profiles?.avatar_url || 'https://via.placeholder.com/40'}" style="width:100%; height:100%;">
-                        </div>
-                        <div style="flex:1;">
-                            <div style="font-size:13px; font-weight:bold; margin-bottom:4px; color:#ccc;">
-                                ${c.profiles?.username || '익명'}
-                                <span style="font-size:11px; color:#666; margin-left:8px;">${new Date(c.created_at).toLocaleDateString()}</span>
-                            </div>
-                            <div style="font-size:14px; line-height:1.4; color:#ddd;">${c.content}</div>
-                            ${currentUser && currentUser.id === c.user_id ? `<button onclick="removeComment('${c.id}')" style="font-size:11px; color:#e74c3c; background:none; border:none; cursor:pointer; margin-top:4px;">삭제</button>` : ''}
-                        </div>
-                    </div>
-                 `).join('');
-            } else {
-                list.innerHTML = '<div style="color:#666; text-align:center; padding:20px;">첫 댓글의 주인공이 되어보세요!</div>';
-            }
-        }
-
-        window.postComment = async () => {
-            const input = document.getElementById('commentInput');
-            if (!input.value.trim()) return;
-            const { error } = await addComment(novelId, input.value);
-            if (error) alert("등록 실패: " + error.message);
-            else { input.value = ''; loadComments(); }
-        }
-        window.removeComment = async (id) => {
-            if (confirm("삭제하시겠습니까?")) { await deleteComment(id); loadComments(); }
-        }
-
-        window.nextStep = () => {
-            const scene = scenes[currentSceneIndex];
-            const data = scene.data || {};
-
-            // If has choices, block click unless choice is made (handled by buttons)
-            if (data.choices && data.choices.length > 0) return;
-
-            // Simple Linear Progression
-            playScene(currentSceneIndex + 1);
-        }
-
-        window.jumpTo = (index) => {
-            playScene(index); // Jump logic
-        }
-
-        function playScene(index) {
-            if (index >= scenes.length) {
-                alert("엔딩입니다! 플레이해주셔서 감사합니다.");
-                location.href = 'index.html';
-                return;
-            }
-            currentSceneIndex = index;
-            const scene = scenes[index];
-            const data = scene.data || {};
-
-            // 1. Set BG
-            const bgEl = document.getElementById('bgLayer');
-            if (data.bg) bgEl.style.backgroundImage = `url('${data.bg}')`;
-
-            // 2. Clear Actors & Set new
-            const actorLayer = document.getElementById('actorLayer');
-            actorLayer.innerHTML = '';
-
-            if (data.character) {
-                const img = document.createElement('img');
-                img.src = data.character;
-                img.className = 'actor';
-                img.style.left = '50%';
-                img.style.transform = 'translateX(-50%)'; // Center for now
-                actorLayer.appendChild(img);
-            }
-
-            // 3. Dialogue
-            const dialogBox = document.querySelector('.dialogue-box');
-            document.getElementById('charName').innerText = data.speaker || "???";
-            document.getElementById('dialogueText').innerText = data.text || "...";
-
-            // Custom Style
-            if (data.boxOpacity !== undefined) {
-                dialogBox.style.background = `rgba(0, 0, 0, ${data.boxOpacity})`;
-            } else {
-                dialogBox.style.background = `rgba(0, 0, 0, 0.85)`;
-            }
-            if (data.boxStyle) {
-                dialogBox.style.cssText += data.boxStyle;
-            }
-
-            // 4. Choices (Overlay)
-            const choiceLayer = document.getElementById('choiceLayer');
-            if (!choiceLayer) {
-                // Create logic if missing
-                const c = document.createElement('div');
-                c.id = 'choiceLayer';
-                c.style.cssText = "position:absolute; inset:0; background:rgba(0,0,0,0.5); display:none; flex-direction:column; justify-content:center; align-items:center; gap:16px; z-index:50;";
-                document.querySelector('.game-stage').appendChild(c);
-            }
-
-            const cl = document.getElementById('choiceLayer');
-            if (data.choices && data.choices.length > 0) {
-                cl.style.display = 'flex';
-                cl.innerHTML = data.choices.map(c => `
-                    <button onclick="event.stopPropagation(); jumpTo(${c.jumpIndex})" style="padding:16px 40px; background:rgba(0,0,0,0.8); border:1px solid #1f8ce6; color:#1f8ce6; border-radius:30px; font-weight:bold; font-size:18px; cursor:pointer; min-width:300px; hover:background:white;">
-                        ${c.text}
-                    </button>
-                `).join('');
-            } else {
-                cl.style.display = 'none';
-            }
-        }
     </script>
 </head>
 
@@ -292,18 +271,16 @@
 
         <!-- Game Stage -->
         <div class="game-stage" onclick="nextStep()">
-            <div id="bgLayer" class="bg-layer"
-                style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000');">
-            </div>
+            <div id="bgLayer" class="bg-layer" style="background:#000;"></div>
             <div id="actorLayer" class="actor-layer"></div>
 
             <div class="ui-overlay">
                 <button class="ui-btn" onclick="event.stopPropagation(); location.href='index.html'">나가기</button>
             </div>
 
-            <div class="dialogue-box">
-                <div id="charName" class="char-name">???</div>
-                <div id="dialogueText" class="dialogue-text">화면을 클릭하여 시작하세요...</div>
+            <div class="dialogue-box" style="opacity:0; transition:opacity 0.2s;">
+                <div id="charName" class="char-name"></div>
+                <div id="dialogueText" class="dialogue-text"></div>
             </div>
 
             <div class="start-screen">
@@ -312,6 +289,7 @@
                 <button class="start-btn" onclick="event.stopPropagation(); startGame()">Game Start</button>
             </div>
         </div>
+
 
         <!-- Comments Section -->
         <div style="margin-top:30px; color:white;">
