@@ -1,145 +1,128 @@
 export function renderHome() {
     const container = document.createElement('div');
 
+    // SVG Icons
+    const icons = {
+        home: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>',
+        search: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>',
+        studio: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>',
+        user: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>'
+    };
+
     container.innerHTML = `
-        <!-- GNB -->
-        <header class="gnb">
-            <div class="container gnb-inner flex items-center justify-between">
-                <div class="flex items-center">
+        <!-- Desktop Header -->
+        <header class="gnb hidden-mobile">
+            <div class="container gnb-inner flex-between">
+                <div class="flex-center" style="gap:40px;">
                     <a href="#/" class="logo">CRAFIQ</a>
-                    <nav class="gnb-nav">
+                    <nav class="nav-links">
                         <a href="#/" class="active">홈</a>
-                        <a href="#/">랭킹</a>
-                        <a href="#/">판타지</a>
-                        <a href="#/">로맨스</a>
-                        <a href="#/">무협</a>
+                        <a href="#/">웹소설</a>
+                        <a href="#/">비주얼노벨</a>
                     </nav>
                 </div>
-                <div class="gnb-utils">
-                    <div class="search-box">
-                        <input type="text" placeholder="작품명, 작가 검색">
-                        <svg width="18" height="18" fill="none" stroke="#999" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </div>
-                    <button class="btn-new-work" onclick="location.hash='#/dashboard'">작품 만들기</button>
-                    <button style="font-weight:600; font-size:13px; color:#555;">로그인</button>
+                <div class="flex-center" style="gap:16px;">
+                    <button onclick="location.hash='#/dashboard'" class="btn-primary">작품 만들기</button>
+                    <div style="width:32px; height:32px; background:#ddd; border-radius:50%;"></div>
                 </div>
             </div>
         </header>
 
-        <!-- Hero Slider (Static Mock) -->
-        <div class="hero-wrapper">
-            <div class="hero-slider">
-                <div class="hero-slide" style="background-image: url('https://via.placeholder.com/1200x500/121212/333?text=Cover+Art');">
-                    <div class="hero-overlay">
-                        <div class="hero-tag">독점 연재</div>
-                        <div class="hero-title">상상 그 이상의 세계,<br>CRAFIQ 오리지널 런칭!</div>
-                        <div class="hero-desc">비주얼 노벨로 다시 태어난 전설의 명작들을 지금 바로 만나보세요.<br>코딩 없이 누구나 작가가 될 수 있는 기회.</div>
-                        <div class="flex gap-10">
-                            <button style="padding:12px 24px; background:white; color:black; font-weight:800; border-radius:4px;">작품 보러가기</button>
-                            <button style="padding:12px 24px; border:1px solid rgba(255,255,255,0.3); color:white; font-weight:800; border-radius:4px;">자세히 보기</button>
-                        </div>
+        <!-- Mobile Header (Logo Only) -->
+        <header class="hidden-desktop" style="height:50px; padding:0 20px; align-items:center; border-bottom:1px solid #eee; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px); position:sticky; top:0; z-index:50;">
+            <a href="#/" class="logo" style="font-size:18px;">CRAFIQ</a>
+        </header>
+
+        <main class="container">
+            <!-- Hero Banner -->
+            <section style="margin-top:24px; margin-bottom:40px;">
+                <div class="hero-card">
+                    <img src="https://via.placeholder.com/1200x500/111/333?text=Cinematic+Cover" style="width:100%; height:100%; object-fit:cover;">
+                    <div class="hero-content">
+                        <div class="hero-badge">Original</div>
+                        <h2 style="font-size:28px; font-weight:800; margin-bottom:8px; line-height:1.2;">나의 상상이<br>현실이 되는 곳</h2>
+                        <p style="opacity:0.9; margin-bottom:16px; font-size:14px;">지금 바로 비주얼 노벨 작가에 도전하세요.</p>
+                        <button onclick="location.hash='#/dashboard'" class="btn-primary" style="width:fit-content;">연재 시작하기</button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <div class="container">
-            <!-- Section 1: Real-time Ranking -->
-            <section class="section">
-                <div class="section-header">
-                    <h3 class="section-title">실시간 종합 랭킹 TOP 6</h3>
-                    <a href="#" class="section-more">더보기 &rsaquo;</a>
+            <!-- Real-time Ranking -->
+            <section>
+                <div class="section-head">
+                    <h3 class="section-title">실시간 인기 랭킹</h3>
+                    <a href="#" class="section-link">더보기</a>
                 </div>
-                <div class="grid-6">
-                    ${renderBookCard(1, "재벌집 막내아들은 코딩천재", "판타지 | 산경", 9.9, "https://via.placeholder.com/200x290/1a237e/fff?text=Rich")}
-                    ${renderBookCard(2, "나 혼자만 인터페이스", "현판 | 추공", 9.8, "https://via.placeholder.com/200x290/212121/fff?text=Solo")}
-                    ${renderBookCard(3, "화산귀환 Visual Remake", "무협 | 비가", 9.8, "https://via.placeholder.com/200x290/b71c1c/fff?text=Volcano")}
-                    ${renderBookCard(4, "전지적 작가 시점", "판타지 | 싱숑", 9.7, "https://via.placeholder.com/200x290/37474f/fff?text=ORV")}
-                    ${renderBookCard(5, "데뷔 못 하면 죽는 병", "현대물 | 백덕수", 9.6, "https://via.placeholder.com/200x290/f06292/fff?text=Idol")}
-                    ${renderBookCard(6, "검은 머리 미군 대원수", "대체역사 | 띵군", 9.5, "https://via.placeholder.com/200x290/4a148c/fff?text=USA")}
+                <div class="rank-list">
+                    ${renderRankItem(1, "회귀한 천재 플레이어", "판타지 | 김작가", "https://via.placeholder.com/100x140/3b82f6/fff?text=1")}
+                    ${renderRankItem(2, "마법학원 최강자", "학원물 | 이작가", "https://via.placeholder.com/100x140/ef4444/fff?text=2")}
+                    ${renderRankItem(3, "황녀님의 이중생활", "로판 | 박작가", "https://via.placeholder.com/100x140/ec4899/fff?text=3")}
                 </div>
             </section>
 
-            <!-- Section 2: Recommended (List Grid) -->
-            <section class="section">
-                <div class="section-header">
-                    <h3 class="section-title">편집자 추천 작품!</h3>
-                    <a href="#" class="section-more">전체보기 &rsaquo;</a>
+            <!-- New Grid -->
+            <section style="margin-bottom:80px;">
+                <div class="section-head">
+                    <h3 class="section-title">오늘의 신작 비주얼 노벨</h3>
                 </div>
-                <div class="list-grid">
-                    ${renderListItem("황제와 여기사", "로판 | 안경숭이", "가슴 뛰는 전장 로맨스", "https://via.placeholder.com/100x140/e91e63/fff?text=Knight")}
-                    ${renderListItem("달빛조각사 위드 전", "게임 | 남희성", "전설의 귀환, 노가다의 신", "https://via.placeholder.com/100x140/3f51b5/fff?text=Moon")}
-                    ${renderListItem("픽미업!", "게임판타지 | 헤르모드", "모바일 게임 속으로 떨어졌다", "https://via.placeholder.com/100x140/ff9800/fff?text=PickMe")}
-                    ${renderListItem("킬 더 히어로", "현대판타지 | 디다트", "배신당한 영웅의 복수극", "https://via.placeholder.com/100x140/000000/fff?text=Kill")}
-                    ${renderListItem("천재의 게임방송", "BJ물 | 하이엔드", "트롤링 없는 클린 방송", "https://via.placeholder.com/100x140/009688/fff?text=Game")}
-                    ${renderListItem("탐식의 재림", "퓨전 | 로유진", "낙원을 향한 최후의 돌격", "https://via.placeholder.com/100x140/795548/fff?text=Eat")}
+                <div class="grid-responsive">
+                    ${renderCard("던전에서 요리하기", "판타지", "https://via.placeholder.com/200x280/10b981/fff?text=Cook")}
+                    ${renderCard("내 여자친구는 AI", "SF/로맨스", "https://via.placeholder.com/200x280/8b5cf6/fff?text=AI")}
+                    ${renderCard("서울 2077", "사이버펑크", "https://via.placeholder.com/200x280/06b6d4/fff?text=2077")}
+                    ${renderCard("슬라임 육성일기", "힐링", "https://via.placeholder.com/200x280/84cc16/fff?text=Slime")}
+                    ${renderCard("학교 괴담 실록", "공포", "https://via.placeholder.com/200x280/71717a/fff?text=Ghost")}
                 </div>
             </section>
-            
-            <!-- Section 3: New Arrivals -->
-            <section class="section">
-                <div class="section-header">
-                    <h3 class="section-title">따끈따끈한 신작 (New)</h3>
-                </div>
-                <div class="grid-6">
-                    ${renderBookCard(null, "이세계 식당", "이누즈카", "New", "https://via.placeholder.com/200x290/558b2f/fff?text=Food")}
-                    ${renderBookCard(null, "책벌레의 하극상", "카즈키", "New", "https://via.placeholder.com/200x290/fdd835/fff?text=Book")}
-                    ${renderBookCard(null, "오버로드", "마루야마", "New", "https://via.placeholder.com/200x290/6d4c41/fff?text=Over")}
-                    ${renderBookCard(null, "코노스바", "아카츠키", "New", "https://via.placeholder.com/200x290/039be5/fff?text=Kono")}
-                    ${renderBookCard(null, "리제로", "나가츠키", "New", "https://via.placeholder.com/200x290/5c6bc0/fff?text=ReZero")}
-                    ${renderBookCard(null, "노게임 노라이프", "카미야", "New", "https://via.placeholder.com/200x290/ec407a/fff?text=NoGame")}
-                </div>
-            </section>
-        </div>
+        </main>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-link">
-                    <a href="#">회사소개</a>
-                    <a href="#">이용약관</a>
-                    <a href="#" style="font-weight:800; color:black;">개인정보처리방침</a>
-                    <a href="#">청소년보호정책</a>
-                    <a href="#">고객센터</a>
-                </div>
-                <div class="footer-info">
-                    <p>상호명: (주)크라픽 | 대표이사: 인공지능 | 사업자등록번호: 120-88-12345</p>
-                    <p>주소: 서울특별시 강남구 테헤란로 123, 45층 (역삼동, 크라픽타워)</p>
-                    <p>통신판매업신고번호: 제2025-서울강남-0000호 | 고객센터: 1588-0000 (평일 09:00~18:00)</p>
-                    <p style="margin-top:12px; font-weight:700;">Copyright © CRAFIQ Corp. All Rights Reserved.</p>
-                </div>
-            </div>
-        </footer>
+        <!-- Bottom Navigation (Mobile Only) -->
+        <nav class="bottom-nav hidden-desktop">
+            <a href="#/" class="nav-item active">
+                ${icons.home}
+                <span>홈</span>
+            </a>
+            <a href="#" class="nav-item">
+                ${icons.search}
+                <span>검색</span>
+            </a>
+            <a href="#/dashboard" class="nav-item">
+                ${icons.studio}
+                <span>스튜디오</span>
+            </a>
+            <a href="#" class="nav-item">
+                ${icons.user}
+                <span>MY</span>
+            </a>
+        </nav>
     `;
 
     return container;
 }
 
-function renderBookCard(rank, title, author, rating, img) {
+function renderRankItem(rank, title, meta, img) {
     return `
-        <div class="book-card">
-            <div class="book-cover">
-                <img src="${img}" alt="${title}">
-                ${rank ? `<div class="book-badge ${rank <= 3 ? 'rank-' + rank : ''}">${rank}</div>` : ''}
+        <div class="rank-item">
+            <div class="rank-num">${rank}</div>
+            <div class="rank-thumb"><img src="${img}"></div>
+            <div style="flex:1;">
+                <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${title}</div>
+                <div style="font-size:12px; color:#64748b;">${meta}</div>
             </div>
-            <div class="book-title">${title}</div>
-            <div class="book-author">${author}</div>
-            <div class="book-meta">
-                <span class="rating">★ ${rating}</span>
-                <span>• 32.5만명</span>
-            </div>
+            <div style="font-size:11px; color:#ef4444; background:#fee2e2; padding:2px 6px; border-radius:4px;">UP</div>
         </div>
     `;
 }
 
-function renderListItem(title, author, desc, img) {
+function renderCard(title, genre, img) {
     return `
-        <div class="list-item">
-            <div class="list-thumb"><img src="${img}"></div>
-            <div class="list-info">
-                <div style="font-size:14px; font-weight:700; margin-bottom:4px; color:#333;">${title}</div>
-                <div style="font-size:12px; color:#666; margin-bottom:4px;">${author}</div>
-                <div style="font-size:12px; color:#999; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${desc}</div>
+        <div class="card-item">
+            <div class="card-thumb">
+                <img src="${img}">
+                <div style="position:absolute; top:6px; left:6px; background:rgba(0,0,0,0.6); color:white; font-size:10px; padding:2px 6px; border-radius:4px; backdrop-filter:blur(4px);">VN</div>
+            </div>
+            <div class="card-info">
+                <h3>${title}</h3>
+                <p>${genre}</p>
             </div>
         </div>
     `;

@@ -4,47 +4,45 @@ export function renderDashboard() {
     const container = document.createElement('div');
     container.className = 'studio-layout';
 
-    // Header + Sidebar Layout
+    // SVG Icons
+    const icons = {
+        back: '<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>'
+    };
+
     container.innerHTML = `
-        <header style="height:60px; background:white; border-bottom:1px solid #ddd; position:fixed; width:100%; top:0; z-index:1001; display:flex; align-items:center; padding:0 20px; justify-content:space-between;">
-             <div class="flex items-center gap-20">
-                <a href="#/" style="font-size:18px; font-weight:900; color:var(--brand-primary);">CRAFIQ Creators</a>
-                <span style="font-size:12px; color:#666; border-left:1px solid #ddd; padding-left:20px;">작가 스튜디오</span>
-             </div>
-             <div class="flex items-center gap-10">
-                 <span style="font-size:13px; font-weight:600;">Guest 작가님</span>
-                 <button style="font-size:12px; border:1px solid #ddd; padding:4px 8px; border-radius:4px;">로그아웃</button>
-             </div>
-        </header>
-
-        <nav class="studio-nav">
-            <a href="#/dashboard" class="nav-item active">작품 관리</a>
-            <a href="#" class="nav-item">통계/리포트</a>
-            <a href="#" class="nav-item">정산 관리</a>
-            <a href="#" class="nav-item">작품 설정</a>
-            <a href="#" class="nav-item">공지사항</a>
-        </nav>
-
-        <main class="studio-main">
-            <div class="flex justify-between items-center" style="margin-bottom:24px;">
-                <h2 style="font-size:24px; font-weight:800;">내 작품 관리</h2>
-                <button id="create-btn" style="background:var(--brand-primary); color:white; padding:10px 20px; border-radius:4px; font-weight:700; font-size:14px;">+ 새 작품 등록</button>
+        <div class="container" style="margin-top:20px;">
+            <div class="flex-between" style="margin-bottom:20px;">
+                <div class="flex-center" style="gap:10px;">
+                    <a href="#/" class="hidden-desktop" style="color:#666;">${icons.back}</a>
+                    <h2 class="section-title" style="font-size:20px;">스튜디오</h2>
+                </div>
+                <button id="create-btn" class="btn-primary" style="font-size:13px; padding:8px 16px;">+ 새 작품</button>
             </div>
 
-            <div style="background:white; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                <table style="width:100%; border-collapse:collapse; font-size:14px;">
-                    <thead style="background:#f9fafb; border-bottom:1px solid #eee;">
+            <div class="studio-card">
+                <table class="responsive-table">
+                    <thead>
                         <tr>
-                            <th style="padding:16px; text-align:left; color:#555; font-weight:600; width:50%;">작품명</th>
-                            <th style="padding:16px; text-align:center; color:#555; font-weight:600;">업데이트</th>
-                            <th style="padding:16px; text-align:center; color:#555; font-weight:600;">상태</th>
-                            <th style="padding:16px; text-align:center; color:#555; font-weight:600;">관리</th>
+                            <th width="50">#</th>
+                            <th align="left">작품 정보</th>
+                            <th class="hide-on-mobile">상태</th>
+                            <th align="right">관리</th>
                         </tr>
                     </thead>
                     <tbody id="project-list-tbody"></tbody>
                 </table>
             </div>
-        </main>
+
+            <div style="margin-top:20px; font-size:12px; color:#94a3b8; text-align:center;">
+                모바일 환경에서는 일부 편집 기능이 제한될 수 있습니다.
+            </div>
+        </div>
+        
+        <!-- Bottom Nav (Mobile) -->
+        <nav class="bottom-nav hidden-desktop">
+            <a href="#/" class="nav-item"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span>홈</span></a>
+            <a href="#/dashboard" class="nav-item active"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg><span>스튜디오</span></a>
+        </nav>
     `;
 
     const renderTable = () => {
@@ -52,32 +50,27 @@ export function renderDashboard() {
         tbody.innerHTML = '';
 
         if (appStore.projects.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" style="padding:60px; text-align:center; color:#999;">등록된 작품이 없습니다.<br>새 작품을 등록하여 연재를 시작해보세요.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="padding:40px; text-align:center; color:#999;">작품이 없습니다.</td></tr>`;
             return;
         }
 
-        appStore.projects.forEach(p => {
+        appStore.projects.forEach((p, idx) => {
             const tr = document.createElement('tr');
-            tr.style.borderBottom = '1px solid #f0f0f0';
-            const date = new Date(p.created || Date.now()).toISOString().split('T')[0];
-
             tr.innerHTML = `
-                <td style="padding:20px;">
-                    <div class="flex gap-20">
-                        <div style="width:60px; height:80px; background:#eee; border-radius:4px; overflow:hidden;">
-                             <img src="${p.cover || `https://via.placeholder.com/60x80/ccc/fff?text=${p.title[0]}`}" style="width:100%; height:100%; object-fit:cover;">
-                        </div>
-                        <div class="flex flex-col justify-center">
-                            <div style="font-size:16px; font-weight:700; margin-bottom:4px;">${p.title}</div>
-                            <div style="font-size:12px; color:#888;">ID: ${p.id}</div>
+                <td align="center" style="color:#94a3b8;">${idx + 1}</td>
+                <td>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <img src="${p.cover || `https://via.placeholder.com/40x50/eee/999?text=${p.title[0]}`}" style="width:40px; height:50px; border-radius:4px; object-fit:cover;">
+                        <div>
+                            <div style="font-weight:600; font-size:14px; margin-bottom:2px;">${p.title}</div>
+                            <div style="font-size:11px; color:#94a3b8;">${p.scenes.length}화</div>
                         </div>
                     </div>
                 </td>
-                <td style="text-align:center; color:#666;">${date}</td>
-                <td style="text-align:center;"><span style="color:#00c853; font-weight:700; background:#e8f5e9; padding:4px 8px; border-radius:4px; font-size:12px;">연재중</span></td>
-                <td style="text-align:center;">
-                    <button class="btn-edit text-brand font-bold" data-id="${p.id}" style="margin-right:10px;">작품 편집</button>
-                    <button class="btn-delete" data-id="${p.id}" style="color:#e53935; text-decoration:underline;">삭제</button>
+                <td class="hide-on-mobile"><span style="font-size:11px; background:#eff6ff; color:#3b82f6; padding:2px 6px; border-radius:4px;">연재중</span></td>
+                <td align="right">
+                    <button class="btn-edit" data-id="${p.id}" style="color:#3b82f6; font-weight:600; font-size:12px; margin-right:10px;">편집</button>
+                    <button class="btn-delete" data-id="${p.id}" style="color:#ef4444; font-size:12px;">삭제</button>
                 </td>
              `;
             tbody.appendChild(tr);
@@ -86,7 +79,7 @@ export function renderDashboard() {
         // Binds
         tbody.querySelectorAll('.btn-edit').forEach(b => b.onclick = () => window.navigateTo('#/editor?id=' + b.dataset.id));
         tbody.querySelectorAll('.btn-delete').forEach(b => {
-            b.onclick = () => { if (confirm('정말 삭제하시겠습니까?')) { appStore.deleteProject(b.dataset.id); renderTable(); } };
+            b.onclick = () => { if (confirm('삭제하시겠습니까?')) { appStore.deleteProject(b.dataset.id); renderTable(); } };
         });
     };
 
