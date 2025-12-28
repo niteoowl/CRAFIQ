@@ -15,38 +15,30 @@
     <script type="module">
         import { getCurrentUser, signOut } from './js/auth.js';
 
-        // Define global function for update
         window.updateAuthUI = async () => {
             const user = await getCurrentUser();
-
             const userName = document.getElementById('userName');
             const guestMsg = document.getElementById('guestMsg');
             const loginBtn = document.getElementById('loginBtn');
-            const userSection = document.getElementById('userSection');
 
-            if (!userName || !loginBtn) return; // Guard against missing DOM
+            if (!userName) return;
 
             if (user) {
-                // Logged In
                 userName.innerText = (user.email ? user.email.split('@')[0] : "독자") + " 님";
-                if (guestMsg) guestMsg.innerText = "반갑습니다! 당신의 서재가 동기화 중입니다.";
+                guestMsg.innerText = "반갑습니다! 당신의 서재입니다.";
                 loginBtn.innerText = "로그아웃";
                 loginBtn.onclick = async () => {
                     await signOut();
                     window.location.reload();
                 };
             } else {
-                // Logged Out
                 userName.innerText = "로그인이 필요합니다";
-                if (guestMsg) guestMsg.innerText = "로그인하고 서재를 연동하세요.";
+                guestMsg.innerText = "로그인하고 서재를 연동하세요.";
                 loginBtn.innerText = "로그인 / 회원가입";
-                loginBtn.onclick = () => {
-                    window.location.href = 'login.html';
-                };
+                loginBtn.onclick = () => window.location.href = 'login.html';
             }
         };
 
-        // Initialize
         if (document.body) window.updateAuthUI();
         window.addEventListener('turbo:load', window.updateAuthUI);
     </script>
@@ -65,21 +57,41 @@
             </nav>
 
             <div class="header-right-pc desktop-only">
+                <div class="search-wrap-pc">
+                    <svg width="18" height="18" stroke="#999" stroke-width="2" fill="none" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="M21 21L16.65 16.65" />
+                    </svg>
+                    <input placeholder="작품 검색">
+                </div>
                 <a href="dashboard.html" class="btn-studio">스튜디오</a>
+            </div>
+
+            <!-- Mobile Search Toggle -->
+            <div class="mobile-only" style="margin-left:auto;">
+                <a href="dashboard.html"
+                    style="font-size:13px; font-weight:700; color:#1f8ce6; margin-right:16px;">스튜디오</a>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21L16.65 16.65" />
+                </svg>
             </div>
         </div>
     </header>
 
-    <main class="inner" style="max-width:600px; padding-top:40px;">
+    <main class="inner" style="max-width:600px; padding: 40px 16px 100px;">
+        <!-- Profile Section -->
         <div class="profile-card">
             <div class="profile-header">
-                <div class="profile-avatar"><svg width="40" height="40" fill="#fff" viewBox="0 0 24 24">
+                <div class="profile-avatar">
+                    <svg width="40" height="40" fill="#fff" viewBox="0 0 24 24">
                         <path
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg></div>
+                    </svg>
+                </div>
                 <div class="profile-info">
-                    <div id="userName" class="profile-name">Loading...</div>
-                    <div id="guestMsg" class="profile-bio">정보를 불러오는 중입니다...</div>
+                    <div id="userName" class="profile-name">Wait...</div>
+                    <div id="guestMsg" class="profile-bio">...</div>
                 </div>
             </div>
 
@@ -89,7 +101,7 @@
                     <div class="label">보던 작품</div>
                 </div>
                 <div class="stat-item">
-                    <div class="num">0</div>
+                    <div class="num">12</div>
                     <div class="label">관심</div>
                 </div>
                 <div class="stat-item">
@@ -101,6 +113,7 @@
             <button id="loginBtn" class="btn-full" style="margin-top:20px;">로그인</button>
         </div>
 
+        <!-- Menu Section -->
         <div class="menu-list">
             <div class="menu-item">
                 <span>🔔 알림 설정</span>
@@ -108,6 +121,10 @@
             </div>
             <div class="menu-item" onclick="location.href='dashboard.html'">
                 <span>🖊️ 창작 스튜디오</span>
+                <span class="m-arrow">></span>
+            </div>
+            <div class="menu-item">
+                <span>💳 결제 내역</span>
                 <span class="m-arrow">></span>
             </div>
             <div class="menu-item">
