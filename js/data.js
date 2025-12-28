@@ -182,3 +182,66 @@ export const saveSceneData = async (sceneId, sceneData) => {
         .select();
     return { data, error };
 };
+
+// --- SEARCH & DISCOVER ---
+
+export const getAllNovels = async () => {
+    const { data, error } = await getSupabase()
+        .from('novels')
+        .select(`*, profiles(username)`)
+        .order('created_at', { ascending: false });
+    return { data, error };
+};
+
+export const searchNovels = async (query) => {
+    const { data, error } = await getSupabase()
+        .from('novels')
+        .select(`*, profiles(username)`)
+        .ilike('title', `%${query}%`)
+        .order('created_at', { ascending: false });
+    return { data, error };
+};
+
+
+// --- COMMENTS ---
+
+export const getComments = async (novelId) => {
+    const { data, error } = await getSupabase()
+        .from('comments')
+        .select(`*, profiles(username, avatar_url)`)
+        .eq('novel_id', novelId)
+        .order('created_at', { ascending: false });
+    return { data, error };
+};
+
+export const addComment = async (novelId, content) => {
+    const user = await getCurrentUser();
+    if (!user) return { error: { message: "Login required" } };
+
+    const { data, error } = await getSupabase()
+        .from('comments')
+        .insert([{ novel_id: novelId, user_id: user.id, content: content }])
+        .select()
+        .single();
+    return { data, error };
+};
+
+export const deleteComment = async (commentId) => {
+    const { data, error } = await getSupabase()
+        .from('comments')
+        .delete()
+        .eq('id', commentId);
+    return { data, error };
+};
+
+
+// --- BULK SCENE SAVE (FOR VISUAL STUDIO) ---
+export const saveScenes = async (novelId, scenesPayload) => {
+    // Strategy: Delete existing for this novel and re-insert (easiest for reordering)
+    // OR upsert if ID exists. For now, upsert is safer if we want to keep IDs.
+    const { data, error } = await getSupabase()
+        .from('scenes')
+        .upsert(scenesPayload)
+        .select();
+    return { data, error };
+};

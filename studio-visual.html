@@ -8,144 +8,214 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/init-supabase.js"></script>
+    <!-- Use FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-panel: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --accent: #1f8ce6;
+            --text-main: #e0e0e0;
+            --text-sub: #a0a0a0;
+            --border: #333;
+        }
+
         body {
-            background: #181818;
-            color: #eee;
+            background: var(--bg-dark);
+            color: var(--text-main);
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
         }
 
-        /* Header */
+        /* --- Header --- */
         .studio-header {
-            height: 50px;
-            border-bottom: 1px solid #333;
+            height: 54px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            padding: 0 20px;
             justify-content: space-between;
-            background: #222;
+            padding: 0 16px;
+            z-index: 10;
         }
 
-        .studio-title {
-            font-weight: 700;
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .studio-logo {
+            font-weight: 800;
             font-size: 16px;
-            color: #fff;
+            color: var(--accent);
+            letter-spacing: -0.5px;
         }
 
-        .action-btn {
-            background: #1f8ce6;
-            color: white;
+        .project-title {
+            font-size: 14px;
+            color: var(--text-sub);
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
             border: none;
-            padding: 6px 16px;
             border-radius: 4px;
-            cursor: pointer;
+            padding: 8px 14px;
             font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: 0.2s;
         }
 
-        .action-btn:hover {
-            background: #0c75ce;
+        .btn-primary {
+            background: var(--accent);
+            color: white;
         }
 
-        .action-btn.secondary {
-            background: #444;
+        .btn-primary:hover {
+            background: #157ac5;
         }
 
-        /* Main Layout */
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-sub);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+
+        /* --- Layout --- */
         .workspace {
             flex: 1;
             display: flex;
-            overflow: hidden;
+            height: calc(100vh - 54px);
         }
 
         /* Left: Scene List */
         .panel-left {
-            width: 250px;
-            background: #222;
-            border-right: 1px solid #333;
+            width: 260px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .scene-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 8px;
         }
 
         .scene-item {
+            display: flex;
+            gap: 10px;
             padding: 10px;
-            margin-bottom: 8px;
-            background: #333;
             border-radius: 6px;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 1px solid transparent;
+            margin-bottom: 4px;
+            background: #252525;
             transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .scene-item:hover {
-            background: #3a3a3a;
+            background: var(--bg-hover);
         }
 
         .scene-item.active {
-            border-color: #1f8ce6;
-            background: #2a2a2a;
+            background: #2d3640;
+            border-color: var(--accent);
         }
 
         .scene-thumb {
-            width: 40px;
-            height: 40px;
-            background: #000;
+            width: 48px;
+            height: 48px;
             border-radius: 4px;
+            background: #000;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
-        .scene-meta {
+        .scene-info {
             flex: 1;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .scene-idx {
             font-size: 10px;
-            color: #888;
-            font-weight: bold;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 2px;
         }
 
         .scene-summary {
-            font-size: 13px;
-            color: #ccc;
+            font-size: 12px;
+            color: var(--text-main);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Center: Stage Preview */
+        /* Center: Stage */
         .panel-center {
             flex: 1;
-            background: #111;
+            background: #0a0a0a;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             position: relative;
-            padding: 40px;
         }
 
-        .stage-wrapper {
+        .stage-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            overflow: hidden;
+        }
+
+        .stage-frame {
             width: 960px;
             height: 540px;
-            background: #000;
+            background: black;
             position: relative;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            border: 1px solid #333;
         }
 
         .preview-bg {
@@ -158,252 +228,332 @@
         .preview-char {
             position: absolute;
             bottom: 0;
-            height: 90%;
             left: 50%;
             transform: translateX(-50%);
+            height: 85%;
             filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-            transition: 0.3s;
         }
 
-        .preview-dialog {
+        .dialog-overlay {
             position: absolute;
             bottom: 30px;
             left: 40px;
             right: 40px;
-            height: 160px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-height: 150px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
-            padding: 25px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(4px);
         }
 
-        .preview-name {
-            font-size: 22px;
-            font-weight: bold;
+        .dialog-name {
+            font-size: 20px;
+            font-weight: 700;
             color: #ffdd59;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .preview-text {
+        .dialog-text {
             font-size: 18px;
-            line-height: 1.5;
-            color: white;
-            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #eee;
         }
 
-        .preview-choices {
+        .choice-overlay {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.6);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            pointer-events: none;
+            gap: 12px;
+            z-index: 20;
         }
 
-        .choice-btn-preview {
-            padding: 10px 30px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #1f8ce6;
-            color: #1f8ce6;
+        .choice-btn {
+            min-width: 320px;
+            padding: 14px 24px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--accent);
+            color: var(--accent);
             border-radius: 30px;
-            font-weight: bold;
-            min-width: 300px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
             text-align: center;
         }
 
         /* Right: Inspector */
         .panel-right {
-            width: 320px;
-            background: #222;
-            border-left: 1px solid #333;
+            width: 300px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+        }
+
+        .inspector-content {
+            flex: 1;
             overflow-y: auto;
+            padding: 16px;
         }
 
-        .prop-group {
-            border-bottom: 1px solid #333;
-            padding: 15px;
+        .inspector-group {
+            margin-bottom: 24px;
         }
 
-        .prop-title {
-            font-size: 12px;
+        .group-label {
+            font-size: 11px;
             font-weight: 700;
-            color: #888;
-            margin-bottom: 10px;
+            color: var(--text-sub);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .input-row {
+        .inp-row {
             margin-bottom: 12px;
         }
 
-        .input-label {
-            font-size: 12px;
-            color: #ccc;
-            margin-bottom: 4px;
+        .inp-label {
             display: block;
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
         }
 
-        .form-input {
+        .inp {
             width: 100%;
             background: #111;
             border: 1px solid #444;
             color: white;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             font-size: 13px;
         }
 
-        .form-input:focus {
-            border-color: #1f8ce6;
-            outline: none;
+        .inp:focus {
+            outline: 1px solid var(--accent);
+            border-color: var(--accent);
         }
 
-        .form-textarea {
-            height: 80px;
+        textarea.inp {
             resize: vertical;
+            height: 80px;
+            line-height: 1.4;
         }
 
-        /* Helper Classes */
-        .flex-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            padding: 4px;
-            border: 1px solid #444;
+        /* Asset Picker */
+        .asset-btn {
+            width: 100%;
+            padding: 8px;
             background: #333;
+            border: 1px solid #444;
             color: #ccc;
             border-radius: 4px;
             cursor: pointer;
-            flex: 1;
-            text-align: center;
             font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .btn-icon:hover {
+        .asset-btn:hover {
             background: #444;
         }
 
-        .btn-icon.active {
-            background: #1f8ce6;
-            border-color: #1f8ce6;
-            color: white;
+        /* BGM Selector */
+        select.inp {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23cccccc%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 8px;
+            padding-right: 30px;
+            appearance: none;
+        }
+
+        /* Image Helper Overlay */
+        .img-helper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #252525;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            width: 400px;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            display: none;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="studio-header">
-        <div style="display:flex; align-items:center; gap:12px;">
-            <button onclick="location.href='dashboard.html'" class="action-btn secondary">◀ 나가기</button>
-            <span id="novelTitle" class="studio-title">제목 로딩중...</span>
+    <!-- Header -->
+    <header class="studio-header">
+        <div class="brand-area">
+            <button onclick="location.href='dashboard.html'" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <span class="studio-logo"><i class="fa-solid fa-layer-group"></i> CRAFIQ STUDIO</span>
+            <span id="novelTitle" class="project-title">Loading...</span>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="addScene()" class="action-btn secondary">+ 장면 추가</button>
-            <button onclick="saveAll()" class="action-btn">💾 저장하기</button>
+        <div class="header-actions">
+            <button onclick="window.open('https://postimages.org/ko/', '_blank')" class="btn btn-secondary">
+                <i class="fa-solid fa-image"></i> 이미지 업로드
+            </button>
+            <button onclick="saveAll()" class="btn btn-primary">
+                <i class="fa-solid fa-cloud-arrow-up"></i> 저장
+            </button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- LEFT: Scenes -->
+        <div class="panel-left">
+            <div class="panel-header">
+                SCENES
+                <button onclick="addScene()"
+                    style="background:none; border:none; color:var(--text-sub); cursor:pointer;">
+                    <i class="fa-solid fa-plus-square"></i>
+                </button>
+            </div>
+            <div id="sceneList" class="scene-list">
+                <!-- Injected -->
+            </div>
+        </div>
+
+        <!-- CENTER: Preview -->
+        <div class="panel-center">
+            <div class="stage-container">
+                <div class="stage-frame">
+                    <div id="pBg" class="preview-bg"></div>
+                    <img id="pChar" class="preview-char" src="" style="display:none;">
+
+                    <div id="pDialogBox" class="dialog-overlay">
+                        <div id="pName" class="dialog-name">Name</div>
+                        <div id="pText" class="dialog-text">Text...</div>
+                    </div>
+
+                    <div id="pChoices" class="choice-overlay" style="display:none;">
+                        <!-- Buttons -->
+                    </div>
+                </div>
+            </div>
+            <div style="padding:10px; text-align:center; color:#555; font-size:12px;">
+                1920x1080 HD Resolution Preview
+            </div>
+        </div>
+
+        <!-- RIGHT: Inspector -->
+        <div class="panel-right">
+            <div class="panel-header">INSPECTOR</div>
+            <div id="inspector" class="inspector-content">
+                <!-- Group: BGM -->
+                <div class="inspector-group">
+                    <div class="group-label"><i class="fa-solid fa-music"></i> 배경음악 (BGM)</div>
+                    <select id="inBgm" class="inp" onchange="updateScene('bgm', this.value)">
+                        <option value="">없음</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/990D774B5DA925FD24">B001 - 경쾌/약간 어두운
+                        </option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/9932104A5DA92C792C">B002 - 경쾌/어두운</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/999201355DA98F741D">B003 - 경쾌/피아노/재즈
+                        </option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/99E0B03D5DA9917738">B004 - 경쾌/빠른/전자</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/993B8C485DA9930A26">B005 - 경쾌/오락</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/9980B83A5DA994ED06">B006 - 왈츠</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/9939ED4D5DA997780C">B007 - 보통/피아노</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/994C4C4B5DA99B9126">B008 - 긍정/진취적</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/99C3B0465DA99E4E2E">B009 - 차분/피아노</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/99896A465DB1ABF921">B027 - 비교적 조용한</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/99FEC7335DB5A5CB33">B030 - 차분한/전자음</option>
+                        <option value="https://t1.daumcdn.net/cfile/tistory/99299C3A5F75A3812A">C039 - 희망/차분</option>
+                        <!-- Added a selection of the provided list -->
+                    </select>
+                </div>
+
+                <!-- Group: Background -->
+                <div class="inspector-group">
+                    <div class="group-label"><i class="fa-solid fa-image"></i> 배경 (Background)</div>
+                    <div class="inp-row">
+                        <label class="inp-label">이미지 URL</label>
+                        <input id="inBg" class="inp" oninput="updateScene('bg', this.value)" placeholder="https://...">
+                        <button onclick="openImgHelp('bg')" class="asset-btn">이미지 링크 가져오기</button>
+                    </div>
+                </div>
+
+                <!-- Group: Character -->
+                <div class="inspector-group">
+                    <div class="group-label"><i class="fa-solid fa-user"></i> 캐릭터 (Character)</div>
+                    <div class="inp-row">
+                        <label class="inp-label">이미지 URL (투명 배경 PNG 권장)</label>
+                        <input id="inChar" class="inp" oninput="updateScene('character', this.value)"
+                            placeholder="https://...">
+                        <button onclick="openImgHelp('char')" class="asset-btn">이미지 링크 가져오기</button>
+                    </div>
+                </div>
+
+                <!-- Group: Script -->
+                <div class="inspector-group">
+                    <div class="group-label"><i class="fa-solid fa-comment-dots"></i> 대사 (Script)</div>
+                    <div class="inp-row">
+                        <label class="inp-label">화자 (Speaker)</label>
+                        <input id="inSpeaker" class="inp" oninput="updateScene('speaker', this.value)">
+                    </div>
+                    <div class="inp-row">
+                        <label class="inp-label">내용 (Text)</label>
+                        <textarea id="inText" class="inp" style="height:100px;"
+                            oninput="updateScene('text', this.value)"></textarea>
+                    </div>
+                </div>
+
+                <!-- Group: Choices -->
+                <div class="inspector-group">
+                    <div class="group-label" style="justify-content:space-between;">
+                        <span><i class="fa-solid fa-list-ul"></i> 선택지 (Choices)</span>
+                        <button onclick="addChoice()"
+                            style="background:none; border:none; color:var(--accent); cursor:pointer;">+ 추가</button>
+                    </div>
+                    <div id="choiceEditor">
+                        <!-- Dynamic -->
+                    </div>
+                </div>
+
+                <div class="inspector-group" style="border-top:1px solid #333; padding-top:20px;">
+                    <button onclick="deleteScene()"
+                        style="width:100%; padding:10px; background:#e74c3c; border:none; color:white; border-radius:4px; font-weight:bold; cursor:pointer;">이
+                        장면 삭제</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="workspace">
-
-        <!-- SCENE LIST -->
-        <div class="panel-left">
-            <div class="prop-group" style="padding:10px; background:#2a2a2a;">
-                <input placeholder="장면 검색..." class="form-input" style="font-size:12px;">
-            </div>
-            <div id="sceneList" class="scene-list">
-                <!-- Items injected here -->
-            </div>
+    <!-- Image Helper Modal -->
+    <div id="imgHelper" class="img-helper">
+        <h3 style="color:white; margin-bottom:12px;">이미지 업로드 가이드</h3>
+        <p style="font-size:13px; color:#aaa; line-height:1.5; margin-bottom:20px;">
+            1. 상단 메뉴의 <b>'이미지 업로드'</b> 버튼을 눌러 PostImages 사이트를 여세요.<br>
+            2. 이미지를 업로드한 후, <b>'직접 링크(Direct Link)'</b> 주소를 복사하세요.<br>
+            3. 아래 칸에 붙여넣기 하면 자동으로 적용됩니다.
+        </p>
+        <input id="pasteImg" class="inp" placeholder="여기에 주소를 붙여넣으세요..." style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button onclick="document.getElementById('imgHelper').style.display='none'"
+                class="btn btn-secondary">닫기</button>
+            <button onclick="applyPastedImg()" class="btn btn-primary">적용하기</button>
         </div>
-
-        <!-- STAGE PREVIEW -->
-        <div class="panel-center">
-            <div id="stage" class="stage-wrapper">
-                <div id="pBg" class="preview-bg"></div>
-                <img id="pChar" class="preview-char" src="" style="display:none;">
-                <div id="pChoices" class="preview-choices" style="display:none;"></div>
-                <div id="pDialogBox" class="preview-dialog">
-                    <div id="pName" class="preview-name">이름</div>
-                    <div id="pText" class="preview-text">대사 내용...</div>
-                </div>
-            </div>
-            <div style="margin-top:10px; color:#666; font-size:12px;">Pretendard 16:9 HD Preview</div>
-        </div>
-
-        <!-- INSPECTOR -->
-        <div class="panel-right" id="inspector">
-            <div class="prop-group">
-                <div class="prop-title">배경 & 인물 (Background & Char)</div>
-                <div class="input-row">
-                    <label class="input-label">배경 이미지 URL</label>
-                    <input id="inBg" class="form-input" oninput="updateCurrentScene('bg', this.value)">
-                </div>
-                <div class="input-row">
-                    <label class="input-label">캐릭터 이미지 URL</label>
-                    <input id="inChar" class="form-input" oninput="updateCurrentScene('character', this.value)">
-                </div>
-                <!-- TODO: Character Position, Scale -->
-            </div>
-
-            <div class="prop-group">
-                <div class="prop-title">대사 (Dialogue)</div>
-                <div class="input-row">
-                    <label class="input-label">화자 이름 (Speaker)</label>
-                    <input id="inSpeaker" class="form-input" oninput="updateCurrentScene('speaker', this.value)">
-                </div>
-                <div class="input-row">
-                    <label class="input-label">대사 내용 (Text)</label>
-                    <textarea id="inText" class="form-input form-textarea"
-                        oninput="updateCurrentScene('text', this.value)"></textarea>
-                </div>
-            </div>
-
-            <div class="prop-group">
-                <div class="prop-title">커스텀 스타일 (Custom Style)</div>
-                <div class="flex-row">
-                    <div style="flex:1">
-                        <label class="input-label">상자 투명도</label>
-                        <input id="inOpacity" type="range" class="form-input" min="0" max="1" step="0.1"
-                            oninput="updateCurrentScene('boxOpacity', this.value)">
-                    </div>
-                </div>
-                <div class="input-row" style="margin-top:10px;">
-                    <label class="input-label">대화 상자 CSS (Expert)</label>
-                    <input id="inBoxStyle" class="form-input" placeholder="e.g. background: blue;"
-                        oninput="updateCurrentScene('boxStyle', this.value)">
-                </div>
-            </div>
-
-            <div class="prop-group">
-                <div class="prop-title" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>선택지 (Choices)</span>
-                    <button onclick="addChoice()" style="font-size:10px; padding:2px 8px; cursor:pointer;">+ 추가</button>
-                </div>
-                <div id="choiceListEditor">
-                    <!-- Choice Inputs -->
-                </div>
-            </div>
-
-            <div class="prop-group">
-                <button onclick="deleteCurrentScene()"
-                    style="width:100%; padding:10px; background:#e74c3c; border:none; color:white; border-radius:4px; cursor:pointer;">이
-                    장면 삭제하기</button>
-            </div>
-        </div>
-
     </div>
 
     <script type="module">
@@ -411,284 +561,201 @@
 
         let novelId = null;
         let scenes = [];
-        let activeIndex = -1;
+        let activeIdx = 0;
+        let targetField = ''; // for img helper
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.init = async () => {
             const params = new URLSearchParams(window.location.search);
             novelId = params.get('id');
-            if (!novelId) return alert("오류: 작품 ID가 없습니다.");
+            if (!novelId) { alert("잘못된 접근입니다."); location.href = 'dashboard.html'; return; }
 
-            // Get Basic Info
+            // Load Text Data
             const { data: novel } = await getNovelById(novelId);
             if (novel) document.getElementById('novelTitle').innerText = novel.title;
 
-            // Get Scenes
+            // Load Scenes
             const { data: list } = await getScenes(novelId);
-            if (list) {
-                // Map DB List to Local model
+            if (list && list.length > 0) {
+                // Parse format
                 scenes = list.map(item => ({
-                    id: item.id, // Scene DB ID
-                    ...item.data // JSON Content
+                    id: item.id,
+                    ...item.data
                 }));
+            } else {
+                // Init first scene
+                addScene();
             }
 
-            if (scenes.length === 0) addScene(); // Start with 1
-            else selectScene(0);
-
             renderList();
-        });
+            selectScene(0);
+        }
 
-        // --- Core Actions ---
+        /* --- LOGIC --- */
 
         window.addScene = () => {
             scenes.push({
-                bg: 'https://images.unsplash.com/photo-1542256840-3b6201e52003?w=1000',
+                bg: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1000',
                 character: '',
-                speaker: '시스템',
+                speaker: '???',
                 text: '새로운 장면입니다.',
+                bgm: '',
                 choices: []
             });
             renderList();
             selectScene(scenes.length - 1);
-        };
+        }
 
-        window.selectScene = (index) => {
-            activeIndex = index;
-            renderList(); // Update Highlight
-            populateInspector();
-            renderPreview();
-        };
-
-        window.deleteCurrentScene = () => {
-            if (!confirm("정말 삭제하시겠습니까?")) return;
-            scenes.splice(activeIndex, 1);
-            if (scenes.length === 0) addScene();
-            activeIndex = Math.max(0, activeIndex - 1);
+        window.selectScene = (idx) => {
+            if (idx < 0 || idx >= scenes.length) return;
+            activeIdx = idx;
             renderList();
-            selectScene(activeIndex);
+            renderInspector();
+            renderStage();
+        }
+
+        window.updateScene = (key, val) => {
+            scenes[activeIdx][key] = val;
+            renderStage();
+            if (key === 'text') {
+                const el = document.getElementById(`desc-${activeIdx}`);
+                if (el) el.innerText = val;
+            }
+        }
+
+        window.deleteScene = () => {
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+            scenes.splice(activeIdx, 1);
+            if (scenes.length === 0) addScene();
+            activeIdx = Math.max(0, activeIdx - 1);
+            renderList();
+            selectScene(activeIdx);
         }
 
         window.saveAll = async () => {
-            const btn = document.querySelector('.action-btn:last-child');
-            btn.innerText = "저장 중...";
-
-            // Convert back to DB format order
+            // Transform to DB
             const payload = scenes.map((s, i) => ({
                 novel_id: novelId,
-                title: s.text.substring(0, 20), // Summary for DB
+                title: s.text.substring(0, 20),
                 order_index: i,
                 data: s
             }));
-
             const { error } = await saveScenes(novelId, payload);
+            if (error) alert(error.message);
+            else alert("저장되었습니다.");
+        }
 
-            if (error) alert("저장 실패: " + error.message);
-            else alert("저장되었습니다!");
-
-            btn.innerText = "💾 저장하기";
-        };
-
-        // --- Model Updates ---
-
-        window.updateCurrentScene = (key, value) => {
-            if (activeIndex < 0) return;
-            scenes[activeIndex][key] = value;
-            renderPreview();
-
-            if (key === 'text') {
-                // Update list thumbnail text
-                const el = document.getElementById(`scene-txt-${activeIndex}`);
-                if (el) el.innerText = value;
-            }
-        };
-
-        // --- Choices Logic ---
+        /* --- INSPECTOR & CHOICES --- */
 
         window.addChoice = () => {
-            if (!scenes[activeIndex].choices) scenes[activeIndex].choices = [];
-            scenes[activeIndex].choices.push({ text: "선택지", jumpIndex: activeIndex + 1 });
-            populateInspector(); // Refresh list
-            renderPreview();
-        };
+            if (!scenes[activeIdx].choices) scenes[activeIdx].choices = [];
+            scenes[activeIdx].choices.push({ text: "선택지 내용", jumpIndex: activeIdx + 1 });
+            renderInspector();
+            renderStage();
+        }
 
         window.updateChoice = (cIdx, key, val) => {
-            scenes[activeIndex].choices[cIdx][key] = val;
-            renderPreview();
+            scenes[activeIdx].choices[cIdx][key] = val;
+            renderStage();
         }
 
         window.removeChoice = (cIdx) => {
-            scenes[activeIndex].choices.splice(cIdx, 1);
-            populateInspector();
-            renderPreview();
+            scenes[activeIdx].choices.splice(cIdx, 1);
+            renderInspector();
+            renderStage();
         }
 
-        // --- Rendering ---
+        /* --- RENDER --- */
 
         function renderList() {
             const list = document.getElementById('sceneList');
             list.innerHTML = scenes.map((s, i) => `
-                <div class="scene-item ${i === activeIndex ? 'active' : ''}" onclick="selectScene(${i})">
-                    <img class="scene-thumb" src="${s.bg || 'about:blank'}">
-                    <div class="scene-meta">
+                <div class="scene-item ${i === activeIdx ? 'active' : ''}" onclick="selectScene(${i})">
+                    <img class="scene-thumb" src="${s.bg || ''}">
+                    <div class="scene-info">
                         <div class="scene-idx">SCENE ${i + 1}</div>
-                        <div id="scene-txt-${i}" class="scene-summary">${s.text || '(내용 없음)'}</div>
+                        <div id="desc-${i}" class="scene-summary">${s.text}</div>
                     </div>
                 </div>
             `).join('');
-
-            // Auto scroll?
         }
 
-        function populateInspector() {
-            const s = scenes[activeIndex];
+        function renderInspector() {
+            const s = scenes[activeIdx];
             document.getElementById('inBg').value = s.bg || '';
             document.getElementById('inChar').value = s.character || '';
             document.getElementById('inSpeaker').value = s.speaker || '';
             document.getElementById('inText').value = s.text || '';
-            document.getElementById('inOpacity').value = s.boxOpacity !== undefined ? s.boxOpacity : 0.8;
-            document.getElementById('inBoxStyle').value = s.boxStyle || '';
+            document.getElementById('inBgm').value = s.bgm || '';
 
-            // Render Choices Editor
-            const cList = document.getElementById('choiceListEditor');
-            const choices = s.choices || [];
-            if (choices.length === 0) {
-                cList.innerHTML = '<div style="font-size:12px; color:#666;">선택지가 없습니다. 다음 장면으로 자동 진행됩니다.</div>';
+            // Choices
+            const cDiv = document.getElementById('choiceEditor');
+            if (!s.choices || s.choices.length === 0) {
+                cDiv.innerHTML = '<div style="font-size:12px; color:#666;">선택지가 없습니다 (자동 진행).</div>';
             } else {
-                cList.innerHTML = choices.map((c, i) => `
-                    <div style="margin-bottom:8px; background:#111; padding:8px; border-radius:4px;">
-                        <input class="form-input" style="margin-bottom:4px;" value="${c.text}" oninput="updateChoice(${i}, 'text', this.value)" placeholder="선택지 내용">
-                        <div style="display:flex; gap:5px; align-items:center;">
-                            <span style="font-size:10px; color:#888;">점프: SCENE</span>
-                            <input class="form-input" type="number" style="width:50px;" value="${c.jumpIndex}" oninput="updateChoice(${i}, 'jumpIndex', parseInt(this.value))">
-                            <button onclick="removeChoice(${i})" style="margin-left:auto; background:none; border:none; color:#e74c3c; cursor:pointer;">×</button>
+                cDiv.innerHTML = s.choices.map((c, i) => `
+                    <div style="background:#1a1a1a; padding:10px; border-radius:4px; margin-bottom:8px;">
+                        <input class="inp" style="margin-bottom:4px;" value="${c.text}" oninput="updateChoice(${i}, 'text', this.value)" placeholder="선택지 텍스트">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                             <div style="font-size:11px; color:#888;">점프: SCENE ${c.jumpIndex + 1}</div>
+                             <input type="number" class="inp" style="width:60px; padding:4px;" value="${c.jumpIndex}" oninput="updateChoice(${i}, 'jumpIndex', parseInt(this.value))">
+                             <button onclick="removeChoice(${i})" style="color:#e74c3c; background:none; border:none; cursor:pointer;">삭제</button>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
-        function renderPreview() {
-            const s = scenes[activeIndex];
-
-            // BG
-            document.getElementById('pBg').style.backgroundImage = `url('${s.bg || ''}')`;
-
-            // Char
-            const pChar = document.getElementById('pChar');
+        function renderStage() {
+            const s = scenes[activeIdx];
+            // BG & Char
+            document.getElementById('pBg').style.backgroundImage = `url('${s.bg}')`;
             if (s.character) {
-                pChar.src = s.character;
-                pChar.style.display = 'block';
+                document.getElementById('pChar').style.display = 'block';
+                document.getElementById('pChar').src = s.character;
             } else {
-                pChar.style.display = 'none';
+                document.getElementById('pChar').style.display = 'none';
             }
 
             // Dialog
-            document.getElementById('pName').innerText = s.speaker || '';
-            document.getElementById('pText').innerText = s.text || '';
+            document.getElementById('pName').innerText = s.speaker;
+            document.getElementById('pText').innerText = s.text;
 
-            const dialogBox = document.getElementById('pDialogBox');
-            // Custom Styles
-            if (s.boxOpacity !== undefined) {
-                dialogBox.style.background = `rgba(0, 0, 0, ${s.boxOpacity})`;
-            } else {
-                dialogBox.style.background = `rgba(0, 0, 0, 0.8)`;
-            }
-            if (s.boxStyle) {
-                dialogBox.style.cssText += s.boxStyle;
-            }
-
-            // Preview Choices Overlay
-            const pChoices = document.getElementById('pChoices');
+            // Choices
+            const cDiv = document.getElementById('pChoices');
             if (s.choices && s.choices.length > 0) {
-                pChoices.style.display = 'flex';
-                pChoices.innerHTML = s.choices.map(c => `
-                    <div class="choice-btn-preview">${c.text}</div>
-                `).join('');
+                cDiv.style.display = 'flex';
+                cDiv.innerHTML = s.choices.map(c => `<div class="choice-btn">${c.text}</div>`).join('');
+                document.getElementById('pDialogBox').style.opacity = '0.3';
             } else {
-                pChoices.style.display = 'none';
+                cDiv.style.display = 'none';
+                document.getElementById('pDialogBox').style.opacity = '1';
             }
         }
+
+        /* --- HELPERS --- */
+        window.openImgHelp = (target) => {
+            targetField = target;
+            document.getElementById('imgHelper').style.display = 'block';
+            document.getElementById('pasteImg').focus();
+        }
+
+        window.applyPastedImg = () => {
+            const val = document.getElementById('pasteImg').value;
+            if (!val) return;
+
+            if (targetField === 'bg') {
+                updateScene('bg', val);
+                document.getElementById('inBg').value = val;
+            } else {
+                updateScene('character', val);
+                document.getElementById('inChar').value = val;
+            }
+            document.getElementById('imgHelper').style.display = 'none';
+            document.getElementById('pasteImg').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
-    <div
-        style="position:absolute; bottom:20px; left:20px; right:20px; height:120px; background:rgba(0,0,0,0.8); border:2px solid #fff; border-radius:8px; padding:16px; display:flex;">
-        <div style="width:100px; font-weight:700; color:#ffdd59; font-size:18px;">지수</div>
-        <div style="flex:1; color:white; font-size:16px;">"오늘도 늦었네? 빨리와!"</div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Timeline -->
-    <div class="timeline-area">
-        <div class="panel-header">TIMELINE</div>
-        <div class="panel-content" style="background:#222;">
-            <!-- Track 1: BG -->
-            <div class="timeline-track">
-                <div class="track-header">배경 (BG)</div>
-                <div class="track-content">
-                    <div
-                        style="position:absolute; left:0; width:300px; height:100%; background:#4caf50; opacity:0.3; border:1px solid #4caf50;">
-                        School_Gate.jpg</div>
-                </div>
-            </div>
-            <!-- Track 2: Char -->
-            <div class="timeline-track">
-                <div class="track-header">캐릭터</div>
-                <div class="track-content">
-                    <div
-                        style="position:absolute; left:50px; width:200px; height:100%; background:#2196f3; opacity:0.3; border:1px solid #2196f3;">
-                        지수 (Smile)</div>
-                </div>
-            </div>
-            <!-- Track 3: Sound -->
-            <div class="timeline-track">
-                <div class="track-header">사운드 (BGM)</div>
-                <div class="track-content">
-                    <div
-                        style="position:absolute; left:0; width:400px; height:100%; background:#ff9800; opacity:0.3; border:1px solid #ff9800;">
-                        Bright_Morning.mp3</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-
-    <!-- Right: Assets & Properties -->
-    <div class="panel-right">
-        <div class="panel-header" style="background:#007acc; color:white;">ASSET LIBRARY (Free)</div>
-        <div style="height:50%; border-bottom:1px solid #000; display:flex; flex-direction:column;">
-            <!-- TABS -->
-            <div style="display:flex; background:#2d2d30;">
-                <div style="flex:1; text-align:center; padding:8px; font-size:11px; background:#3e3e42; color:white;">
-                    BGM (Free)</div>
-                <div style="flex:1; text-align:center; padding:8px; font-size:11px; color:#888;">Images</div>
-            </div>
-            <!-- BGM LIST (Massive Mockup) -->
-            <div class="panel-content">
-                <div class="asset-grid">
-                    <!-- Creative Commons Mocks -->
-                    <div class="asset-item" onclick="selectAsset('Kevin MacLeod - Monkeys Spinning Monkeys')">
-                        <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                        <div class="asset-name">Monkeys...</div>
-                    </div>
-                    <div class="asset-item" onclick="selectAsset('Bensound - Epic')">
-                        <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                        <div class="asset-name">Epic Theme</div>
-                    </div>
-                    <!-- More items... -->
-                </div>
-            </div>
-        </div>
-
-        <!-- INSPECTOR -->
-        <div class="panel-header">PROPERTIES</div>
-        <div class="panel-content" style="padding:10px;">
-            <div class="prop-row">
-                <div class="prop-label">이름</div>
-                <input class="prop-input" value="지수 (Smile)">
-            </div>
-        </div>
-    </div>
-    </div>
 </body>
 
 </html>

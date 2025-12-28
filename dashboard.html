@@ -4,112 +4,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>창작자 스튜디오 - CRAFIQ</title>
+    <title>CRAFIQ Creators Studio</title>
+    <!-- Pretendard Font -->
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
+    <!-- Ionicons for modern icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
-    <!-- Supabase -->
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/init-supabase.js"></script>
     <script type="module" src="js/turbo-router.js"></script>
-    <script src="js/app.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --accent: #1f8ce6;
+            --text-main: #f5f5f5;
+            --text-sub: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .dash-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .create-btn {
+            background: var(--accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(31, 140, 230, 0.4);
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(31, 140, 230, 0.6);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: #555;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-cover {
+            height: 160px;
+            background: #252525;
+            position: relative;
+        }
+
+        .card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-type {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 20px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .c-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+        }
+
+        .btn-edit {
+            background: #333;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-edit:hover {
+            background: #444;
+        }
+
+        .btn-play {
+            background: #252525;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-play:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .create-modal {
+            background: #222;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #444;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .type-select-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .type-option {
+            background: #333;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
+        .type-option:hover,
+        .type-option.selected {
+            background: #2a2a2a;
+            border-color: var(--accent);
+        }
+
+        .type-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .type-label {
+            font-weight: 700;
+            font-size: 14px;
+        }
+    </style>
+
     <script type="module">
-        import { getUserNovels, createNovel } from './js/data.js';
+        import { createNovel, getUserNovels } from './js/data.js';
 
-        // Ensure global access
-        window.handleCreate = async (type) => {
-            let title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요:" : "비주얼 노벨 제목을 입력하세요:");
+        // Modal Logic
+        let selectedType = 'webnovel';
 
-            while (title) {
-                const { data, error } = await createNovel(title, type);
-                if (error) {
-                    // Check for Unique Violation (Postgres 23505) or 409 Conflict
-                    if (error.code === '23505' || error.status === 409 || (error.message && error.message.includes('unique'))) {
-                        title = prompt("⚠️ 이미 존재하는 제목입니다.\n다른 제목을 입력해주세요:", title);
-                    } else if (error.code === '23503') {
-                        alert("프로필 생성 오류: 계정이 올바르게 설정되지 않았습니다. 로그아웃 후 다시 로그인해보세요.");
-                        break;
-                    } else {
-                        alert("시스템 오류: " + error.message);
-                        console.error(error);
-                        break;
-                    }
-                } else {
-                    location.reload();
-                    break;
-                }
+        window.openCreateModal = () => document.getElementById('newProjectModal').style.display = 'flex';
+        window.closeCreateModal = () => document.getElementById('newProjectModal').style.display = 'none';
+
+        window.selectType = (type) => {
+            selectedType = type;
+            document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`type-${type}`).classList.add('selected');
+        }
+
+        window.createNewProject = async () => {
+            const title = document.getElementById('newProjectTitle').value;
+            if (!title.trim()) return alert("제목을 입력해주세요.");
+
+            const { data, error } = await createNovel(title, selectedType);
+            if (error) {
+                alert("생성 실패: " + error.message);
+            } else {
+                location.reload();
             }
         };
 
-        async function initDashboard() {
-            // Wait for auth to init
-            await new Promise(r => setTimeout(r, 100));
+        // Init
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: novels } = await getUserNovels();
+            const list = document.getElementById('projectList');
 
-            const listEl = document.getElementById('novelList');
-            if (!listEl) return;
+            if (novels && novels.length > 0) {
+                document.getElementById('totalCount').innerText = novels.length;
 
-            listEl.innerHTML = '<div style="padding:20px; text-align:center;">로딩 중...</div>';
-
-            const { data: novels, error } = await getUserNovels();
-
-            if (!novels || novels.length === 0) {
-                listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#888;">아직 생성한 작품이 없습니다.<br>위 버튼을 눌러 창작을 시작해보세요!</div>';
-                return;
-            }
-
-            listEl.innerHTML = novels.map(n => `
-                <div class="studio-card" style="position:relative;">
-                    <div onclick="location.href='${n.is_visual_novel ? `studio-visual.html?id=${n.id}` : `studio-novel.html?id=${n.id}`}'" style="cursor:pointer;">
-                        <strong style="font-size:16px;">${n.title}</strong>
-                        <div style="font-size:12px; color:#666; margin-top:4px;">
-                            ${n.is_visual_novel ? '🎮 비주얼 노벨' : '📖 웹소설'} 
-                            | ${new Date(n.created_at).toLocaleDateString()}
+                list.innerHTML = novels.map(n => `
+                    <div class="project-card">
+                        <div class="card-cover">
+                            <img src="${n.cover_url || 'https://via.placeholder.com/300x160'}" loading="lazy">
+                            <span class="card-type">${n.is_visual_novel ? 'Visual Novel' : 'Web Novel'}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">${n.title}</div>
+                            <div class="card-meta">최종 수정: ${new Date(n.created_at).toLocaleDateString()}</div>
+                            
+                            <div class="card-actions">
+                                <button class="c-btn btn-edit" onclick="location.href='novel-settings.html?id=${n.id}'">설정</button>
+                                ${n.is_visual_novel
+                        ? `<button class="c-btn btn-play" onclick="location.href='studio-visual.html?id=${n.id}'">에디터 열기</button>`
+                        : `<button class="c-btn btn-play" onclick="location.href='studio-novel.html?id=${n.id}'">집필하기</button>`
+                    }
+                            </div>
                         </div>
                     </div>
-                    <button onclick="event.stopPropagation(); location.href='novel-settings.html?id=${n.id}'" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#666; cursor:pointer; padding:4px;">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        if (document.body) initDashboard();
-        window.addEventListener('turbo:load', initDashboard);
+                `).join('');
+            } else {
+                list.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px; color:#666;">
+                    <ion-icon name="folder-open-outline" style="font-size:48px; margin-bottom:10px;"></ion-icon>
+                    <p>생성된 프로젝트가 없습니다.</p>
+                </div>`;
+            }
+        });
     </script>
 </head>
 
 <body>
-    <header>
-        <div class="header-inner">
-            <a href="index.html" class="brand">CRAFIQ Studio</a>
-            <div class="header-right-pc" style="margin-left:auto;">
-                <a href="index.html" style="font-size:14px; font-weight:700;">나가기</a>
-            </div>
+    <!-- Nav -->
+    <header style="height:60px; border-bottom:1px solid #333; display:flex; align-items:center; padding:0 20px;">
+        <a href="index.html" style="font-weight:900; font-size:20px; color:white; text-decoration:none;">CRAFIQ</a>
+        <div style="margin-left:auto; display:flex; gap:16px; align-items:center;">
+            <a href="index.html" style="color:#aaa; font-size:14px; text-decoration:none;">플랫폼 홈</a>
+            <div style="width:32px; height:32px; background:#333; border-radius:50%;"></div>
         </div>
     </header>
 
-    <main class="inner" style="padding-top:40px;">
-        <h2 class="sec-title" style="margin:0 16px 20px;">무엇을 창작하시겠습니까?</h2>
+    <div class="dashboard-container">
 
-        <div class="studio-option-grid">
-            <div class="studio-card" onclick="window.handleCreate('novel')">
-                <div style="font-size:24px; margin-bottom:8px;">📖</div>
-                <div style="font-weight:800; font-size:18px;">웹소설 만들기</div>
-                <div style="font-size:13px; color:#666; margin-top:4px;">텍스트 중심의 스토리텔링</div>
+        <div class="dash-header">
+            <div>
+                <h1 class="dash-title">Creators Studio</h1>
+                <p style="color:#888; margin-top:8px;">당신의 상상력을 현실로 만드세요.</p>
             </div>
-            <div class="studio-card" onclick="window.handleCreate('visual')">
-                <div style="font-size:24px; margin-bottom:8px;">🎮</div>
-                <div style="font-weight:800; font-size:18px;">비주얼 노벨 만들기</div>
-                <div style="font-size:13px; color:#666; margin-top:4px;">게임을 만드는 가장 쉬운 방법</div>
+            <button onclick="openCreateModal()" class="create-btn">
+                <ion-icon name="add-circle"></ion-icon> 새 프로젝트 만들기
+            </button>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">총 프로젝트</div>
+                <div id="totalCount" class="stat-val">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">이번 달 독자 수</div>
+                <div class="stat-val">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">총 수익</div>
+                <div class="stat-val">₩0</div>
             </div>
         </div>
 
-        <h3 class="sec-title" style="margin:0 16px 16px;">내 작품 목록</h3>
-        <div id="novelList" class="studio-option-grid">
-            <!-- Dynamic Load -->
+        <div class="section-title">내 프로젝트</div>
+        <div id="projectList" class="project-grid">
+            <!-- Loading... -->
+            <div style="color:#666; padding:20px;">로딩 중...</div>
         </div>
 
-    </main>
+    </div>
+
+    <!-- Create Modal -->
+    <div id="newProjectModal" class="modal-overlay">
+        <div class="create-modal">
+            <h2 style="font-size:24px; margin-bottom:20px; font-weight:700;">새 프로젝트 생성</h2>
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block; color:#aaa; margin-bottom:8px; font-size:13px; font-weight:bold;">작품
+                    제목</label>
+                <input id="newProjectTitle" type="text" placeholder="제목을 입력하세요"
+                    style="width:100%; padding:14px; background:#111; border:1px solid #444; color:white; border-radius:8px;">
+            </div>
+
+            <label style="display:block; color:#aaa; margin-bottom:10px; font-size:13px; font-weight:bold;">형식
+                선택</label>
+            <div class="type-select-grid">
+                <div id="type-webnovel" class="type-option selected" onclick="selectType('webnovel')">
+                    <div class="type-icon">📖</div>
+                    <div class="type-label">웹소설</div>
+                </div>
+                <div id="type-visual" class="type-option" onclick="selectType('visual')">
+                    <div class="type-icon">🎮</div>
+                    <div class="type-label">비주얼 노벨</div>
+                </div>
+            </div>
+
+            <div style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="closeCreateModal()"
+                    style="padding:12px 24px; background:none; border:1px solid #444; color:#ccc; border-radius:8px; cursor:pointer;">취소</button>
+                <button onclick="createNewProject()"
+                    style="padding:12px 24px; background:var(--accent); border:none; color:white; border-radius:8px; font-weight:bold; cursor:pointer;">생성하기</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
