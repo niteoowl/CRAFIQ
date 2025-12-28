@@ -109,35 +109,41 @@
             </div>
         </section>
 
-        <!-- Section: Fantasy -->
+        <!-- Section: All Novels (Replaces Fantasy for now) -->
         <section class="section">
             <div class="section-head">
-                <h3 class="sec-title">⚔️ 판타지</h3>
-                <a href="#" class="sec-more">더보기</a>
+                <h3 class="sec-title">📚 전체 작품 탐색</h3>
             </div>
-            <div class="h-scroll-view">
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=300"></div>
-                    <div class="book-title">그녀가 공작저로</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=300"></div>
-                    <div class="book-title">달빛 조각사</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300"></div>
-                    <div class="book-title">슬라임 전생</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=300"></div>
-                    <div class="book-title">나 혼자만 레벨업</div>
-                </a>
+            <div id="discoverList" class="h-scroll-view" style="flex-wrap:wrap; overflow-x:hidden; gap:16px;">
+                <div style="padding:20px; color:#888;">로딩 중...</div>
             </div>
         </section>
+
+        <script type="module">
+            import { getAllNovels } from './js/data.js';
+
+            async function initDiscover() {
+                await new Promise(r => setTimeout(r, 100));
+                const { data: novels, error } = await getAllNovels();
+                const container = document.getElementById('discoverList');
+
+                if (error || !novels) {
+                    container.innerHTML = '<div>로딩 실패</div>';
+                    return;
+                }
+
+                container.innerHTML = novels.map(n => `
+                <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item" style="width:calc(33% - 11px); min-width:100px; margin-right:0;">
+                     <div class="book-cover"><img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
+                        ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">Game</span>' : ''}
+                     </div>
+                    <div class="book-title">${n.title}</div>
+                </a>
+                `).join('');
+            }
+            if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initDiscover);
+            else initDiscover();
+        </script>
 
         <!-- Section: Romance -->
         <section class="section">

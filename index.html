@@ -27,12 +27,23 @@
         import { getRecentPublishedNovels } from './js/data.js';
 
         async function initHome() {
-            const { data: novels } = await getRecentPublishedNovels();
-            if (!novels || novels.length === 0) return;
+            // Give time for Supabase to init
+            await new Promise(r => setTimeout(r, 100));
 
-            // Target the first scroll view (Hot New)
-            const container = document.querySelector('.h-scroll-view');
+            const { data: novels, error } = await getRecentPublishedNovels();
+            const container = document.getElementById('homeRecentList');
             if (!container) return;
+
+            if (error) {
+                console.error(error);
+                container.innerHTML = '<div style="padding:20px;">로딩 실패</div>';
+                return;
+            }
+
+            if (!novels || novels.length === 0) {
+                container.innerHTML = '<div style="padding:20px;">등록된 작품이 없습니다.</div>';
+                return;
+            }
 
             // Create Real Data Cards
             const realCards = novels.map(n => `
@@ -46,8 +57,7 @@
                 </a>
             `).join('');
 
-            // Prepend to the existing list
-            container.insertAdjacentHTML('afterbegin', realCards);
+            container.innerHTML = realCards;
         }
 
         window.addEventListener('DOMContentLoaded', initHome);
@@ -133,48 +143,13 @@
                 <h2 class="sec-title">🔥 화제의 신작</h2>
                 <a href="discover.html" class="sec-more">더보기</a>
             </div>
-            <div class="h-scroll-view">
-                <!-- Real Data will be injected HERE -->
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=400"></div>
-                    <div class="book-title">달빛 조각사</div>
-                    <div class="book-meta">남희성 • 게임판타지</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400"></div>
-                    <div class="book-title">슬라임 전생</div>
-                    <div class="book-meta">퓨즈 • 이세계</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=400"></div>
-                    <div class="book-title">나 혼자만 레벨업</div>
-                    <div class="book-meta">추공 • 헌터물</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400"></div>
-                    <div class="book-title">화산귀환</div>
-                    <div class="book-meta">비가 • 무협</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1463171379577-7f9923021716?w=400"></div>
-                    <div class="book-title">전지적 독자 시점</div>
-                    <div class="book-meta">싱숑 • 판타지</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400"></div>
-                    <div class="book-title">재벌집 막내아들</div>
-                    <div class="book-meta">산경 • 현대판타지</div>
-                </a>
+            <div id="homeRecentList" class="h-scroll-view">
+                <!-- Data injected by initHome() -->
+                <div style="padding:20px; color:#888;">로딩 중...</div>
             </div>
         </section>
 
-        <!-- Section 2: Editor's Pick (Wide Cards) -->
+        <!-- Section 2: Editor's Pick (Static for now) -->
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">MD's Pick: 이번 주 필독</h2>
@@ -191,12 +166,6 @@
                             src="https://images.unsplash.com/photo-1518818419601-72c8673f5852?w=600"></div>
                     <div class="book-title">먼치킨 주인공 특집</div>
                     <div class="book-meta">답답함 없는 시원한 전개</div>
-                </a>
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=600"></div>
-                    <div class="book-title">밤 새는 줄 모르는 미스터리</div>
-                    <div class="book-meta">당신의 심장을 뛰게 할 스릴러</div>
                 </a>
             </div>
         </section>

@@ -61,74 +61,44 @@
     <main class="inner">
         <!-- Section: Realtime Top 10 -->
         <section class="section" style="margin-top:24px;">
-            <h2 class="sec-title" style="margin: 0 16px 20px;">🏆 실시간 종합 100</h2>
-            <div class="rank-list" style="padding:0;">
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">1</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1516410541193-6dbf07918b8b?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">광마회귀</div>
-                        <div class="rank-desc">유진성 • 무협</div>
-                        <div class="rank-tags"><span class="tag-sm">먼치킨</span><span class="tag-sm">개그</span></div>
-                    </div>
-                </a>
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">2</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1501250987900-1b8a1a2a4bcf?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">데뷔 못 하면 죽는 병</div>
-                        <div class="rank-desc">백덕수 • 현판</div>
-                        <div class="rank-tags"><span class="tag-sm">아이돌</span><span class="tag-sm">빙의</span></div>
-                    </div>
-                </a>
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">3</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">나노 마신</div>
-                        <div class="rank-desc">한중월야 • 무협</div>
-                        <div class="rank-tags"><span class="tag-sm">미래</span><span class="tag-sm">기계</span></div>
-                    </div>
-                </a>
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">4</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1513001900722-370f8deed956?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">비뢰도</div>
-                        <div class="rank-desc">검류혼 • 무협</div>
-                        <div class="rank-tags"><span class="tag-sm">학원</span></div>
-                    </div>
-                </a>
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">5</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">달빛 조각사</div>
-                        <div class="rank-desc">남희성 • 겜판</div>
-                        <div class="rank-tags"><span class="tag-sm">조각</span></div>
-                    </div>
-                </a>
-                <a href="#" class="rank-item" style="padding:12px 16px;">
-                    <div class="rank-num" style="color:#000;">6</div>
-                    <div class="rank-thumb"><img
-                            src="https://images.unsplash.com/photo-1614726365723-49cfa0950ecb?w=200"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">나 혼자만 레벨업</div>
-                        <div class="rank-desc">추공 • 헌터</div>
-                        <div class="rank-tags"><span class="tag-sm">성장</span></div>
-                    </div>
-                </a>
-            </div>
-            <div
-                style="text-align:center; padding:20px; color:#888; font-size:14px; border-top:1px solid #f0f0f0; margin-top:20px;">
-                100위까지 더보기 ∨
+            <h2 class="sec-title" style="margin: 0 16px 20px;">🏆 실시간 종합</h2>
+            <div id="bestList" class="rank-list" style="padding:0;">
+                <div style="padding:20px; text-align:center; color:#888;">랭킹 로딩 중...</div>
             </div>
         </section>
+
+        <script type="module">
+            import { getBestNovels } from './js/data.js';
+
+            async function initBest() {
+                // Wait for auth init (just in case, though public read is fine)
+                await new Promise(r => setTimeout(r, 100));
+
+                const { data: novels, error } = await getBestNovels();
+                const container = document.getElementById('bestList');
+
+                if (error || !novels) {
+                    container.innerHTML = '<div style="padding:20px; text-align:center;">불러오기 실패</div>';
+                    return;
+                }
+
+                container.innerHTML = novels.map((n, i) => `
+                <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="rank-item" style="padding:12px 16px;">
+                    <div class="rank-num" style="color:#000;">${i + 1}</div>
+                    <div class="rank-thumb"><img src="${n.cover_url || 'https://via.placeholder.com/150'}" style="object-fit:cover;"></div>
+                    <div class="rank-info">
+                        <div class="rank-title">${n.title}</div>
+                        <div class="rank-desc">${n.profiles?.username || '작가'} • ${n.is_visual_novel ? 'Game' : 'Novel'}</div>
+                        <div class="rank-tags"><span class="tag-sm">인기</span></div>
+                    </div>
+                </a>
+                `).join('');
+            }
+
+            // Init
+            if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initBest);
+            else initBest();
+        </script>
 
         <!-- Section: Fantasy Best -->
         <section class="section">
