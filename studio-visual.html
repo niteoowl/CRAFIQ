@@ -3,784 +3,772 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CRAFIQ Engine Pro</title>
-    <!-- Pretendard & Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <title>CRAFIQ INFINITY ENGINE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Supabase -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/init-supabase.js"></script>
 
     <style>
-        /* --- IDE THEME (VSCode/Unity Style) --- */
+        /* --- INFINITY THEME (Flat, Clean, Dark) --- */
         :root {
-            --ide-bg: #1e1e1e;
-            --ide-panel: #252526;
-            --ide-border: #333333;
-            --ide-header: #3c3c3c;
-            --ide-highlight: #007acc;
-            --ide-text: #cccccc;
-            --ide-accent: #0e639c;
-            --ide-input-bg: #3c3c3c;
-            --ide-hover: #2a2d2e;
+            --bg-body: #111;
+            --bg-panel: #1e1e1e;
+            --bg-header: #252525;
+            --bg-input: #111;
+            --main: #3b82f6;
+            /* Blue for Pro */
+            --easy: #10b981;
+            /* Green for Easy */
+            --border: #333;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
         }
 
         body {
-            background: var(--ide-bg);
-            color: var(--ide-text);
-            font-family: 'Pretendard', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
             margin: 0;
-            font-size: 13px;
-        }
-
-        /* Scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--ide-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* HEADER */
-        .ide-toolbar {
-            height: 48px;
-            background: var(--ide-header);
-            border-bottom: 1px solid var(--ide-border);
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-body);
+            color: var(--text);
+            font-family: 'Gulim', 'Pretendard', sans-serif;
+            /* Requested Gulim */
+            overflow: hidden;
             display: flex;
-            align-items: center;
-            padding: 0 16px;
-            justify-content: space-between;
-            user-select: none;
-        }
-
-        .tool-group {
-            display: flex;
-            gap: 8px;
+            justify-content: center;
             align-items: center;
         }
 
-        .ide-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--ide-text);
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
+        /* ZOOM CONTAINER */
+        #app-scale-wrap {
+            width: 1600px;
+            height: 900px;
+            /* Fixed Base Resolution */
+            background: var(--bg-panel);
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transform-origin: center center;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        /* COMMON UI */
+        .btn {
+            background: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #3a3a3a;
+            padding: 6px 14px;
             font-size: 12px;
-            display: flex;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            font-family: 'Gulim', sans-serif;
         }
 
-        .ide-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .ide-btn.primary {
-            background: var(--ide-accent);
+        .btn:hover {
+            background: #3a3a3a;
             color: white;
         }
 
-        .ide-btn.primary:hover {
-            background: #1177bb;
+        .btn.primary {
+            background: var(--main);
+            border-color: var(--main);
+            color: white;
         }
 
-        /* MAIN WORKSPACE */
-        .workspace {
-            flex: 1;
+        .btn.easy {
+            background: var(--easy);
+            border-color: var(--easy);
+            color: white;
+        }
+
+        .inp {
+            background: var(--bg-input);
+            border: 1px solid #333;
+            color: white;
+            padding: 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            width: 100%;
+            font-family: 'Gulim', sans-serif;
+        }
+
+        .inp:focus {
+            border-color: var(--main);
+        }
+
+        .panel-head {
+            height: 36px;
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border);
             display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-weight: bold;
+            font-size: 12px;
+            justify-content: space-between;
+            color: #ddd;
+        }
+
+        /* LAYOUT */
+        #topbar {
+            height: 48px;
+            background: #181818;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        /* CONTENT SPLIT */
+        #main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
             overflow: hidden;
         }
 
-        /* PANELS */
-        .panel {
+        /* LEFT: MANAGER */
+        #left-col {
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            background: var(--ide-panel);
-            border-right: 1px solid var(--ide-border);
-        }
-
-        .panel-header {
-            padding: 8px 12px;
-            font-weight: 700;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background: #2d2d2d;
-            border-bottom: 1px solid var(--ide-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* LEFT: HIERARCHY (Scenes & Resources) */
-        .panel.left {
-            width: 280px;
-            min-width: 200px;
-        }
-
-        .tree-view {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 20px;
-        }
-
-        .tree-node {
-            padding: 4px 8px 4px 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid transparent;
-        }
-
-        .tree-node:hover {
-            background: var(--ide-hover);
-        }
-
-        .tree-node.selected {
-            background: #094771;
-            color: white;
-        }
-
-        .tree-node i {
-            width: 16px;
-            text-align: center;
-            opacity: 0.7;
         }
 
         /* CENTER: STAGE */
-        .panel.center {
-            flex: 1;
-            background: #181818;
-            position: relative;
-            border-right: none;
+        #center-col {
+            background: #000;
+            display: flex;
+            flex-direction: column;
         }
 
-        .stage-area {
+        #stage-area {
             flex: 1;
             display: flex;
-            align-items: center;
             justify-content: center;
-            overflow: hidden;
-            background-image:
-                linear-gradient(45deg, #222 25%, transparent 25%),
-                linear-gradient(-45deg, #222 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, #222 75%),
-                linear-gradient(-45deg, transparent 75%, #222 75%);
+            align-items: center;
+            background-image: radial-gradient(#333 1px, transparent 1px);
             background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-
-        .game-canvas {
-            width: 1280px;
-            /* Base Resolution */
-            height: 720px;
-            background: black;
             position: relative;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            transform-origin: center;
-            /* Scaled by JS */
         }
 
-        .game-object {
-            position: absolute;
-            user-select: none;
-            /* Interactive borders for selection could go here */
+        #game-canvas {
+            width: 1280px;
+            height: 720px;
+            background: #000;
+            position: relative;
+            box-shadow: 0 0 50px black;
+            overflow: hidden;
         }
 
-        .game-object.selected {
-            outline: 2px solid var(--ide-highlight);
-        }
-
-        /* BOTTOM: TIMELINE (Events) */
-        .panel.bottom {
-            height: 250px;
-            border-top: 1px solid var(--ide-border);
-            border-right: none;
-        }
-
-        .event-list {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .event-row {
+        /* TIMELINE (PRO MODE) */
+        #timeline-area {
+            height: 280px;
+            background: #161616;
+            border-top: 1px solid var(--border);
             display: flex;
-            border-bottom: 1px solid #333;
-            background: var(--ide-panel);
+            flex-direction: column;
         }
 
-        .event-row:hover {
-            background: var(--ide-hover);
-        }
-
-        .event-row.selected {
-            background: #3a3d41;
-            border-left: 3px solid var(--ide-highlight);
-        }
-
-        .event-cell {
-            padding: 8px;
-            font-size: 12px;
-        }
-
-        .cell-type {
-            width: 100px;
-            color: #4ec9b0;
-            font-weight: bold;
-            border-right: 1px solid #333;
-        }
-
-        .cell-desc {
+        /* SCRIPT EDITOR (EASY MODE) */
+        #script-area {
             flex: 1;
-            color: #d4d4d4;
+            background: #111;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
         }
 
-        .cell-action {
-            width: 40px;
-            text-align: center;
-            cursor: pointer;
-            color: #e06c75;
+        .script-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .s-name {
+            width: 100px;
+            text-align: right;
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .s-text {
+            flex: 1;
+            background: #222;
+            border: 1px solid #333;
+            color: #eee;
+            padding: 8px;
+            border-radius: 4px;
         }
 
         /* RIGHT: INSPECTOR */
-        .panel.right {
-            width: 320px;
-            min-width: 250px;
-            border-left: 1px solid var(--ide-border);
+        #right-col {
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
         }
 
-        .prop-group {
-            border-bottom: 1px solid var(--ide-border);
-            padding: 12px;
+        /* TAB BAR */
+        .tabs {
+            display: flex;
+            background: #222;
         }
 
-        .prop-label {
-            display: block;
-            margin-bottom: 6px;
-            color: #888;
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            color: #777;
+            border-bottom: 2px solid transparent;
             font-size: 11px;
         }
 
-        .c-input,
-        .c-select,
-        .c-textarea {
-            width: 100%;
-            background: var(--ide-input-bg);
-            border: 1px solid var(--ide-border);
-            color: #eee;
-            padding: 6px;
-            border-radius: 2px;
-            font-size: 12px;
+        .tab.active {
+            color: white;
+            border-bottom-color: var(--main);
+            background: #2a2a2a;
         }
 
-        .c-input:focus {
-            border-color: var(--ide-highlight);
-            outline: none;
-        }
-
-        .row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        /* Helper Modal */
-        .modal-overlay {
+        /* HELPERS */
+        .modal-over {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
             display: none;
             justify-content: center;
             align-items: center;
         }
 
-        .modal-box {
-            background: var(--ide-panel);
-            border: 1px solid var(--ide-highlight);
+        .modal {
+            width: 500px;
+            background: #222;
+            border: 1px solid #444;
             padding: 20px;
-            width: 400px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            box-shadow: 0 20px 50px black;
+        }
+
+        /* CLASSES */
+        .t-bg {
+            color: #2ecc71;
+        }
+
+        .t-char {
+            color: #3498db;
+        }
+
+        .t-txt {
+            color: #f1c40f;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- TOOLBAR -->
-    <div class="ide-toolbar">
-        <div class="tool-group">
-            <div style="font-weight:900; color:var(--ide-highlight); margin-right:12px;">CRAFIQ ENGINE</div>
-            <button class="ide-btn" onclick="location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i>
-                Home</button>
-            <div style="width:1px; height:20px; background:#444; margin:0 8px;"></div>
-            <button class="ide-btn" onclick="Engine.saveProject()"><i class="fa-solid fa-save"></i> Save
-                Project</button>
-            <button class="ide-btn" onclick="Engine.previewGame()"><i class="fa-solid fa-play"></i> Run Preview</button>
-        </div>
-        <div class="tool-group">
-            <span id="projectName" style="color:#888; font-size:12px;">Untitled Project</span>
-        </div>
-    </div>
+    <div id="app-scale-wrap">
 
-    <!-- MAIN GRID -->
-    <div class="workspace">
-
-        <!-- LEFT: HIERARCHY -->
-        <div class="panel left">
-            <div class="panel-header">
-                SCENES (CHAPTERS)
-                <button class="ide-btn" style="padding:2px 6px;" onclick="Engine.addScene()"><i
-                        class="fa-solid fa-plus"></i></button>
-            </div>
-            <div id="sceneTree" class="tree-view">
-                <!-- Scenes List -->
+        <!-- HEADER -->
+        <div id="topbar">
+            <div style="display:flex; align-items:center; gap:20px;">
+                <span style="font-size:18px; font-weight:900; color:white;"><i class="fa-solid fa-infinity"></i>
+                    INFINITY ENGINE</span>
+                <div style="background:#333; padding:4px; border-radius:20px; display:flex;">
+                    <button id="mode-easy" class="btn easy" style="border-radius:16px;"
+                        onclick="Engine.setMode('EASY')">✨ 초보자 모드</button>
+                    <button id="mode-pro" class="btn"
+                        style="border-radius:16px; border:none; background:transparent; opacity:0.5;"
+                        onclick="Engine.setMode('PRO')">🛠️ 전문가 모드</button>
+                </div>
             </div>
 
-            <div class="panel-header" style="border-top:1px solid #333;">GLOBAL VARIABLES</div>
-            <div style="padding:10px; height:150px; overflow-y:auto;">
-                <button class="ide-btn" style="width:100%; margin-bottom:8px;" onclick="Engine.addVariable()">+ Add
-                    Variable</button>
-                <div id="varList"></div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn" onclick="Nav.exit()"><i class="fa-solid fa-house"></i> 나가기</button>
+                <button class="btn" onclick="Project.save()"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+                <button class="btn primary" onclick="Project.play()"><i class="fa-solid fa-play"></i> 실행</button>
             </div>
         </div>
 
-        <!-- CENTER: STAGE -->
-        <div style="display:flex; flex-direction:column; flex:1;">
-            <div class="panel center">
-                <div class="stage-area">
-                    <div id="gameStage" class="game-canvas">
-                        <!-- RENDER TARGET -->
-                        <div id="layer-bg" style="position:absolute; inset:0; z-index:0;"></div>
-                        <div id="layer-chars" style="position:absolute; inset:0; z-index:10;"></div>
-                        <div id="layer-ui" style="position:absolute; inset:0; z-index:20; pointer-events:none;">
-                            <!-- Dialog Box Container -->
-                            <div id="dialogBox"
-                                style="position:absolute; bottom:50px; left:100px; right:100px; height:180px; background:rgba(0,0,0,0.8); border:2px solid white; padding:20px; display:none;">
-                                <div id="dialogName"
-                                    style="color:yellow; font-weight:bold; font-size:24px; margin-bottom:10px;">Name
+        <!-- MAIN -->
+        <div id="main-content">
+
+            <!-- 1. LEFT: ASSETS & SCENES -->
+            <div id="left-col">
+                <div class="tabs">
+                    <div id="tab-scene" class="tab active" onclick="UI.tab('scene')">장면 (Scenes)</div>
+                    <div id="tab-asset" class="tab" onclick="UI.tab('asset')">자산 (Assets)</div>
+                    <div id="tab-ui" class="tab" onclick="UI.tab('ui')">UI 설정</div>
+                </div>
+
+                <!-- SCENE LIST -->
+                <div id="p-scene" class="flex-col" style="flex:1;">
+                    <div class="panel-head">
+                        <span>장면 목록</span>
+                        <button class="btn" style="padding:2px 8px;" onclick="Scene.add()"><i
+                                class="fa-solid fa-plus"></i> 추가</button>
+                    </div>
+                    <div id="list-scenes" style="padding:10px; overflow-y:auto; flex:1;"></div>
+                </div>
+
+                <!-- ASSET LIST -->
+                <div id="p-asset" class="flex-col" style="flex:1; display:none;">
+                    <div style="padding:10px;">
+                        <button class="btn primary" style="width:100%; justify-content:center; margin-bottom:10px;"
+                            onclick="Utils.modal('import')">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> 이미지/오디오 링크 가져오기
+                        </button>
+                        <div style="color:#666; font-size:11px; text-align:center;">
+                            PostImages 등의 URL을 입력하세요.<br>
+                            드래그 앤 드롭으로 넣을 수도 있습니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UI EDIT -->
+                <div id="p-ui" class="flex-col" style="flex:1; display:none; padding:10px;">
+                    <label style="color:#888; display:block; margin-bottom:4px;">대화창 스타일</label>
+                    <select class="inp" style="margin-bottom:10px;">
+                        <option>기본 (Dark)</option>
+                        <option>밝음 (Light)</option>
+                        <option>판타지 (Fantasy)</option>
+                        <option>SF (Cyber)</option>
+                    </select>
+
+                    <label style="color:#888; display:block; margin-bottom:4px;">폰트</label>
+                    <select class="inp" style="margin-bottom:10px;">
+                        <option>굴림체 (Gulim)</option>
+                        <option>프리텐다드 (Pretendard)</option>
+                        <option>나눔고딕 (Nanum)</option>
+                        <option>바탕체 (Batang)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. CENTER: STAGE -->
+            <div id="center-col">
+
+                <!-- SCRIPT EDITOR (EASY) -->
+                <div id="script-area">
+                    <h2 style="color:var(--easy); margin-top:0;">📜 시나리오 모드</h2>
+                    <p style="color:#666; font-size:12px;">복잡한 타임라인 없이, 대본 쓰듯이 게임을 만드세요.</p>
+                    <div id="script-lines">
+                        <!-- Generated Lines -->
+                    </div>
+                    <button class="btn easy" style="width:100%; justify-content:center; margin-top:20px;"
+                        onclick="EasyMode.addLine()">+ 대사 추가</button>
+                </div>
+
+                <!-- GAME STAGE (VISUAL) -->
+                <div id="stage-area">
+                    <div id="game-canvas">
+                        <div id="r-bg"
+                            style="position:absolute; inset:0; background-size:cover; background-position:center;">
+                        </div>
+                        <div id="r-chars" style="position:absolute; inset:0;"></div>
+
+                        <!-- UI PREVIEW -->
+                        <div id="r-ui" style="position:absolute; inset:0; pointer-events:none;">
+                            <div id="r-box"
+                                style="position:absolute; bottom:50px; left:100px; right:100px; height:180px; background:rgba(0,0,0,0.8); border:2px solid #555; border-radius:10px; padding:30px;">
+                                <div id="r-name"
+                                    style="color:#f1c40f; font-weight:bold; font-size:24px; margin-bottom:10px;">이름
                                 </div>
-                                <div id="dialogText" style="color:white; font-size:20px;">Text...</div>
+                                <div id="r-text" style="color:#eee; font-size:20px; line-height:1.5;">대사 내용이 여기에 표시됩니다.
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Zoom Controls overlay -->
-                <div
-                    style="position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.5); padding:4px; border-radius:4px; font-size:11px;">
-                    1280x720 | 100%
+
+                <!-- TIMELINE (PRO) -->
+                <div id="timeline-area" style="display:none;">
+                    <div class="panel-head">
+                        <span>타임라인 (Timeline)</span>
+                        <div style="display:flex; gap:4px;">
+                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('bg')"><i
+                                    class="fa-solid fa-image t-bg"></i> 배경</button>
+                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('char')"><i
+                                    class="fa-solid fa-user t-char"></i> 캐릭터</button>
+                            <button class="btn" style="padding:2px 8px;" onclick="Timeline.addClip('text')"><i
+                                    class="fa-solid fa-comment t-txt"></i> 대사</button>
+                        </div>
+                    </div>
+                    <div id="tl-tracks" style="padding:10px; overflow:auto;">
+                        <!-- Tracks -->
+                    </div>
                 </div>
             </div>
 
-            <!-- BOTTOM: EVENT SEQUENCER -->
-            <div class="panel bottom">
-                <div class="panel-header">
-                    <span>EVENT TIMELINE (Action Script)</span>
-                    <div class="tool-group">
-                        <button class="ide-btn" onclick="Engine.addEvent('dialog')"><i class="fa-solid fa-comment"></i>
-                            Text</button>
-                        <button class="ide-btn" onclick="Engine.addEvent('background')"><i
-                                class="fa-solid fa-image"></i> BG</button>
-                        <button class="ide-btn" onclick="Engine.addEvent('character')"><i class="fa-solid fa-user"></i>
-                            Char</button>
-                        <button class="ide-btn" onclick="Engine.addEvent('sound')"><i class="fa-solid fa-music"></i>
-                            Audio</button>
-                        <button class="ide-btn" onclick="Engine.addEvent('choice')"><i
-                                class="fa-solid fa-list-check"></i> Choice</button>
-                    </div>
-                </div>
-                <div class="event-list">
-                    <div class="event-row header" style="font-weight:bold; opacity:0.7;">
-                        <div class="event-cell cell-type">TYPE</div>
-                        <div class="event-cell cell-desc">PARAMETERS</div>
-                        <div class="event-cell cell-action">DEL</div>
-                    </div>
-                    <div id="eventContainer">
-                        <!-- Events go here -->
-                    </div>
+            <!-- 3. RIGHT: INSPECTOR -->
+            <div id="right-col">
+                <div class="panel-head">속성 (Inspector)</div>
+                <div id="inspector-body" style="padding:10px;">
+                    <div style="text-align:center; color:#555; margin-top:50px;">선택된 항목 없음</div>
                 </div>
             </div>
+
         </div>
-
-        <!-- RIGHT: INSPECTOR -->
-        <div class="panel right">
-            <div class="panel-header">INSPECTOR</div>
-            <div id="inspector" style="flex:1; overflow-y:auto;">
-                <div style="padding:20px; text-align:center; color:#666;">Select an Event or Scene specifically.</div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- HELPERS -->
-    <div id="imgHelper" class="modal-overlay">
-        <div class="modal-box">
-            <h3>Image Asset Uploader</h3>
-            <p style="color:#888;">PostImages에서 'Direct Link'를 복사해오세요.</p>
-            <input id="imgPaste" class="c-input" placeholder="https://..." style="margin:10px 0;">
-            <div style="text-align:right;">
-                <button class="ide-btn"
-                    onclick="document.getElementById('imgHelper').style.display='none'">Close</button>
-                <button class="ide-btn primary" onclick="Engine.applyImage()">Apply</button>
+    <!-- MODAL IMPORT -->
+    <div id="modal-import" class="modal-over">
+        <div class="modal">
+            <h3>이미지/오디오 URL 입력</h3>
+            <input id="inp-url" class="inp" placeholder="https://..."
+                style="font-size:14px; padding:10px; margin:20px 0;">
+            <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
+                <button class="btn" onclick="Utils.modalClose('import')">취소</button>
+                <button class="btn primary" onclick="Utils.applyUrl()">적용하기</button>
             </div>
         </div>
     </div>
 
-    <!-- ENGINE CORE (JAVASCRIPT) -->
     <script type="module">
         import { getNovelById, getScenes, saveScenes } from './js/data.js';
 
-        // --- MODEL DEFINITION ---
-        /*
-           Data Structure (Ren'Py Style):
-           Novel -> Scenes[]
-           Scene -> Events[] (Linear execution flow)
-           
-           Event Types:
-           - dialog: { speaker, text, speed }
-           - background: { url, transition }
-           - character: { name, url, x, y, scale, transition }
-           - sound: { url, type: 'bgm'|'sfx', volume }
-           - choice: { options: [{label, jumpSceneId}] }
-           - variable: { key, op, val }
+        /* 
+            INFINITY ENGINE LOGIC
+            Supports both Easy (Linear List) and Pro (Timeline Tracks) data models.
+            Actually, Easy mode just abstracts the Timeline. 
+            Easy Mode = Auto-generates Tracks.
         */
 
         const State = {
-            novelId: null,
-            novel: null,
+            mode: 'EASY', // EASY | PRO
+            project: { id: null },
             scenes: [],
-            activeSceneId: null, // internal uuid or index
-            selectedEventIndex: -1,
-            clipboard: null
+            sceneId: null,
+            clipId: null
         };
 
-        window.Engine = {
+        const Engine = {
+            init: async () => {
+                // 1. Auto Scale
+                Engine.resize();
+                window.addEventListener('resize', Engine.resize);
 
-            async init() {
-                const params = new URLSearchParams(window.location.search);
-                State.novelId = params.get('id');
-                if (!State.novelId) return alert("No ID provided");
+                // 2. Load
+                const p = new URLSearchParams(location.search);
+                const id = p.get('id');
+                if (!id) return alert("ID 없음");
+                State.project.id = id;
 
-                // Load Data
-                const { data: novel } = await getNovelById(State.novelId);
-                State.novel = novel;
-                document.getElementById('projectName').innerText = novel.title;
-
-                const { data: scenes } = await getScenes(State.novelId);
-                if (scenes && scenes.length > 0) {
-                    // Normalize Data: Ensure 'events' array exists
+                const { data: scenes } = await getScenes(id);
+                if (scenes && scenes.length) {
                     State.scenes = scenes.map(s => ({
-                        id: s.id, // DB ID
-                        name: s.title || `Scene ${s.order_index}`,
-                        events: s.data.events || [] // The new event stream
+                        id: s.id,
+                        name: s.title,
+                        tracks: s.data.tracks || Timeline.defaultTracks()
                     }));
                 } else {
-                    State.scenes = [];
-                    this.addScene();
+                    Scene.add();
                 }
 
-                this.renderSceneTree();
-                this.selectScene(0);
+                Render.scenes();
+                if (State.scenes.length) Scene.select(State.scenes[0].id);
             },
 
-            // --- SCENE MANAGEMENT ---
-
-            addScene() {
-                State.scenes.push({
-                    id: 'temp-' + Date.now(),
-                    name: `Scene ${State.scenes.length + 1}`,
-                    events: []
-                });
-                this.renderSceneTree();
-                this.selectScene(State.scenes.length - 1);
+            resize: () => {
+                const h = window.innerHeight;
+                const baseH = 900;
+                // Don't upscale too much, but downscale unlimited
+                let s = h / baseH;
+                if (s > 1) s = 1;
+                const el = document.getElementById('app-scale-wrap');
+                el.style.transform = `scale(${s})`;
+                // Compensate margin if needed
             },
 
-            selectScene(index) {
-                State.activeSceneIndex = index;
-                State.selectedEventIndex = -1;
-                this.renderSceneTree();
-                this.renderEventList();
-                this.simulatePreview(); // Show end state of scene
-            },
+            setMode: (m) => {
+                State.mode = m;
+                document.getElementById('mode-easy').className = `btn ${m === 'EASY' ? 'easy' : ''}`;
+                document.getElementById('mode-easy').style.opacity = m === 'EASY' ? 1 : 0.5;
+                document.getElementById('mode-pro').className = `btn ${m === 'PRO' ? 'primary' : ''}`;
+                document.getElementById('mode-pro').style.opacity = m === 'PRO' ? 1 : 0.5;
 
-            // --- EVENT SYSTEM ---
-
-            addEvent(type) {
-                const scene = State.scenes[State.activeSceneIndex];
-                let newEvent = { type };
-
-                // Defaults
-                if (type === 'dialog') { newEvent.speaker = "Someone"; newEvent.text = "Hello World"; }
-                if (type === 'background') { newEvent.url = ""; newEvent.transition = "fade"; }
-                if (type === 'character') { newEvent.name = "Char1"; newEvent.url = ""; newEvent.x = 0.5; newEvent.y = 1.0; newEvent.scale = 1.0; }
-                if (type === 'sound') { newEvent.url = ""; newEvent.mode = "bgm"; }
-                if (type === 'choice') { newEvent.options = [{ label: "Next", jump: -1 }]; }
-
-                scene.events.push(newEvent);
-                this.selectEvent(scene.events.length - 1);
-                this.renderEventList();
-            },
-
-            selectEvent(index) {
-                State.selectedEventIndex = index;
-                this.renderEventList();
-                this.renderInspector();
-                this.simulatePreview(index); // Preview up to this event
-            },
-
-            deleteEvent(index, e) {
-                if (e) e.stopPropagation();
-                const scene = State.scenes[State.activeSceneIndex];
-                scene.events.splice(index, 1);
-                this.renderEventList();
-                this.selectEvent(Math.max(0, index - 1));
-            },
-
-            updateEvent(key, val) {
-                const scene = State.scenes[State.activeSceneIndex];
-                const ev = scene.events[State.selectedEventIndex];
-                if (!ev) return;
-                ev[key] = val;
-                this.renderEventList(); // Update Grid description
-                this.simulatePreview(State.selectedEventIndex);
-            },
-
-            // --- SIMULATION / RENDERER ---
-
-            simulatePreview(upToEventIndex = 9999) {
-                // Clear Stage
-                document.getElementById('layer-bg').style.backgroundImage = 'none';
-                document.getElementById('layer-chars').innerHTML = '';
-                document.getElementById('dialogBox').style.display = 'none';
-
-                const scene = State.scenes[State.activeSceneIndex];
-                if (!scene) return;
-
-                // Replay events from start to current selected
-                const limit = Math.min(upToEventIndex, scene.events.length - 1);
-
-                for (let i = 0; i <= limit; i++) {
-                    const ev = scene.events[i];
-
-                    if (ev.type === 'background') {
-                        document.getElementById('layer-bg').style.backgroundImage = `url('${ev.url}')`;
-                        document.getElementById('layer-bg').style.backgroundSize = 'cover';
-                    }
-
-                    if (ev.type === 'character') {
-                        // Creating/Updating DOM element for char
-                        let el = document.getElementById(`char-${ev.name}`);
-                        if (!el) {
-                            el = document.createElement('img');
-                            el.id = `char-${ev.name}`;
-                            el.style.position = 'absolute';
-                            el.style.bottom = '0';
-                            el.style.transition = '0.3s';
-                            document.getElementById('layer-chars').appendChild(el);
-                        }
-                        if (ev.url) el.src = ev.url;
-
-                        // Positioning (x: 0~1)
-                        // Canvas is 1280 wide.
-                        const leftPos = (ev.x * 100) + '%';
-                        el.style.left = leftPos;
-                        el.style.transform = `translateX(-50%) scale(${ev.scale})`;
-                        el.style.height = '90%'; // default height
-                    }
-
-                    if (ev.type === 'dialog' && i === limit) {
-                        // Only show dialog if it's the *current* active event (or last one)
-                        const box = document.getElementById('dialogBox');
-                        box.style.display = 'block';
-                        document.getElementById('dialogName').innerText = ev.speaker;
-                        document.getElementById('dialogText').innerText = ev.text;
-                    }
+                // Toggle UI
+                if (m === 'EASY') {
+                    document.getElementById('stage-area').style.display = 'none';
+                    document.getElementById('timeline-area').style.display = 'none';
+                    document.getElementById('script-area').style.display = 'block';
+                    EasyMode.render();
+                } else {
+                    document.getElementById('stage-area').style.display = 'flex';
+                    document.getElementById('timeline-area').style.display = 'flex';
+                    document.getElementById('script-area').style.display = 'none';
+                    Timeline.render();
                 }
-            },
-
-            // --- UI RENDERERS ---
-
-            renderSceneTree() {
-                const container = document.getElementById('sceneTree');
-                container.innerHTML = State.scenes.map((s, i) => `
-                    <div class="tree-node ${i === State.activeSceneIndex ? 'selected' : ''}" onclick="Engine.selectScene(${i})">
-                        <i class="fa-solid fa-film"></i>
-                        <span>${s.name}</span>
-                    </div>
-                `).join('');
-            },
-
-            renderEventList() {
-                const container = document.getElementById('eventContainer');
-                const scene = State.scenes[State.activeSceneIndex];
-                if (!scene) return;
-
-                container.innerHTML = scene.events.map((ev, i) => `
-                    <div class="event-row ${i === State.selectedEventIndex ? 'selected' : ''}" onclick="Engine.selectEvent(${i})">
-                        <div class="event-cell cell-type" style="color:${this.getTypeColor(ev.type)}">${ev.type.toUpperCase()}</div>
-                        <div class="event-cell cell-desc">${this.getEventDesc(ev)}</div>
-                        <div class="event-cell cell-action" onclick="Engine.deleteEvent(${i}, event)">×</div>
-                    </div>
-                `).join('');
-            },
-
-            getTypeColor(t) {
-                if (t === 'dialog') return '#4ec9b0';
-                if (t === 'background') return '#ce9178';
-                if (t === 'character') return '#dcdcaa';
-                if (t === 'choice') return '#c586c0';
-                return '#ccc';
-            },
-
-            getEventDesc(ev) {
-                if (ev.type === 'dialog') return `<b>${ev.speaker}</b>: "${ev.text.substring(0, 30)}..."`;
-                if (ev.type === 'background') return `Set BG: ...${ev.url.slice(-15)}`;
-                if (ev.type === 'character') return `Show <b>${ev.name}</b> at X:${ev.x}`;
-                if (ev.type === 'sound') return `Play ${ev.mode}`;
-                return JSON.stringify(ev);
-            },
-
-            renderInspector() {
-                const container = document.getElementById('inspector');
-                const scene = State.scenes[State.activeSceneIndex];
-                const ev = scene.events[State.selectedEventIndex];
-
-                if (!ev) {
-                    container.innerHTML = '<div style="padding:20px; color:#666;">No event selected. Select or Add an event to edit properties.</div>';
-                    return;
-                }
-
-                let html = `<div class="prop-group"><div class="prop-label">EVENT TYPE</div><div style="font-weight:bold; color:#fff;">${ev.type.toUpperCase()}</div></div>`;
-
-                if (ev.type === 'dialog') {
-                    html += `
-                    <div class="prop-group">
-                        <label class="prop-label">Speaker Name</label>
-                        <input class="c-input" value="${ev.speaker}" oninput="Engine.updateEvent('speaker', this.value)">
-                    </div>
-                    <div class="prop-group">
-                        <label class="prop-label">Dialog Text</label>
-                        <textarea class="c-textarea" style="height:80px;" oninput="Engine.updateEvent('text', this.value)">${ev.text}</textarea>
-                    </div>`;
-                }
-
-                if (ev.type === 'background') {
-                    html += `
-                    <div class="prop-group">
-                        <label class="prop-label">Image URL</label>
-                        <div style="display:flex; gap:4px;">
-                            <input class="c-input" id="inp-bg" value="${ev.url}" oninput="Engine.updateEvent('url', this.value)">
-                            <button class="ide-btn" onclick="Engine.openImgHelper('inp-bg')"><i class="fa-solid fa-image"></i></button>
-                        </div>
-                    </div>`;
-                }
-
-                if (ev.type === 'character') {
-                    html += `
-                    <div class="prop-group">
-                        <label class="prop-label">Character ID (Internal Name)</label>
-                        <input class="c-input" value="${ev.name}" oninput="Engine.updateEvent('name', this.value)">
-                    </div>
-                    <div class="prop-group">
-                        <label class="prop-label">Image URL</label>
-                         <div style="display:flex; gap:4px;">
-                            <input class="c-input" id="inp-char" value="${ev.url}" oninput="Engine.updateEvent('url', this.value)">
-                            <button class="ide-btn" onclick="Engine.openImgHelper('inp-char')"><i class="fa-solid fa-image"></i></button>
-                        </div>
-                    </div>
-                    <div class="prop-group row-2">
-                        <div>
-                            <label class="prop-label">Position X (0.0 - 1.0)</label>
-                            <input type="number" step="0.1" class="c-input" value="${ev.x}" oninput="Engine.updateEvent('x', parseFloat(this.value))">
-                        </div>
-                        <div>
-                            <label class="prop-label">Scale</label>
-                            <input type="number" step="0.1" class="c-input" value="${ev.scale}" oninput="Engine.updateEvent('scale', parseFloat(this.value))">
-                        </div>
-                    </div>`;
-                }
-
-                if (ev.type === 'sound') {
-                    html += `
-                    <div class="prop-group">
-                        <label class="prop-label">Select BGM</label>
-                        <select class="c-select" onchange="Engine.updateEvent('url', this.value)">
-                            <option value="">(Select Track)</option>
-                            <option value="https://t1.daumcdn.net/cfile/tistory/9939ED4D5DA997780C" ${ev.url.includes('9939ED') ? 'selected' : ''}>Light Piano</option>
-                            <option value="https://t1.daumcdn.net/cfile/tistory/9980B83A5DA994ED06" ${ev.url.includes('9980B8') ? 'selected' : ''}>Waltz</option>
-                            <!-- More can be added -->
-                        </select>
-                    </div>`;
-                }
-
-                container.innerHTML = html;
-            },
-
-            // --- SAVE ---
-
-            async saveProject() {
-                if (!State.novelId) return;
-
-                // Map scenes back to DB text/data
-                const payload = State.scenes.map((s, i) => ({
-                    novel_id: State.novelId,
-                    title: s.name,
-                    order_index: i,
-                    data: { events: s.events } // Wrapping actions inside 'events' key
-                }));
-
-                const { error } = await saveScenes(State.novelId, payload);
-                if (error) alert("Error: " + error.message);
-                else alert("Project Saved Successfully!");
-            },
-
-            previewGame() {
-                // Determine start scene (0) and go
-                const url = `play.html?id=${State.novelId}`;
-                window.open(url, '_blank');
-            },
-
-            // --- HELPERS ---
-            targetInputId: null,
-            openImgHelper(targetId) {
-                this.targetInputId = targetId;
-                document.getElementById('imgHelper').style.display = 'flex';
-            },
-            applyImage() {
-                const val = document.getElementById('imgPaste').value;
-                if (val && this.targetInputId) {
-                    const el = document.getElementById(this.targetInputId);
-                    el.value = val;
-                    // Trigger input event manually to update model
-                    el.dispatchEvent(new Event('input'));
-                }
-                document.getElementById('imgHelper').style.display = 'none';
-                document.getElementById('imgPaste').value = '';
             }
         };
 
-        // Init
-        window.addEventListener('DOMContentLoaded', () => Engine.init());
+        const Scene = {
+            add: () => {
+                State.scenes.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: `장면 ${State.scenes.length + 1}`,
+                    tracks: Timeline.defaultTracks()
+                });
+                Render.scenes();
+            },
+            select: (id) => {
+                State.sceneId = id;
+                Render.scenes();
+                if (State.mode === 'PRO') {
+                    Timeline.render();
+                    Preview.render();
+                } else {
+                    EasyMode.render();
+                }
+            },
+            active: () => State.scenes.find(s => s.id === State.sceneId)
+        };
 
+        const Timeline = {
+            defaultTracks: () => [
+                { type: 'bg', name: '배경', clips: [] },
+                { type: 'char', name: '캐릭터', clips: [] },
+                { type: 'text', name: '대사', clips: [] }
+            ],
+
+            addClip: (type) => {
+                const s = Scene.active();
+                const track = s.tracks.find(t => t.type === type);
+                if (!track) return;
+
+                // Find end time
+                let start = 0;
+                track.clips.forEach(c => { if (c.start + c.dur > start) start = c.start + c.dur; });
+
+                track.clips.push({
+                    id: Math.random().toString(36).substr(2, 9),
+                    type,
+                    start,
+                    dur: 2,
+                    data: Timeline.defaults(type)
+                });
+                Timeline.render();
+            },
+
+            defaults: (t) => {
+                if (t === 'bg') return { url: '' };
+                if (t === 'char') return { url: '', x: 0.5, y: 1, scale: 1 };
+                if (t === 'text') return { speaker: '이름', text: '내용을 입력하세요.' };
+                return {};
+            },
+
+            render: () => {
+                const s = Scene.active();
+                if (!s) return;
+                const el = document.getElementById('tl-tracks');
+                el.innerHTML = '';
+
+                s.tracks.forEach(t => {
+                    const row = document.createElement('div');
+                    row.style.marginBottom = '4px';
+                    row.innerHTML = `<div style="background:#222; padding:4px; font-size:11px; color:#888;">${t.name}</div>`;
+
+                    const lane = document.createElement('div');
+                    lane.style.background = '#111'; lane.style.height = '30px'; lane.style.position = 'relative';
+                    lane.style.border = '1px solid #333';
+
+                    t.clips.forEach(c => {
+                        const clip = document.createElement('div');
+                        clip.style.position = 'absolute';
+                        clip.style.left = (c.start * 30) + 'px'; // 1s = 30px
+                        clip.style.width = (c.dur * 30) + 'px';
+                        clip.style.height = '100%';
+                        clip.style.border = '1px solid black';
+
+                        let col = '#555';
+                        if (c.type === 'bg') col = '#27ae60';
+                        if (c.type === 'char') col = '#2980b9';
+                        if (c.type === 'text') col = '#e67e22';
+
+                        clip.style.background = col;
+                        clip.style.opacity = 0.8;
+                        if (c.id === State.clipId) clip.style.border = '2px solid white';
+
+                        clip.onclick = (e) => {
+                            e.stopPropagation();
+                            State.clipId = c.id;
+                            Timeline.render();
+                            Inspector.render();
+                            Preview.render(); // Update visual to show chosen clip
+                        };
+                        lane.appendChild(clip);
+                    });
+                    row.appendChild(lane);
+                    el.appendChild(row);
+                });
+            }
+        };
+
+        const EasyMode = {
+            render: () => {
+                const s = Scene.active();
+                // We primarily allow editing "Text" tracks here, 
+                // maybe simple cues for BG/Char?
+                // For simplicity, just list all clips sorted by time.
+
+                const all = [];
+                s.tracks.forEach(t => t.clips.forEach(c => all.push(c)));
+                all.sort((a, b) => a.start - b.start);
+
+                const el = document.getElementById('script-lines');
+                el.innerHTML = all.map(c => `
+                    <div class="script-line" onclick="State.clipId='${c.id}'; Inspector.render();">
+                        <div style="width:60px; font-size:10px; color:#555;">${c.type.toUpperCase()}</div>
+                        ${EasyMode.content(c)}
+                        <button class="btn" onclick="Timeline.remove('${c.id}')">X</button>
+                    </div>
+                `).join('');
+            },
+
+            content: (c) => {
+                if (c.type === 'text') return `<input class="inp s-name" value="${c.data.speaker}"><input class="inp s-text" value="${c.data.text}">`;
+                if (c.type === 'bg') return `<div style="flex:1; color:#2ecc71;">배경 변경: ${c.data.url ? '설정됨' : '비어있음'}</div>`;
+                if (c.type === 'char') return `<div style="flex:1; color:#3498db;">캐릭터 등장: ${c.data.url ? '설정됨' : '비어있음'}</div>`;
+                return '';
+            },
+
+            addLine: () => {
+                // Add text clip at end
+                Timeline.addClip('text');
+                EasyMode.render();
+            }
+        };
+
+        const Inspector = {
+            render: () => {
+                const s = Scene.active();
+                let clip = null;
+                s.tracks.forEach(t => { const f = t.clips.find(x => x.id === State.clipId); if (f) clip = f; });
+
+                const el = document.getElementById('inspector-body');
+                if (!clip) return el.innerHTML = '<div style="text-align:center;color:#555;">선택 없음</div>';
+
+                let h = `<h3 style="margin-top:0">${clip.type} 속성</h3>`;
+
+                const field = (l, k) => `<div style="margin-bottom:8px;"><label style="font-size:11px; color:#888;">${l}</label><input class="inp" value="${clip.data[k] || ''}" oninput="Inspector.update('${k}', this.value)"></div>`;
+
+                if (clip.type === 'text') {
+                    h += field('화자 이름', 'speaker');
+                    h += field('대사 내용', 'text');
+                }
+                if (clip.type === 'bg' || clip.type === 'char') {
+                    h += field('이미지 URL', 'url');
+                    h += `<button class="btn primary" style="width:100%;" onclick="Utils.modal('import')">이미지 붙여넣기</button>`;
+                }
+                if (clip.type === 'char') {
+                    h += field('X 좌표 (0~1)', 'x');
+                    h += field('Y 좌표 (0~1)', 'y');
+                    h += field('크기 (Scale)', 'scale');
+                }
+
+                el.innerHTML = h;
+            },
+            update: (k, v) => {
+                const s = Scene.active();
+                let clip = null;
+                s.tracks.forEach(t => { const f = t.clips.find(x => x.id === State.clipId); if (f) clip = f; });
+                if (clip) {
+                    clip.data[k] = v;
+                    if (State.mode === 'PRO') Preview.render();
+                }
+            }
+        };
+
+        const Preview = {
+            render: () => {
+                const s = Scene.active();
+                // Simple snapshot of all clips
+                document.getElementById('r-bg').style.backgroundImage = '';
+                document.getElementById('r-chars').innerHTML = '';
+
+                s.tracks.forEach(t => {
+                    t.clips.forEach(c => {
+                        if (c.type === 'bg') document.getElementById('r-bg').style.backgroundImage = `url('${c.data.url}')`;
+                        if (c.type === 'char') {
+                            const img = document.createElement('img');
+                            img.src = c.data.url;
+                            img.style.position = 'absolute';
+                            img.style.left = (c.data.x * 100) + '%';
+                            img.style.top = (c.data.y * 100) + '%';
+                            img.style.transform = `translate(-50%, -100%) scale(${c.data.scale})`;
+                            document.getElementById('r-chars').appendChild(img);
+                        }
+                    })
+                });
+            }
+        };
+
+        const Render = {
+            scenes: () => {
+                document.getElementById('list-scenes').innerHTML = State.scenes.map(s => `
+                    <div style="padding:8px; cursor:pointer; background:${s.id === State.sceneId ? '#333' : 'transparent'}; color:${s.id === State.sceneId ? 'white' : '#888'};" onclick="Scene.select('${s.id}')">
+                        <i class="fa-solid fa-film"></i> ${s.name}
+                    </div>
+                `).join('');
+            }
+        };
+
+        const Utils = {
+            modal: (id) => document.getElementById(`modal-${id}`).style.display = 'flex',
+            modalClose: (id) => document.getElementById(`modal-${id}`).style.display = 'none',
+            applyUrl: () => {
+                const url = document.getElementById('inp-url').value;
+                if (url) Inspector.update('url', url);
+                Utils.modalClose('import');
+                // Refresh
+                if (State.mode === 'PRO') Preview.render();
+                Inspector.render();
+            }
+        }
+
+        const Nav = { exit: () => location.href = 'dashboard.html' };
+        const Project = {
+            save: async () => {
+                const payload = State.scenes.map((s, i) => ({ novel_id: State.project.id, title: s.name, order_index: i, data: { tracks: s.tracks } }));
+                await saveScenes(State.project.id, payload);
+                alert("저장되었습니다!");
+            },
+            play: () => window.open(`play.html?id=${State.project.id}`)
+        };
+
+        // EXPORTS
+        window.Engine = Engine;
+        window.Scene = Scene;
+        window.Timeline = Timeline;
+        window.EasyMode = EasyMode;
+        window.Inspector = Inspector;
+        window.Preview = Preview;
+        window.Utils = Utils;
+        window.Nav = Nav;
+        window.Project = Project;
+        window.UI = {
+            tab: (id) => {
+                ['scene', 'asset', 'ui'].forEach(x => {
+                    document.getElementById(`tab-${x}`).className = `tab ${x === id ? 'active' : ''}`;
+                    document.getElementById(`p-${x}`).style.display = x === id ? 'flex' : 'none';
+                })
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', Engine.init);
     </script>
 </body>
 
