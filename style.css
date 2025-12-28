@@ -1,34 +1,18 @@
 :root {
-    /* Modern Palette (Soft & Premium) */
-    --brand-primary: #3b82f6;
-    /* Vivid Blue */
-    --brand-hover: #2563eb;
-    --brand-soft: #eff6ff;
+    --brand-primary: #00dc64;
+    /* Naver/Webtoon Green - High Vis */
+    --brand-dark: #00b351;
 
-    --text-main: #0f172a;
-    --text-sub: #64748b;
-    --text-muted: #94a3b8;
+    --text-primary: #000000;
+    --text-secondary: #888888;
+    --text-tertiary: #bbbbbb;
 
-    --bg-body: #f8fafc;
-    /* Cool Grey White */
-    --bg-card: #ffffff;
-    --bg-glass: rgba(255, 255, 255, 0.85);
-    /* For blur effects */
+    --bg-base: #ffffff;
+    --bg-gray: #f5f5f5;
 
-    --border-light: #e2e8f0;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-float: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
-    --radius-lg: 16px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-
-    --header-height: 60px;
-    --bottom-nav-height: 64px;
-    --max-content: 1200px;
-
-    --font-stack: "Pretendard Variable", "Pretendard", system-ui, -apple-system, sans-serif;
+    --border: #e0e0e0;
+    --header-h: 56px;
+    --tab-h: 60px;
 }
 
 * {
@@ -39,430 +23,280 @@
 }
 
 body {
-    font-family: var(--font-stack);
-    background-color: var(--bg-body);
-    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard Variable", Pretendard, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-base);
     font-size: 15px;
-    line-height: 1.6;
-    padding-bottom: var(--bottom-nav-height);
-    /* Mobile spacing */
+    padding-bottom: var(--tab-h);
+    /* Safe area for bottom nav */
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     body {
         padding-bottom: 0;
+        background: var(--bg-gray);
     }
+
+    /* Desktop: Grey bg outside app area */
 }
 
 a {
     text-decoration: none;
     color: inherit;
-    transition: all 0.2s ease;
+    display: block;
 }
 
 button {
     background: none;
     border: none;
-    font: inherit;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 img {
     display: block;
-    max-width: 100%;
-}
-
-/* --- Layout Utils --- */
-.container {
     width: 100%;
-    max-width: var(--max-content);
-    margin: 0 auto;
-    padding: 0 20px;
+    object-fit: cover;
 }
 
-.flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Utilities */
+.container {
+    max-width: 1024px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+}
+
+.full-width {
+    width: 100%;
 }
 
 .flex-between {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gap-8 {
+    gap: 8px;
+}
+
+/* --- RESPONSIVE VISIBILITY (Strict) --- */
+.mobile-only {
+    display: flex !important;
+}
+
+.desktop-only {
+    display: none !important;
+}
+
+@media (min-width: 1024px) {
+    .mobile-only {
+        display: none !important;
+    }
+
+    .desktop-only {
+        display: flex !important;
+    }
+}
+
+/* --- HEADER (App Bar) --- */
+.app-header {
+    height: var(--header-h);
+    display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.hidden-mobile {
-    display: none;
-}
-
-.hidden-desktop {
-    display: flex;
-}
-
-@media (min-width: 768px) {
-    .hidden-mobile {
-        display: flex;
-    }
-
-    .hidden-desktop {
-        display: none;
-    }
-}
-
-/* --- Navigation (Responsive) --- */
-/* Desktop GNB */
-.gnb {
+    padding: 0 16px;
     position: sticky;
     top: 0;
     z-index: 50;
-    height: var(--header-height);
-    background: var(--bg-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-light);
+    background: white;
+    border-bottom: 1px solid var(--border);
 }
 
-.gnb-inner {
-    height: 100%;
-}
-
-.logo {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--brand-primary);
+.logo-area {
+    font-weight: 900;
+    font-size: 18px;
     letter-spacing: -0.5px;
 }
 
-.nav-links {
-    display: flex;
-    gap: 32px;
-    font-weight: 600;
-    color: var(--text-sub);
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    color: var(--brand-primary);
-}
-
-/* Mobile Bottom Nav */
-.bottom-nav {
+/* --- BOTTOM TAB BAR (Native Style) --- */
+.tab-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: var(--bottom-nav-height);
-    background: var(--bg-glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border-light);
+    height: var(--tab-h);
+    background: white;
+    border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-around;
-    align-items: center;
     z-index: 100;
     padding-bottom: env(safe-area-inset-bottom);
 }
 
-.nav-item {
+.tab-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #999;
     gap: 4px;
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 500;
-    width: 100%;
-    height: 100%;
 }
 
-.nav-item svg {
+.tab-item.active {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.tab-icon {
     width: 24px;
     height: 24px;
-    stroke-width: 2px;
 }
 
-.nav-item.active {
-    color: var(--brand-primary);
+.tab-label {
+    font-size: 10px;
 }
 
-/* --- Components --- */
-/* Hero */
-.hero-modern {
-    padding: 40px 0;
-    text-align: center;
-    background: linear-gradient(180deg, #fff 0%, var(--bg-body) 100%);
-}
-
-.hero-card {
+/* --- SECTIONS --- */
+.hero-banner {
     width: 100%;
-    aspect-ratio: 2.5/1;
-    background: #000;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+    aspect-ratio: 2/1;
+    background: #ddd;
     position: relative;
-    box-shadow: var(--shadow-float);
-}
-
-@media (max-width: 768px) {
-    .hero-card {
-        aspect-ratio: 4/5;
-    }
-}
-
-.hero-content {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 30px;
-    color: white;
-    text-align: left;
-}
-
-.hero-badge {
-    background: var(--brand-primary);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 6px;
-    width: fit-content;
-    margin-bottom: 12px;
-}
-
-/* Sections */
-.section-head {
-    margin: 40px 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-main);
-}
-
-.section-link {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-/* Grids */
-.grid-responsive {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* Mobile default */
-    gap: 16px;
-}
-
-@media (min-width: 640px) {
-    .grid-responsive {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 @media (min-width: 1024px) {
-    .grid-responsive {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 24px;
+    .hero-banner {
+        border-radius: 8px;
+        margin-top: 20px;
     }
 }
 
-.card-item {
-    background: transparent;
-    transition: transform 0.2s ease;
+.section {
+    padding: 24px 16px 0;
 }
 
-.card-item:hover {
-    transform: translateY(-4px);
+.section-title {
+    font-size: 19px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.card-thumb {
-    width: 100%;
-    aspect-ratio: 3/4;
-    border-radius: var(--radius-md);
-    background: #eee;
-    overflow: hidden;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-}
-
-.card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.card-item:hover img {
-    transform: scale(1.05);
-}
-
-.card-info h3 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 2px;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.card-info p {
+.more-link {
     font-size: 13px;
-    color: var(--text-sub);
+    color: #999;
+    font-weight: 400;
 }
 
-/* Ranking List */
-.rank-list {
+/* --- CONTENT GRIDS --- */
+/* Horizontal Scroll (Mobile Pattern) */
+.scroll-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-right: 16px;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scroll-row::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-item {
+    flex: 0 0 120px;
+    scroll-snap-align: start;
+}
+
+.cover-img {
+    width: 120px;
+    height: 160px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #f4f4f4;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Vertical List (Ranking) */
+.ranking-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
 }
 
-@media (min-width: 768px) {
-    .rank-list {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-    }
-}
-
-.rank-item {
+.rank-row {
     display: flex;
-    gap: 16px;
     align-items: center;
-    background: var(--bg-card);
-    padding: 12px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
 }
 
 .rank-num {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 800;
-    color: var(--text-main);
-    width: 24px;
+    width: 32px;
     text-align: center;
+    margin-right: 8px;
 }
 
-.rank-thumb {
-    width: 48px;
-    height: 64px;
-    border-radius: 4px;
-    overflow: hidden;
-    background: #ddd;
-    flex-shrink: 0;
-}
-
-.rank-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Buttons */
-.btn-primary {
-    background: var(--brand-primary);
-    color: white;
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.btn-primary:hover {
-    background: var(--brand-hover);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-/* Dashboard Studio */
-.studio-layout {
-    padding-bottom: 80px;
-}
-
-/* Add padding for mobile nav */
-.studio-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    margin-top: 20px;
-}
-
-.responsive-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.responsive-table th {
-    text-align: left;
-    padding: 16px;
-    background: var(--bg-body);
-    color: var(--text-sub);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.responsive-table td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.responsive-table tr:last-child td {
-    border-bottom: none;
-}
-
-/* Mobile Table Adjustments */
-@media (max-width: 640px) {
-    .hide-on-mobile {
-        display: none;
-    }
-
-    .studio-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-}
-
-/* Editor Updates */
-.editor-shell {
-    background: #f0f2f5;
-    height: 100vh;
+.rank-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
-@media (max-width: 768px) {
-    .editor-layout {
-        flex-direction: column;
-        overflow-y: auto;
-        height: auto;
+/* --- Desktop Specific Overrides --- */
+@media (min-width: 1024px) {
+    .container {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        /* Paper look */
+        margin: 40px auto;
+        min-height: 800px;
     }
 
-    .panel-left,
-    .panel-right {
+    .app-header {
+        padding: 0 40px;
+        height: 70px;
+    }
+
+    .scroll-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .scroll-item {
+        width: auto;
+        flex: none;
+    }
+
+    .cover-img {
         width: 100%;
+        aspect-ratio: 1/1.5;
         height: auto;
-        border: none;
     }
+}
 
-    .canvas-wrap {
-        aspect-ratio: auto;
-        height: 300px;
-        padding: 10px;
-    }
-
-    /* Hide some complex editor tools on mobile or simplify */
+/* Studio Button */
+.btn-studio {
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    background: #333;
+    padding: 6px 14px;
+    border-radius: 20px;
 }
