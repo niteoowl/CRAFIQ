@@ -119,12 +119,14 @@
     </style>
 
     <script type="module">
-        import { getNovelById, getChapters } from './js/data.js';
+        import { getNovelById, getChapters, getComments, addComment, deleteComment } from './js/data.js';
+        import { getCurrentUser } from './js/auth.js';
 
         let currentNovelId = null;
         let currentChapterIndex = 0;
         let chapters = [];
         let isMenuOpen = false;
+        let currentUser = null; // Added for comment section
 
         window.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
@@ -143,6 +145,10 @@
             } else {
                 document.getElementById('content').innerText = "아직 등록된 회차가 없습니다.";
             }
+
+            // Init Comments
+            currentUser = await getCurrentUser();
+            loadComments();
 
             // Click listener for menu
             document.body.addEventListener('click', (e) => {
@@ -186,6 +192,55 @@
         window.setTheme = (theme) => {
             document.body.className = `reader-body theme-${theme}`;
         }
+
+        // --- Comment Logic ---
+
+        window.loadComments = async () => {
+            const { data: comments } = await getComments(currentNovelId);
+            const countEl = document.getElementById('commentCount');
+            const listEl = document.getElementById('commentList');
+            if (countEl) countEl.innerText = comments ? comments.length : 0;
+
+            if (comments && comments.length > 0) {
+                listEl.innerHTML = comments.map(c => `
+                    <div style="display:flex; gap:12px;">
+                        <div style="width:36px; height:36px; background:#eee; border-radius:50%; overflow:hidden; flex-shrink:0;">
+                             <img src="${c.profiles?.avatar_url || 'https://via.placeholder.com/36'}" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:13px; font-weight:700; margin-bottom:2px; color:#555;">
+                                ${c.profiles?.username || '익명'}
+                                <span style="font-weight:400; color:#aaa; font-size:11px; margin-left:6px;">${new Date(c.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div style="font-size:14px; line-height:1.5; color:#333;">${c.content}</div>
+                            ${currentUser && currentUser.id === c.user_id ? `<button onclick="removeComment('${c.id}')" style="font-size:11px; color:#e74c3c; border:none; background:none; cursor:pointer; padding:0; margin-top:4px;">삭제</button>` : ''}
+                        </div>
+                    </div>
+                 `).join('');
+            } else {
+                listEl.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">첫 댓글을 남겨보세요!</div>';
+            }
+        }
+
+        window.postComment = async () => {
+            const input = document.getElementById('commentInput');
+            if (!input.value.trim()) return;
+
+            const { error } = await addComment(currentNovelId, input.value);
+            if (error) {
+                if (error.message === "Login required") alert("로그인이 필요합니다.");
+                else alert("실패: " + error.message);
+            } else {
+                input.value = '';
+                loadComments();
+            }
+        }
+
+        window.removeComment = async (id) => {
+            if (!confirm("삭제하시겠습니까?")) return;
+            await deleteComment(id);
+            loadComments();
+        }
     </script>
 </head>
 
@@ -203,6 +258,24 @@
         <div style="font-size:12px; color:#888; margin-bottom:10px;" id="bookTitle"></div>
         <div id="content" class="content-area">
             Loading Content...
+        </div>
+
+        <!-- Comment Section -->
+        <div style="margin-top:60px; padding-top:20px; border-top:1px solid #eee;">
+            <h3 style="font-size:18px; margin-bottom:16px;">댓글 <span id="commentCount" style="color:#1f8ce6;">0</span>
+            </h3>
+
+            <div style="display:flex; gap:8px; margin-bottom:24px;">
+                <input id="commentInput" type="text" placeholder="댓글을 남겨주세요..."
+                    style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px; outline:none;">
+                <button onclick="postComment()"
+                    style="background:#1f8ce6; color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">등록</button>
+            </div>
+
+            <div id="commentList" style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Comments injected here -->
+                <div style="text-align:center; color:#999; padding:20px;">로딩 중...</div>
+            </div>
         </div>
     </div>
 

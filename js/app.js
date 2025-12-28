@@ -1,39 +1,19 @@
-import { renderMainLayout } from './components/view.js';
-import { renderDashboard } from './components/dashboard.js';
-import { renderEditor } from './components/editor.js';
-import { renderPlayer } from './components/player.js';
+// Global Search Logic for CRAFIQ
+// Handles the search input in the header on all pages.
 
-const routes = {
-    '/': () => renderMainLayout('home'),
-    '/discover': () => renderMainLayout('disc'),
-    '/best': () => renderMainLayout('best'),
-    '/my': () => renderMainLayout('my'),
-    '/dashboard': renderDashboard,
-    '/editor': renderEditor,
-    '/play': renderPlayer
-};
+document.addEventListener('DOMContentLoaded', () => {
+    // Select all search inputs (Desktop & Mobile Overlay)
+    const searchInputs = document.querySelectorAll('input[placeholder="작품 검색"], .search-overlay-input');
 
-function router() {
-    const app = document.getElementById('app');
-    const hash = window.location.hash.slice(1) || '/';
-
-    // Handle params (e.g., /editor?id=123)
-    const [path, query] = hash.split('?');
-    const params = new URLSearchParams(query);
-
-    const renderFn = routes[path] || routes['/'];
-
-    // Clear app
-    app.innerHTML = '';
-
-    // Render new component
-    app.appendChild(renderFn(params));
-}
-
-window.addEventListener('hashchange', router);
-window.addEventListener('load', router);
-
-// Global navigation helper
-window.navigateTo = (path) => {
-    window.location.hash = path;
-};
+    searchInputs.forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    // Redirect to discover.html with query param
+                    window.location.href = `discover.html?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    });
+});

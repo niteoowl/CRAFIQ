@@ -15,11 +15,12 @@
     <style>
         body {
             background: #000;
-            overflow: hidden;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            flex-direction: column;
+            /* Changed for layout */
+            margin: 0;
+            /* align-items: center; Removed to allow full width content */
         }
 
         .game-stage {
@@ -136,11 +137,14 @@
     </style>
 
     <script type="module">
-        import { getNovelById, getScenes } from './js/data.js';
+        import { getNovelById, getScenes, getComments, addComment, deleteComment } from './js/data.js';
+        import { getCurrentUser } from './js/auth.js';
 
         let scenes = [];
         let currentSceneIndex = 0;
         let isPlaying = false;
+        let novelId = null; // Added
+        let currentUser = null; // Added
 
         window.startGame = async () => {
             document.querySelector('.start-screen').style.display = 'none';
@@ -149,15 +153,58 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (!id) return alert("게임 정보가 없습니다.");
+            novelId = params.get('id'); // Capture into global variable
+            if (!novelId) return alert("게임 정보가 없습니다.");
 
-            const { data: novel } = await getNovelById(id);
+            const { data: novel } = await getNovelById(novelId);
             if (novel) document.getElementById('gameTitle').innerText = novel.title;
 
-            const { data: list } = await getScenes(id);
+            const { data: list } = await getScenes(novelId);
             scenes = list || [];
+
+            // Comments
+            currentUser = await getCurrentUser();
+            loadComments();
         });
+
+        // Comment Functions
+        window.loadComments = async () => {
+            const { data: comments } = await getComments(novelId);
+            document.getElementById('commentCount').innerText = comments ? comments.length : 0;
+            const list = document.getElementById('commentList');
+
+            if (comments && comments.length > 0) {
+                list.innerHTML = comments.map(c => `
+                    <div style="display:flex; gap:12px;">
+                        <div style="width:40px; height:40px; background:#444; border-radius:50%; flex-shrink:0; overflow:hidden;">
+                             <img src="${c.profiles?.avatar_url || 'https://via.placeholder.com/40'}" style="width:100%; height:100%;">
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:13px; font-weight:bold; margin-bottom:4px; color:#ccc;">
+                                ${c.profiles?.username || '익명'}
+                                <span style="font-size:11px; color:#666; margin-left:8px;">${new Date(c.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div style="font-size:14px; line-height:1.4; color:#ddd;">${c.content}</div>
+                            ${currentUser && currentUser.id === c.user_id ? `<button onclick="removeComment('${c.id}')" style="font-size:11px; color:#e74c3c; background:none; border:none; cursor:pointer; margin-top:4px;">삭제</button>` : ''}
+                        </div>
+                    </div>
+                 `).join('');
+            } else {
+                list.innerHTML = '<div style="color:#666; text-align:center; padding:20px;">첫 댓글의 주인공이 되어보세요!</div>';
+            }
+        }
+
+        window.postComment = async () => {
+            const input = document.getElementById('commentInput');
+            if (!input.value.trim()) return;
+            const { error } = await addComment(novelId, input.value);
+            if (error) alert("등록 실패: " + error.message);
+            else { input.value = ''; loadComments(); }
+        }
+
+        window.removeComment = async (id) => {
+            if (confirm("삭제하시겠습니까?")) { await deleteComment(id); loadComments(); }
+        }
 
         function playScene(index) {
             if (index >= scenes.length) {
@@ -207,28 +254,45 @@
 </head>
 
 <body>
-    <div class="game-stage" onclick="nextStep()">
-        <div id="bgLayer" class="bg-layer"
-            style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000');"></div>
-        <div id="actorLayer" class="actor-layer">
-            <!-- Dynamic Actors -->
+    <div style="width:100%; max-width:1280px; margin:0 auto; padding:20px;">
+
+        <!-- Game Stage -->
+        <div class="game-stage" onclick="nextStep()">
+            <div id="bgLayer" class="bg-layer"
+                style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000');">
+            </div>
+            <div id="actorLayer" class="actor-layer"></div>
+
+            <div class="ui-overlay">
+                <button class="ui-btn" onclick="event.stopPropagation(); location.href='index.html'">나가기</button>
+            </div>
+
+            <div class="dialogue-box">
+                <div id="charName" class="char-name">???</div>
+                <div id="dialogueText" class="dialogue-text">화면을 클릭하여 시작하세요...</div>
+            </div>
+
+            <div class="start-screen">
+                <h1 id="gameTitle" style="color:white; font-size:40px; margin-bottom:20px; text-shadow:0 0 10px black;">
+                    Loading...</h1>
+                <button class="start-btn" onclick="event.stopPropagation(); startGame()">Game Start</button>
+            </div>
         </div>
 
-        <div class="ui-overlay">
-            <button class="ui-btn" onclick="location.href='index.html'">나가기</button>
-            <button class="ui-btn">설정</button>
+        <!-- Comments Section -->
+        <div style="margin-top:30px; color:white;">
+            <h3 style="margin-bottom:15px;">댓글 <span id="commentCount">0</span></h3>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <input id="commentInput" type="text" placeholder="재미있게 보셨나요? 댓글을 남겨주세요!"
+                    style="flex:1; background:#222; border:1px solid #444; color:white; padding:12px; border-radius:4px;">
+                <button onclick="postComment()"
+                    style="background:#1f8ce6; border:none; color:white; padding:0 20px; border-radius:4px; cursor:pointer;">등록</button>
+            </div>
+            <div id="commentList" style="display:flex; flex-direction:column; gap:20px;">
+                <div style="color:#666;">로딩 중...</div>
+            </div>
         </div>
 
-        <div class="dialogue-box">
-            <div id="charName" class="char-name">???</div>
-            <div id="dialogueText" class="dialogue-text">화면을 클릭하여 시작하세요...</div>
-        </div>
-
-        <div class="start-screen">
-            <h1 id="gameTitle" style="color:white; font-size:40px; margin-bottom:20px; text-shadow:0 0 10px black;">
-                Loading...</h1>
-            <button class="start-btn" onclick="startGame()">Game Start</button>
-        </div>
     </div>
 </body>
 

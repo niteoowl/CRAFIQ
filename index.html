@@ -13,6 +13,7 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/turbo-router.js"></script>
+    <script src="js/app.js"></script>
     <script>
         function toggleSearch() {
             const overlay = document.getElementById('searchOverlay');
@@ -30,34 +31,43 @@
             // Give time for Supabase to init
             await new Promise(r => setTimeout(r, 100));
 
+            // Load Recent
             const { data: novels, error } = await getRecentPublishedNovels();
             const container = document.getElementById('homeRecentList');
-            if (!container) return;
 
-            if (error) {
-                console.error(error);
-                container.innerHTML = '<div style="padding:20px;">로딩 실패</div>';
-                return;
+            if (container) {
+                if (novels && novels.length > 0) {
+                    container.innerHTML = novels.map(n => `
+                        <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item">
+                            <div class="book-cover">
+                                <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
+                                ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
+                            </div>
+                            <div class="book-title">${n.title}</div>
+                            <div class="book-meta">${n.profiles?.username || '작가'} • 신작</div>
+                        </a>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div style="padding:20px;">등록된 작품이 없습니다.</div>';
+                }
             }
 
-            if (!novels || novels.length === 0) {
-                container.innerHTML = '<div style="padding:20px;">등록된 작품이 없습니다.</div>';
-                return;
+            // Load Featured (MD Pick)
+            const { data: featured } = await import('./js/data.js').then(m => m.getFeaturedNovels());
+            const featuredContainer = document.getElementById('homeFeaturedList');
+            if (featuredContainer) {
+                if (featured && featured.length > 0) {
+                    featuredContainer.innerHTML = featured.map(n => `
+                         <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item wide-item">
+                            <div class="wide-cover"><img src="${n.cover_url || 'https://via.placeholder.com/600x300'}" style="object-fit:cover;"></div>
+                            <div class="book-title">${n.title}</div>
+                            <div class="book-meta">${n.description || n.profiles?.username || '추천 작품'}</div>
+                        </a>
+                    `).join('');
+                } else {
+                    featuredContainer.innerHTML = '<div style="padding:20px; color:#666;">추천 작품을 준비 중입니다.</div>';
+                }
             }
-
-            // Create Real Data Cards
-            const realCards = novels.map(n => `
-                <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item">
-                    <div class="book-cover">
-                        <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
-                        ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
-                    </div>
-                    <div class="book-title">${n.title}</div>
-                    <div class="book-meta">${n.profiles?.username || '작가'} • 신작</div>
-                </a>
-            `).join('');
-
-            container.innerHTML = realCards;
         }
 
         window.addEventListener('DOMContentLoaded', initHome);
@@ -149,24 +159,13 @@
             </div>
         </section>
 
-        <!-- Section 2: Editor's Pick (Static for now) -->
+        <!-- Section 2: Editor's Pick (Dynamic) -->
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">MD's Pick: 이번 주 필독</h2>
             </div>
-            <div class="h-scroll-view">
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1447968954315-3f0c44f7375c?w=600"></div>
-                    <div class="book-title">감성 충만 로맨스 모음</div>
-                    <div class="book-meta">가을에 읽기 좋은 달달한 이야기</div>
-                </a>
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1518818419601-72c8673f5852?w=600"></div>
-                    <div class="book-title">먼치킨 주인공 특집</div>
-                    <div class="book-meta">답답함 없는 시원한 전개</div>
-                </a>
+            <div id="homeFeaturedList" class="h-scroll-view">
+                <div style="padding:20px; color:#888;">추천 작품 로딩 중...</div>
             </div>
         </section>
 

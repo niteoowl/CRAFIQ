@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작품 설정 - CRAFIQ Studio</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/init-supabase.js"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <script type="module">
+        import { getNovelById, updateNovel, getSupabase } from './js/data.js';
+
+        let currentNovelId = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            currentNovelId = params.get('id');
+
+            if (!currentNovelId) {
+                alert("잘못된 접근입니다.");
+                location.href = 'dashboard.html';
+                return;
+            }
+
+            // Load Data
+            const { data: novel, error } = await getNovelById(currentNovelId);
+            if (error || !novel) {
+                alert("작품 정보를 불러올 수 없습니다.");
+                return;
+            }
+
+            // Fill Form
+            document.getElementById('inputTitle').value = novel.title || "";
+            document.getElementById('inputDesc').value = novel.description || "";
+            document.getElementById('inputSynopsis').value = novel.synopsis || "";
+            document.getElementById('inputCover').value = novel.cover_url || "";
+            document.getElementById('selectAge').value = novel.age_rating || "All";
+            document.getElementById('selectCopyright').value = novel.copyright_type || "Rental";
+            document.getElementById('inputLegal').value = novel.copyright_terms || "본 작품의 저작권은 작가에게 있으며, 무단 전재 및 재배포를 금합니다.";
+
+            // Preview
+            updatePreview();
+        });
+
+        window.saveSettings = async () => {
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "저장 중...";
+            btn.disabled = true;
+
+            const updates = {
+                title: document.getElementById('inputTitle').value,
+                description: document.getElementById('inputDesc').value,
+                synopsis: document.getElementById('inputSynopsis').value,
+                cover_url: document.getElementById('inputCover').value,
+                age_rating: document.getElementById('selectAge').value,
+                copyright_type: document.getElementById('selectCopyright').value,
+                copyright_terms: document.getElementById('inputLegal').value
+            };
+
+            const { error } = await updateNovel(currentNovelId, updates);
+
+            if (error) {
+                alert("저장 실패: " + error.message);
+                btn.innerText = "설정 저장";
+                btn.disabled = false;
+            } else {
+                alert("저장되었습니다.");
+                btn.innerText = "설정 저장";
+                btn.disabled = false;
+                // Optional: Reload or Redirect
+            }
+        };
+
+        window.updatePreview = () => {
+            const url = document.getElementById('inputCover').value;
+            if (url) document.getElementById('coverPreview').src = url;
+        }
+
+        window.goBack = () => {
+            history.back();
+        }
+    </script>
+</head>
+
+<body style="background:#111; color:#eee;">
+    <header>
+        <div class="header-inner">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button onclick="goBack()" style="background:none; border:none; color:white; cursor:pointer;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <span class="brand">작품 상세 설정</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="inner" style="padding-top:40px; max-width:800px;">
+
+        <div class="studio-form-grid">
+            <!-- Cover Image Section -->
+            <div style="width:200px; flex-shrink:0;">
+                <div style="margin-bottom:8px; font-weight:700;">표지 이미지</div>
+                <div class="book-cover" style="width:200px; height:300px; margin-bottom:12px;">
+                    <img id="coverPreview" src="https://via.placeholder.com/200x300?text=No+Cover"
+                        style="width:100%; height:100%; object-fit:cover; border-radius:6px;">
+                </div>
+                <input id="inputCover" class="auth-input" placeholder="이미지 URL 입력" onchange="updatePreview()">
+                <div style="font-size:11px; color:#666; margin-top:4px;">* Unsplash 등의 이미지 주소를 입력하세요.</div>
+            </div>
+
+            <!-- Metadata Section -->
+            <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
+
+                <!-- Title -->
+                <div>
+                    <label class="form-label">작품 제목 (Title)</label>
+                    <input id="inputTitle" class="auth-input" type="text" placeholder="작품 제목을 입력하세요">
+                </div>
+
+                <!-- Short Desc -->
+                <div>
+                    <label class="form-label">한줄 소개 (Short Description)</label>
+                    <input id="inputDesc" class="auth-input" type="text" placeholder="작품을 한 문장으로 표현한다면?">
+                </div>
+
+                <!-- Synopsis -->
+                <div>
+                    <label class="form-label">줄거리 (Synopsis)</label>
+                    <textarea id="inputSynopsis" class="auth-input" style="height:120px; resize:vertical;"
+                        placeholder="전체적인 줄거리나 독자들에게 전하고 싶은 말을 적어주세요."></textarea>
+                </div>
+
+                <!-- Age Rating -->
+                <div>
+                    <label class="form-label">이용 등급 (Age Rating)</label>
+                    <select id="selectAge" class="auth-input" style="background:#222; color:white;">
+                        <option value="All">전체 이용가</option>
+                        <option value="12+">12세 이용가</option>
+                        <option value="15+">15세 이용가 (주제, 언어 등)</option>
+                        <option value="19+">19세 미만 구독 불가</option>
+                    </select>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+
+                <!-- Legal & Copyright -->
+                <div>
+                    <h3 style="margin-bottom:16px;">법적 고지 및 저작권 설정</h3>
+
+                    <div style="margin-bottom:16px;">
+                        <label class="form-label">연재 방식 및 저작권 유형</label>
+                        <select id="selectCopyright" class="auth-input" style="background:#222; color:white;">
+                            <option value="Rental">대여형 (연재, 1화씩 구매/열람)</option>
+                            <option value="Perpetual">소장형 (단행본, 영구 소장)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label">이용 약관 및 면책 조항 (직접 입력 가능)</label>
+                        <textarea id="inputLegal" class="auth-input"
+                            style="height:100px; font-size:13px; line-height:1.6; color:#aaa;"></textarea>
+                        <div style="font-size:11px; color:#666; margin-top:8px;">
+                            * 예시: "본 작품은 픽션이며 등장하는 인물, 단체, 지명은 실제와 무관합니다. 구매 후 7일 이내 열람하지 않은 경우에만 청약 철회가 가능합니다."
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px;">
+                    <button id="saveBtn" class="auth-btn" onclick="saveSettings()">설정 저장</button>
+                    <div style="text-align:center; margin-top:12px;">
+                        <span style="font-size:12px; color:#666;">저장 시 위 내용에 대한 법적 효력에 동의하는 것으로 간주합니다.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <style>
+        .studio-form-grid {
+            display: flex;
+            gap: 40px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .studio-form-grid {
+                flex-direction: column;
+            }
+
+            .book-cover {
+                margin: 0 auto 12px;
+            }
+        }
+    </style>
+</body>
+
+</html>

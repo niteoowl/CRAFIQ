@@ -12,7 +12,7 @@
     <!-- Supabase -->
     <script type="module" src="js/init-supabase.js"></script>
     <script type="module" src="js/turbo-router.js"></script>
-
+    <script src="js/app.js"></script>
     <script type="module">
         import { getUserNovels, createNovel } from './js/data.js';
 
@@ -58,12 +58,17 @@
             }
 
             listEl.innerHTML = novels.map(n => `
-                <div class="studio-card" onclick="location.href='${n.is_visual_novel ? `studio-visual.html?id=${n.id}` : `studio-novel.html?id=${n.id}`}'">
-                    <strong style="font-size:16px;">${n.title}</strong>
-                    <div style="font-size:12px; color:#666; margin-top:4px;">
-                        ${n.is_visual_novel ? '🎮 비주얼 노벨' : '📖 웹소설'} 
-                        | ${new Date(n.created_at).toLocaleDateString()}
+                <div class="studio-card" style="position:relative;">
+                    <div onclick="location.href='${n.is_visual_novel ? `studio-visual.html?id=${n.id}` : `studio-novel.html?id=${n.id}`}'" style="cursor:pointer;">
+                        <strong style="font-size:16px;">${n.title}</strong>
+                        <div style="font-size:12px; color:#666; margin-top:4px;">
+                            ${n.is_visual_novel ? '🎮 비주얼 노벨' : '📖 웹소설'} 
+                            | ${new Date(n.created_at).toLocaleDateString()}
+                        </div>
                     </div>
+                    <button onclick="event.stopPropagation(); location.href='novel-settings.html?id=${n.id}'" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#666; cursor:pointer; padding:4px;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                    </button>
                 </div>
             `).join('');
         }

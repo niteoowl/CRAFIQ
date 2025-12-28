@@ -9,6 +9,7 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
     <script type="module" src="js/turbo-router.js"></script>
+    <script src="js/app.js"></script>
     <script>
         function toggleSearch() {
             const overlay = document.getElementById('searchOverlay');
@@ -120,15 +121,37 @@
         </section>
 
         <script type="module">
-            import { getAllNovels } from './js/data.js';
+            import { getAllNovels, searchNovels } from './js/data.js';
 
             async function initDiscover() {
-                await new Promise(r => setTimeout(r, 100));
-                const { data: novels, error } = await getAllNovels();
+                const params = new URLSearchParams(window.location.search);
+                const query = params.get('q');
+
+                // Update Title if searching
+                if (query) {
+                    document.querySelector('.sec-title').innerText = `'${query}' 검색 결과`;
+                    document.getElementById('mobileSearchInput').value = query;
+                }
+
+                await new Promise(r => setTimeout(r, 100)); // Wait for Supabase
+
+                let result;
+                if (query) {
+                    result = await searchNovels(query);
+                } else {
+                    result = await getAllNovels();
+                }
+
+                const { data: novels, error } = result;
                 const container = document.getElementById('discoverList');
 
                 if (error || !novels) {
                     container.innerHTML = '<div>로딩 실패</div>';
+                    return;
+                }
+
+                if (novels.length === 0) {
+                    container.innerHTML = '<div style="padding:20px;">검색 결과가 없습니다.</div>';
                     return;
                 }
 
