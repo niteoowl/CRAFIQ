@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRAFIQ 홈 - 프리미엄 크리에이티브 플랫폼</title>
-    <!-- Font -->
+    <title>CRAFIQ 홈</title>
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
@@ -13,53 +12,37 @@
     <script>
         function toggleSearch() {
             const overlay = document.getElementById('searchOverlay');
-            if (overlay.style.display === 'flex') {
-                overlay.style.display = 'none';
-            } else {
-                overlay.style.display = 'flex';
-                document.getElementById('mobileSearchInput').focus();
-            }
+            overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+            if (overlay.style.display === 'flex') document.getElementById('mobileSearchInput').focus();
         }
     </script>
 </head>
 
 <body>
-
-    <!-- SEARCH OVERLAY (Mobile) -->
     <div id="searchOverlay" class="search-overlay">
         <div class="search-overlay-header">
             <svg onclick="toggleSearch()" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
                 viewBox="0 0 24 24" style="margin-right:12px; cursor:pointer;">
                 <path d="M15 19l-7-7 7-7" />
             </svg>
-            <input id="mobileSearchInput" class="search-overlay-input" placeholder="작품, 태그, 작가 검색">
-            <svg width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" viewBox="0 0 24 24">
-                <path d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <input id="mobileSearchInput" class="search-overlay-input" placeholder="검색">
         </div>
-        <div style="padding:10px 0;">
-            <h4 style="font-size:14px; color:#999; margin-bottom:12px;">최근 검색어</h4>
-            <div class="search-recent">
-                <span class="search-tag">로맨스판타지</span>
-                <span class="search-tag">먼치킨</span>
-                <span class="search-tag">전지적 독자 시점</span>
-            </div>
+        <div class="search-recent">
+            <span class="search-tag">로맨스판타지</span>
+            <span class="search-tag">먼치킨</span>
+            <span class="search-tag">전지적 독자 시점</span>
         </div>
     </div>
 
     <header>
         <div class="header-inner">
             <a href="index.html" class="brand">CRAFIQ</a>
-
-            <!-- Desktop Nav -->
             <nav class="nav-pc desktop-only">
                 <a href="index.html" class="active">홈</a>
                 <a href="discover.html">탐색</a>
                 <a href="best.html">베스트</a>
-                <a href="my.html">MY</a> <!-- Changed from 보관함 -> MY -->
+                <a href="my.html">MY</a>
             </nav>
-
-            <!-- Desktop Search (Right Aligned) -->
             <div class="header-right-pc desktop-only">
                 <div class="search-wrap-pc">
                     <svg width="18" height="18" stroke="#999" stroke-width="2" fill="none" viewBox="0 0 24 24">
@@ -69,17 +52,13 @@
                     <input placeholder="작품 검색">
                 </div>
                 <a href="dashboard.html" class="btn-studio">스튜디오</a>
-                <div class="avatar"></div>
             </div>
-
-            <!-- Mobile Actions -->
-            <div class="mobile-only" style="margin-left:auto; gap:16px; align-items:center;">
-                <button onclick="toggleSearch()" class="mobile-search-btn">
-                    <svg width="24" height="24" stroke="#333" stroke-width="2" fill="none" viewBox="0 0 24 24">
+            <div class="mobile-only" style="margin-left:auto;">
+                <button onclick="toggleSearch()" class="mobile-search-btn"><svg width="24" height="24"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8" />
                         <path d="M21 21L16.65 16.65" />
-                    </svg>
-                </button>
+                    </svg></button>
             </div>
         </div>
     </header>
@@ -94,7 +73,6 @@
             <span>무료</span>
         </div>
 
-        <!-- HERO -->
         <div class="hero-wrap">
             <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&q=80" class="hero-img">
             <div class="hero-overlay">
@@ -105,7 +83,6 @@
             </div>
         </div>
 
-        <!-- Section 1 -->
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">🔥 화제의 신작</h2>
@@ -145,34 +122,7 @@
             </div>
         </section>
 
-        <!-- Section 2: Editor's Pick (Wide Cards) -->
-        <section class="section">
-            <div class="section-head">
-                <h2 class="sec-title">MD's Pick: 이번 주 필독</h2>
-            </div>
-            <div class="h-scroll-view">
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1447968954315-3f0c44f7375c?w=600"></div>
-                    <div class="book-title">감성 충만 로맨스 모음</div>
-                    <div class="book-meta">가을에 읽기 좋은 달달한 이야기</div>
-                </a>
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1518818419601-72c8673f5852?w=600"></div>
-                    <div class="book-title">먼치킨 주인공 특집</div>
-                    <div class="book-meta">답답함 없는 시원한 전개</div>
-                </a>
-                <a href="#" class="item wide-item">
-                    <div class="wide-cover"><img
-                            src="https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=600"></div>
-                    <div class="book-title">밤 새는 줄 모르는 미스터리</div>
-                    <div class="book-meta">당신의 심장을 뛰게 할 스릴러</div>
-                </a>
-            </div>
-        </section>
-
-        <!-- Section 3: Ranking -->
+        <!-- Ranking Section -->
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">🏆 실시간 랭킹</h2>
@@ -207,6 +157,7 @@
         </footer>
     </main>
 
+    <!-- ACTIVE STATE: HOME -->
     <nav class="bottom-nav mobile-only">
         <a href="index.html" class="nav-btn active"><svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 3L4 9v12h5v-7h6v7h5V9z" />

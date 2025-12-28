@@ -58,39 +58,61 @@
         </div>
     </header>
 
-    <main class="inner" style="padding-top:40px; min-height:80vh;">
-        <div style="text-align:center; margin-bottom:60px;">
-            <div
-                style="width:100px; height:100px; background:#f0f0f0; border-radius:50%; margin:0 auto 24px; display:flex; align-items:center; justify-content:center;">
+    <main class="inner">
+        <!-- New MY HEADER Layout: Clean, Centered, No Overlap -->
+        <div class="my-header">
+            <div class="my-profile-img">
                 <svg width="40" height="40" stroke="#ccc" viewBox="0 0 24 24" fill="none" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                 </svg>
             </div>
-            <h2 style="font-size:24px; font-weight:800; margin-bottom:8px;">게스트 님</h2>
-            <p style="color:#888; margin-bottom:32px;">로그인하고 내 서재를 동기화하세요.</p>
-            <button
-                style="background:var(--color-primary); color:white; padding:16px 0; width:100%; max-width:320px; border-radius:8px; font-weight:700; border:none; cursor:pointer; font-size:16px;">로그인
-                / 회원가입</button>
+            <h2 style="font-size:20px; font-weight:800; margin-bottom:8px;">게스트 님</h2>
+            <p style="color:#888; font-size:14px; margin-bottom:24px;">로그인하고 내 서재를 동기화하세요</p>
+            <button class="btn-login">로그인 / 회원가입</button>
         </div>
 
-        <div style="padding:0 16px;">
-            <h3 class="sec-title" style="margin-bottom:24px;">최근 본 작품</h3>
-            <div class="h-scroll-view">
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=300"></div>
-                    <div class="book-title">그녀가 공작저로</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=300"></div>
-                    <div class="book-title">달빛 조각사</div>
-                </a>
-            </div>
+        <!-- Content Sections -->
+        <div style="padding:0 0 60px;">
+            <!-- Recent -->
+            <section class="section">
+                <div class="section-head">
+                    <h3 class="sec-title">최근 본 작품</h3>
+                    <a href="#" class="sec-more">전체</a>
+                </div>
+                <!-- Placeholder for Empty State if needed, but styling populated -->
+                <div class="h-scroll-view">
+                    <a href="#" class="item">
+                        <div class="book-cover"><img
+                                src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=300"></div>
+                        <div class="book-title">그녀가 공작저로</div>
+                    </a>
+                    <a href="#" class="item">
+                        <div class="book-cover"><img
+                                src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=300"></div>
+                        <div class="book-title">달빛 조각사</div>
+                    </a>
+                    <div class="item"
+                        style="display:flex; align-items:center; justify-content:center; width:100px; height:150px; background:#f8f8f8; border-radius:6px; color:#bbb; font-size:12px;">
+                        더보기</div>
+                </div>
+            </section>
+
+            <!-- Favorites (Placeholder) -->
+            <section class="section">
+                <div class="section-head">
+                    <h3 class="sec-title">찜한 작품</h3>
+                    <a href="#" class="sec-more">전체</a>
+                </div>
+                <div
+                    style="padding:0 16px; font-size:14px; color:#999; text-align:center; padding:30px 0; background:#f9f9f9; border-radius:8px; margin:0 16px;">
+                    아직 찜한 작품이 없습니다.
+                </div>
+            </section>
         </div>
     </main>
 
+    <!-- ACTIVE STATE: MY -->
     <nav class="bottom-nav mobile-only">
         <a href="index.html" class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
