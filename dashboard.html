@@ -23,7 +23,11 @@
 
             const { data, error } = await createNovel(title, type);
             if (error) {
-                alert("생성 실패: " + error.message);
+                if (error.code === '23505' || error.status === 409) {
+                    alert("이미 존재하는 작품 제목입니다. 다른 제목을 사용해주세요.");
+                } else {
+                    alert("생성 실패: " + error.message);
+                }
             } else {
                 location.reload();
             }

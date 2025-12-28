@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - CRAFIQ</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase -->
+    <script type="module" src="js/init-supabase.js"></script>
+    <script type="module">
+        import { signUpWithEmail } from './js/auth.js';
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pw = document.getElementById('password').value;
+            const pwConfirm = document.getElementById('passwordConfirm').value;
+            const btn = document.querySelector('.auth-btn');
+
+            if (pw !== pwConfirm) {
+                alert("비밀번호가 일치하지 않습니다.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "가입 중...";
+
+            const { data, error } = await signUpWithEmail(email, pw);
+            if (error) {
+                alert("가입 실패: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "회원가입";
+            } else {
+                alert("가입이 완료되었습니다!");
+                location.href = "my.html";
+            }
+        }
+
+        window.handleSignup = handleSignup;
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="brand">CRAFIQ</a>
+        </div>
+    </header>
+
+    <main class="inner">
+        <div class="auth-container">
+            <h1 class="auth-title">회원가입</h1>
+            <form onsubmit="handleSignup(event)">
+                <input type="email" id="email" class="auth-input" placeholder="이메일" required>
+                <input type="password" id="password" class="auth-input" placeholder="비밀번호" required>
+                <input type="password" id="passwordConfirm" class="auth-input" placeholder="비밀번호 확인" required>
+                <button type="submit" class="auth-btn">회원가입</button>
+            </form>
+            <a href="login.html" class="auth-link">이미 계정이 있으신가요? 로그인</a>
+        </div>
+    </main>
+</body>
+
+</html>
