@@ -8,17 +8,98 @@
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
-    <script>
-        // Simple editor logic
-        function toggleDark() {
-            const area = document.getElementById('editorArea');
-            area.classList.toggle('dark-paper');
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <script type="module">
+        import { getNovelById, getChapters, createChapter, saveChapterContent } from './js/data.js';
+
+        // State
+        let currentNovelId = null;
+        let currentChapterId = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            currentNovelId = params.get('id');
+
+            if (!currentNovelId) {
+                alert("잘못된 접근입니다.");
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Load Info
+            const { data: novel, error } = await getNovelById(currentNovelId);
+            if (novel) document.getElementById('novelTitle').innerText = novel.title;
+
+            // Load Chapters
+            loadChapterList();
+        });
+
+        async function loadChapterList() {
+            const listEl = document.getElementById('chapterList');
+            const { data: chapters, error } = await getChapters(currentNovelId);
+
+            listEl.innerHTML = ''; // Clear
+            if (chapters && chapters.length > 0) {
+                chapters.forEach(ch => {
+                    const div = document.createElement('div');
+                    div.className = `chapter-list-item ${currentChapterId === ch.id ? 'active' : ''}`;
+                    div.innerText = ch.title;
+                    div.onclick = () => loadChapter(ch);
+                    listEl.appendChild(div);
+                });
+                // Load first chapter if none selected
+                if (!currentChapterId) loadChapter(chapters[0]);
+            } else {
+                listEl.innerHTML = '<div style="padding:10px; color:#666;">챕터가 없습니다.</div>';
+            }
         }
-        function saveMock() {
+
+        async function loadChapter(chapter) {
+            currentChapterId = chapter.id;
+            document.getElementById('editorArea').innerText = chapter.content || ""; // Simple text load
+
+            // Update active state
+            document.querySelectorAll('.chapter-list-item').forEach(el => el.classList.remove('active'));
+            // (In a real app, I'd map elements to IDs, but this is a quick refresh)
+            // Re-render list to show active state properly? simpler to just reload list
+            loadChapterList();
+        }
+
+        window.addChapter = async () => {
+            const title = prompt("새 챕터 제목:");
+            if (!title) return;
+            // Get current count for order
+            const { data: chapters } = await getChapters(currentNovelId);
+            const nextOrder = chapters ? chapters.length + 1 : 1;
+
+            const { error } = await createChapter(currentNovelId, title, nextOrder);
+            if (error) alert(error.message);
+            else loadChapterList();
+        };
+
+        window.saveCurrent = async () => {
+            if (!currentChapterId) return;
+            const content = document.getElementById('editorArea').innerText;
             const btn = document.getElementById('saveBtn');
-            const original = btn.innerText;
+
             btn.innerText = "저장중...";
-            setTimeout(() => { btn.innerText = "저장됨"; setTimeout(() => btn.innerText = original, 2000); }, 500);
+            const { error } = await saveChapterContent(currentChapterId, content);
+
+            if (error) {
+                alert("저장 실패: " + error.message);
+                btn.innerText = "저장";
+            } else {
+                btn.innerText = "저장됨";
+                setTimeout(() => btn.innerText = "저장", 2000);
+            }
+        };
+
+        window.toggleDark = () => {
+            document.getElementById('editorArea').classList.toggle('dark-paper');
         }
     </script>
 </head>
@@ -31,7 +112,8 @@
                     stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg></a>
-            <span>회귀한 천재 마법사 - 집필실</span>
+            <span id="novelTitle">제목 로딩중...</span>
+            <span style="color:#888; font-weight:400; font-size:12px; margin-left:8px;"> - 집필실</span>
         </div>
         <div class="studio-toolbar">
             <button class="tool-btn" onclick="toggleDark()"><svg width="14" height="14" fill="none"
@@ -39,8 +121,8 @@
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg> 야간모드</button>
             <div style="width:1px; height:16px; background:#444; margin:0 8px;"></div>
-            <button class="tool-btn primary" id="saveBtn" onclick="saveMock()"><svg width="14" height="14" fill="none"
-                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button class="tool-btn primary" id="saveBtn" onclick="saveCurrent()"><svg width="14" height="14"
+                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
                     <polyline points="17 21 17 13 7 13 7 21" />
                     <polyline points="7 3 7 8 15 8" />
@@ -54,69 +136,32 @@
         <!-- Left Panel: Chapter Tree -->
         <div class="panel-left">
             <div class="panel-header">
-                <span>목차 (Explorer)</span>
-                <span style="margin-left:auto; cursor:pointer;">+</span>
+                <span>목차</span>
+                <span style="margin-left:auto; cursor:pointer;" onclick="addChapter()">+</span>
             </div>
-            <div class="panel-content">
-                <div style="padding:10px; font-weight:700; color:#fff; font-size:13px;">1권: 아카데미 입학</div>
-                <div class="chapter-list-item">1화. 프롤로그</div>
-                <div class="chapter-list-item">2화. 회귀의 시작</div>
-                <div class="chapter-list-item active">3화. 입학 시험 (작성중)</div>
-                <div class="chapter-list-item">4화. 라이벌 등장</div>
-                <div class="chapter-list-item">5화. 첫 번째 수업</div>
-
-                <div style="padding:10px; font-weight:700; color:#fff; font-size:13px; margin-top:10px;">설정 자료집</div>
-                <div class="chapter-list-item" style="color:#888;">📄 세계관 설정 - 마법 체계</div>
-                <div class="chapter-list-item" style="color:#888;">📄 등장인물 - 주인공</div>
+            <div id="chapterList" class="panel-content">
+                <!-- Dynamic List -->
             </div>
             <div style="padding:10px; border-top:1px solid #333; font-size:11px; color:#666;">
-                총 24,500자 / 5화
+                서버 자동 저장 켜짐
             </div>
         </div>
 
         <!-- Center: Editor -->
         <div class="panel-center">
-            <div id="editorArea" class="novel-editor-area" contenteditable="true">
-                <p>강렬한 빛이 눈을 찔렀다.</p>
-                <p>"으윽..."</p>
-                <p>주인공인 나는 눈을 떴다. 익숙한 천장이다. 이곳은 내가 20년 전에 살았던 낡은 하숙집이었다. 마력 폭주로 죽기 직전, 회귀 마법이 성공한 것이다.</p>
-                <p>"돌아왔어... 정말로..."</p>
-                <p>손을 내려다보았다. 굳은살 하나 없는 매끈한 손바닥. 아직 마법을 배우기 전의 육체다. 하지만 내 머릿속에는 9서클 대마법사의 지식이 고스란히 남아있었다.</p>
-                <p>창문을 열자 입학 시험장이 있는 황립 아카데미의 거대한 첨탑이 보였다.</p>
-                <p>"이번 생은 다를 거야. 그 누구에게도 이용당하지 않겠어."</p>
-                <p><br></p>
-            </div>
-            <!-- Status Bar -->
-            <div
-                style="position:absolute; bottom:0; left:0; right:0; height:24px; background:#f0f0f0; border-top:1px solid #ddd; display:flex; align-items:center; padding:0 20px; font-size:11px; color:#666;">
-                <span>공백 포함 342자</span>
-                <span style="margin:0 8px;">|</span>
-                <span>공백 제외 280자</span>
-                <span style="margin-left:auto;">저장됨 (14:22)</span>
+            <div id="editorArea" class="novel-editor-area" contenteditable="true" style="outline:none;">
+
             </div>
         </div>
 
-        <!-- Right Panel: Info -->
+        <!-- Right Panel: Info (Mock for now, can be expanded to DB later) -->
         <div class="panel-right">
             <div class="panel-header">Context & Memo</div>
             <div class="panel-content">
                 <div class="memo-card">
-                    <div style="font-weight:700; margin-bottom:4px; color:#fff;">💡 이번 화 목표</div>
-                    주인공이 입학 시험에서 압도적인 실력을 보여주고 교수를 놀라게 해야 함.
-                </div>
-
-                <div class="memo-card">
-                    <div style="font-weight:700; margin-bottom:4px; color:#fff;">👤 등장인물: 카엘</div>
-                    - 나이: 17세<br>
-                    - 특기: 화염 마법 (아직 기초)<br>
-                    - 성격: 냉철함, 계산적
-                </div>
-
-                <div class="memo-card">
-                    <div style="font-weight:700; margin-bottom:4px; color:#fff;">🤖 AI 문장 추천</div>
-                    <div style="background:#444; padding:6px; margin-top:4px; border-radius:2px; font-style:italic;">
-                        "그의 손끝에서 피어오른 불꽃은 작았지만, 그 열기는 태양처럼 뜨거웠다."
-                    </div>
+                    <div style="font-weight:700; margin-bottom:4px; color:#fff;">💡 사용 팁</div>
+                    좌측 상단의 + 버튼을 눌러 새 챕터를 생성하세요.<br>
+                    글을 쓰고 상단의 '저장' 버튼을 누르면 서버에 저장됩니다.
                 </div>
             </div>
         </div>

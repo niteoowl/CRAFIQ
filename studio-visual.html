@@ -8,10 +8,111 @@
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
-    <script>
-        function selectAsset(name) {
-            alert(name + " 선택됨 (스테이지로 드래그하여 배치하세요)");
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <script type="module">
+        import { getNovelById, getScenes, createScene, saveSceneData } from './js/data.js';
+
+        let currentNovelId = null;
+        let currentSceneId = null;
+        // Mock State for Editor
+        let sceneData = {
+            bg: 'https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000',
+            actors: [
+                { name: '지수', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400', x: 100, dialog: "오늘도 늦었네? 빨리와!" }
+            ],
+            bgm: 'Bensound - Epic'
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            currentNovelId = params.get('id');
+
+            if (!currentNovelId) {
+                // For demo/fallback
+                if (!confirm("프로젝트 ID가 없습니다. 대시보드로 돌아갈까요? (취소 시 데모 모드)")) {
+                    // Demo Mode
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                const { data: novel } = await getNovelById(currentNovelId);
+                if (novel) document.getElementById('projectTitle').innerText = novel.title + " - Scene Editor";
+                loadSceneList();
+            }
+        });
+
+        async function loadSceneList() {
+            if (!currentNovelId) return;
+            const listEl = document.getElementById('sceneList');
+            const { data: scenes } = await getScenes(currentNovelId);
+
+            listEl.innerHTML = '';
+            if (scenes && scenes.length > 0) {
+                scenes.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = `chapter-list-item ${currentSceneId === s.id ? 'active' : ''}`;
+                    div.innerText = s.title;
+                    div.onclick = () => loadScene(s);
+                    listEl.appendChild(div);
+                });
+                if (!currentSceneId) loadScene(scenes[0]);
+            } else {
+                listEl.innerHTML = '<div style="padding:10px; color:#666;">씬이 없습니다. (+ 버튼)</div>';
+            }
         }
+
+        async function loadScene(scene) {
+            currentSceneId = scene.id;
+            sceneData = scene.data || sceneData; // Load data or keep default mock if empty
+            renderStage();
+
+            document.querySelectorAll('.chapter-list-item').forEach(el => el.classList.remove('active'));
+            // Refetch or redraw list active state... simplified here:
+            loadSceneList(); // Quick refresh
+        }
+
+        window.addScene = async () => {
+            if (!currentNovelId) return alert("저장하려면 먼저 대시보드에서 프로젝트를 생성해야 합니다.");
+            const title = prompt("새 장면 제목 (예: S1. 학교 정문)");
+            if (!title) return;
+
+            const { data: list } = await getScenes(currentNovelId);
+            const idx = list ? list.length + 1 : 1;
+
+            await createScene(currentNovelId, title, idx);
+            loadSceneList();
+        };
+
+        window.saveProject = async () => {
+            if (!currentSceneId) return alert("선택된 씬이 없습니다.");
+            const btn = document.getElementById('saveBtn');
+            btn.innerText = "저장중...";
+
+            // In real app, we would gather data from DOM. 
+            // Here we just save the 'sceneData' object which we mock-modify.
+            const { error } = await saveSceneData(currentSceneId, sceneData);
+
+            if (error) alert(error.message);
+            else {
+                btn.innerText = "저장 완료";
+                setTimeout(() => btn.innerText = "프로젝트 저장", 2000);
+            }
+        };
+
+        function renderStage() {
+            // Update DOM based on sceneData
+            document.getElementById('stageInfo').innerText = `Current BG: ${sceneData.bg.substring(0, 20)}...`;
+        }
+
+        /* Mock Asset Selection */
+        window.selectAsset = (name) => {
+            alert(name + " 선택됨 -> 타임라인에 추가되었습니다 (가상)");
+            sceneData.bgm = name;
+        }
+
     </script>
 </head>
 
@@ -23,7 +124,7 @@
                     stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg></a>
-            <span>운명의 사랑 - Scene 1 Editor</span>
+            <span id="projectTitle">New Project - Scene Editor</span>
         </div>
         <div class="studio-toolbar">
             <button class="tool-btn"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
@@ -31,7 +132,7 @@
                     <polygon points="5 3 19 12 5 21 5 3" />
                 </svg> 플레이 테스트</button>
             <div style="width:1px; height:16px; background:#444; margin:0 8px;"></div>
-            <button class="tool-btn primary"> 프로젝트 저장</button>
+            <button class="tool-btn primary" id="saveBtn" onclick="saveProject()"> 프로젝트 저장</button>
             <button class="tool-btn" style="background:#e91e63; color:white;">배포 (Build)</button>
         </div>
     </div>
@@ -40,21 +141,16 @@
     <div class="studio-layout">
         <!-- Left Panel: Scene Tree & Outline -->
         <div class="panel-left">
-            <div class="panel-header">SCENE LIST</div>
-            <div class="panel-content">
-                <div class="chapter-list-item active">S1. 학교 정문 (등교)</div>
-                <div class="chapter-list-item">S2. 교실 복도</div>
-                <div class="chapter-list-item">S3. 방과 후 옥상</div>
-                <div class="chapter-list-item">S4. 축제 준비</div>
-                <div class="chapter-list-item">S5. 고백 (엔딩 분기)</div>
+            <div class="panel-header">
+                <span>SCENE LIST</span>
+                <span style="margin-left:auto; cursor:pointer;" onclick="addScene()">+</span>
+            </div>
+            <div id="sceneList" class="panel-content">
+                <!-- Loaded from DB -->
             </div>
             <div class="panel-header" style="margin-top:1px;">SCRIPT OUTLINE</div>
             <div class="panel-content" style="font-size:12px; color:#aaa; padding:10px;">
-                1. 배경음악 시작 (Morning.mp3)<br>
-                2. 배경 전환 (School_Gate)<br>
-                3. 캐릭터 등장 (남주, Slide Left)<br>
-                4. 대사: "지각이다!"<br>
-                5. 선택지 발생 (뛰어간다 / 걸어간다)
+                * 선택된 씬의 스크립트 요약이 여기에 표시됩니다.
             </div>
         </div>
 
@@ -64,6 +160,10 @@
             <div class="stage-area">
                 <div class="stage-canvas"
                     style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000'); background-size:cover;">
+                    <div id="stageInfo"
+                        style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.5); color:white; font-size:10px; padding:4px;">
+                        BG Loading...</div>
+
                     <!-- Mock Character -->
                     <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400"
                         style="position:absolute; bottom:0; left:100px; height:400px; filter:drop-shadow(0 0 10px rgba(0,0,0,0.5));">
@@ -107,15 +207,6 @@
                                 Bright_Morning.mp3</div>
                         </div>
                     </div>
-                    <!-- Track 4: Voice -->
-                    <div class="timeline-track">
-                        <div class="track-header">보이스</div>
-                        <div class="track-content">
-                            <div
-                                style="position:absolute; left:60px; width:100px; height:100%; background:#9c27b0; opacity:0.3; border:1px solid #9c27b0;">
-                                vo_001.wav</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -129,7 +220,6 @@
                     <div
                         style="flex:1; text-align:center; padding:8px; font-size:11px; background:#3e3e42; color:white;">
                         BGM (Free)</div>
-                    <div style="flex:1; text-align:center; padding:8px; font-size:11px; color:#888;">SFX</div>
                     <div style="flex:1; text-align:center; padding:8px; font-size:11px; color:#888;">Images</div>
                 </div>
                 <!-- BGM LIST (Massive Mockup) -->
@@ -144,34 +234,7 @@
                             <div class="asset-thumb" style="background:#ff9800;">🎵</div>
                             <div class="asset-name">Epic Theme</div>
                         </div>
-                        <div class="asset-item" onclick="selectAsset('Morning Stroll')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Morning...</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Pixel Story')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Pixel Story</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Sad Piano')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Sad Piano</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Battle Loop 1')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Battle 01</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Forest Ambience')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Forest</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Cafe Noise')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Cafe bg</div>
-                        </div>
-                        <div class="asset-item" onclick="selectAsset('Rain Sound')">
-                            <div class="asset-thumb" style="background:#ff9800;">🎵</div>
-                            <div class="asset-name">Rain</div>
-                        </div>
+                        <!-- More items... -->
                     </div>
                 </div>
             </div>
@@ -182,27 +245,6 @@
                 <div class="prop-row">
                     <div class="prop-label">이름</div>
                     <input class="prop-input" value="지수 (Smile)">
-                </div>
-                <div class="prop-row">
-                    <div class="prop-label">위치 X</div>
-                    <input class="prop-input" value="100">
-                </div>
-                <div class="prop-row">
-                    <div class="prop-label">위치 Y</div>
-                    <input class="prop-input" value="0">
-                </div>
-                <div class="prop-row">
-                    <div class="prop-label">크기 (Scale)</div>
-                    <input class="prop-input" value="1.0">
-                </div>
-                <div class="prop-row">
-                    <div class="prop-label">투명도</div>
-                    <input class="prop-input" value="100%">
-                </div>
-                <div style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
-                    <div style="font-size:11px; color:#888; margin-bottom:4px;">대사 내용</div>
-                    <textarea
-                        style="width:100%; height:60px; background:#333; border:1px solid #555; color:white; font-size:12px; padding:4px;">오늘도 늦었네? 빨리와!</textarea>
                 </div>
             </div>
         </div>

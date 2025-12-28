@@ -8,7 +8,75 @@
     <link rel="stylesheet" as="style" crossOrigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/turbo-router.js"></script>
+
+    <script type="module">
+        import { createNovel, getUserNovels } from './js/data.js';
+        import { getCurrentUser } from './js/auth.js';
+
+        async function initDashboard() {
+            const user = await getCurrentUser();
+            if (!user) {
+                alert("로그인이 필요합니다.");
+                window.location.href = "my.html";
+                return;
+            }
+
+            // Load List
+            loadMyNovels();
+        }
+
+        async function loadMyNovels() {
+            const listContainer = document.getElementById('myNovelList');
+            const { data, error } = await getUserNovels();
+
+            if (error) {
+                console.error(error);
+                listContainer.innerHTML = `<div style="padding:20px;">오류 발생: ${error.message}</div>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                listContainer.innerHTML = `<div style="padding:40px; text-align:center; color:#999;">아직 작품이 없습니다.<br>새 작품을 만들어보세요!</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = data.map(novel => `
+                <div class="rank-item" onclick="openStudio('${novel.id}', '${novel.is_visual_novel ? 'visual' : 'novel'}')">
+                    <div class="rank-thumb" style="width:50px; height:70px; background:#eee; display:flex; align-items:center; justify-content:center; font-size:20px;">
+                        ${novel.is_visual_novel ? '🎮' : '📝'}
+                    </div>
+                    <div class="rank-info">
+                        <div class="rank-title">${novel.title}</div>
+                        <div class="rank-desc">${novel.is_visual_novel ? '비주얼 노벨' : '웹소설'} • ${new Date(novel.created_at).toLocaleDateString()}</div>
+                    </div>
+                     <button class="tool-btn" style="border:1px solid #ddd; padding:4px 8px; color:#555;">편집</button>
+                </div>
+            `).join('');
+        }
+
+        window.openStudio = (id, type) => {
+            if (type === 'novel') window.location.href = `studio-novel.html?id=${id}`;
+            else window.location.href = `studio-visual.html?id=${id}`;
+        };
+
+        window.handleCreate = async (type) => {
+            const title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요" : "비주얼 노벨 제목을 입력하세요");
+            if (!title) return;
+
+            const { data, error } = await createNovel(title, type);
+            if (error) alert(error.message);
+            else {
+                alert("작품이 생성되었습니다!");
+                loadMyNovels(); // Refresh
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
 </head>
 
 <body>
@@ -28,8 +96,8 @@
         <h2 class="sec-title" style="margin: 0 16px 24px;">작품 제작</h2>
 
         <div class="studio-option-grid">
-            <!-- Link to NEW Novel Studio -->
-            <div class="studio-card" onclick="window.location.href='studio-novel.html'">
+            <!-- Create Novel -->
+            <div class="studio-card" onclick="handleCreate('novel')">
                 <div class="studio-icon">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
@@ -37,12 +105,12 @@
                     </svg>
                 </div>
                 <h3>웹소설 제작</h3>
-                <p>전문 집필 도구<br>설정집 + Zen 모드 + AI 어시스턴트</p>
-                <div style="margin-top:12px; color:#007acc; font-weight:700; font-size:13px;">스튜디오 열기 →</div>
+                <p>전문 집필 도구<br>설정집 + Zen 모드</p>
+                <div style="margin-top:12px; color:#007acc; font-weight:700; font-size:13px;">+ 새 웹소설 만들기</div>
             </div>
 
-            <!-- Link to NEW Visual Studio -->
-            <div class="studio-card" onclick="window.location.href='studio-visual.html'">
+            <!-- Create Visual Novel -->
+            <div class="studio-card" onclick="handleCreate('visual')">
                 <div class="studio-icon" style="color:#6c5ce7;">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path
@@ -50,32 +118,16 @@
                     </svg>
                 </div>
                 <h3>비주얼 노벨 제작</h3>
-                <p>게임 엔진형 에디터<br>프리 소스 라이브러리 + 타임라인 연출</p>
-                <div style="margin-top:12px; color:#6c5ce7; font-weight:700; font-size:13px;">엔진 실행 →</div>
+                <p>게임 엔진형 에디터<br>타임라인 + 연출 효과</p>
+                <div style="margin-top:12px; color:#6c5ce7; font-weight:700; font-size:13px;">+ 새 프로젝트 만들기</div>
             </div>
         </div>
 
         <section style="margin-top:40px;">
             <h3 class="sec-title" style="margin: 0 16px 20px;">내 작품 목록</h3>
-            <div style="border-top:1px solid #eee; margin: 0 16px;">
-                <div class="rank-item" onclick="window.location.href='studio-novel.html'">
-                    <div class="rank-thumb" style="width:50px; height:70px; background:#eee;"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">회귀한 천재 마법사</div>
-                        <div class="rank-desc">웹소설 • 연재중 (마지막 저장: 방금 전)</div>
-                    </div>
-                    <button
-                        style="padding:6px 12px; border:1px solid #ddd; background:white; border-radius:4px; font-size:12px;">편집</button>
-                </div>
-                <div class="rank-item" onclick="window.location.href='studio-visual.html'">
-                    <div class="rank-thumb" style="width:50px; height:70px; background:#eee;"></div>
-                    <div class="rank-info">
-                        <div class="rank-title">운명의 사랑</div>
-                        <div class="rank-desc">비주얼 노벨 • 제작중</div>
-                    </div>
-                    <button
-                        style="padding:6px 12px; border:1px solid #ddd; background:white; border-radius:4px; font-size:12px;">편집</button>
-                </div>
+            <div id="myNovelList" style="border-top:1px solid #eee; margin: 0 16px;">
+                <!-- Content will be loaded here -->
+                <div style="padding:20px; text-align:center;">로딩 중...</div>
             </div>
         </section>
     </main>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - CRAFIQ</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <script type="module">
+        import { signUpWithEmail } from './js/auth.js';
+
+        window.submitSignup = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('passwordConfirm').value;
+            const btn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (password !== passwordConfirm) {
+                errorMsg.innerText = "비밀번호가 일치하지 않습니다.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "가입 처리 중...";
+            errorMsg.style.display = 'none';
+
+            const { data, error } = await signUpWithEmail(email, password);
+
+            if (error) {
+                btn.disabled = false;
+                btn.innerText = "회원가입";
+                errorMsg.innerText = error.message;
+                errorMsg.style.display = 'block';
+            } else {
+                // Success
+                alert("가입이 완료되었습니다! 로그인해주세요.");
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            padding: 20px;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+        }
+
+        .auth-brand {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1f8ce6;
+            text-align: center;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 16px;
+            font-size: 15px;
+            transition: 0.2s;
+            background: #fff;
+        }
+
+        .input-field:focus {
+            border-color: #1f8ce6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(31, 140, 230, 0.1);
+        }
+
+        .btn-full {
+            width: 100%;
+            height: 52px;
+            background: #1f8ce6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-full:hover {
+            background: #1273c4;
+        }
+
+        .btn-full:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .auth-links {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .auth-links a {
+            text-decoration: underline;
+            color: #555;
+            margin-left: 8px;
+        }
+
+        .error-banner {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <a href="index.html" class="auth-brand">CRAFIQ</a>
+
+            <div id="errorMsg" class="error-banner"></div>
+
+            <form onsubmit="submitSignup(event)">
+                <div class="input-group">
+                    <label class="input-label">이메일</label>
+                    <input type="email" id="email" class="input-field" placeholder="user@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">비밀번호</label>
+                    <input type="password" id="password" class="input-field" placeholder="8자 이상" required minlength="8">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">비밀번호 확인</label>
+                    <input type="password" id="passwordConfirm" class="input-field" placeholder="비밀번호를 한번 더 입력"
+                        required>
+                </div>
+                <button type="submit" id="submitBtn" class="btn-full">회원가입</button>
+            </form>
+
+            <div class="auth-links">
+                이미 계정이 있으신가요? <a href="login.html">로그인</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
