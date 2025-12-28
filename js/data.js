@@ -12,7 +12,11 @@ export const createNovel = async (title, type) => {
             {
                 creator_id: user.id,
                 title: title,
-                is_visual_novel: type === 'visual'
+                is_visual_novel: type === 'visual',
+                // Default cover for now
+                cover_url: type === 'visual'
+                    ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400'
+                    : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400'
             }
         ])
         .select()
@@ -37,9 +41,28 @@ export const getUserNovels = async () => {
 export const getNovelById = async (novelId) => {
     const { data, error } = await getSupabase()
         .from('novels')
-        .select('*')
+        .select(`
+            *,
+            profiles (username)
+        `)
         .eq('id', novelId)
         .single();
+    return { data, error };
+};
+
+// --- PUBLIC FETCHING (HOME PAGE) ---
+
+export const getRecentPublishedNovels = async () => {
+    // For now, fetch ALL. In real app, filter by is_published = true
+    const { data, error } = await getSupabase()
+        .from('novels')
+        .select(`
+            *,
+            profiles (username)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
     return { data, error };
 };
 
@@ -88,8 +111,7 @@ export const getScenes = async (novelId) => {
 };
 
 export const createScene = async (novelId, title, orderIndex) => {
-    // Initial empty scene data
-    const initialData = { bg: "", actors: [], bgm: "", script: [] };
+    const initialData = { bg: "https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000", actors: [], bgm: "", script: [] };
 
     const { data, error } = await getSupabase()
         .from('scenes')

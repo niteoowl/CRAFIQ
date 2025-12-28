@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAFIQ Player</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <style>
+        body {
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .game-stage {
+            width: 100%;
+            max-width: 1280px;
+            aspect-ratio: 16/9;
+            background: #222;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .bg-layer {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1s;
+        }
+
+        .actor-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .actor {
+            position: absolute;
+            bottom: 0;
+            height: 90%;
+            transition: transform 0.5s, opacity 0.5s;
+            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+        }
+
+        .dialogue-box {
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            right: 40px;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        .char-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffdd59;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .dialogue-text {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .ui-btn {
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .start-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start-btn {
+            font-size: 24px;
+            padding: 16px 40px;
+            background: #1f8ce6;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(31, 140, 230, 0.6);
+        }
+    </style>
+
+    <script type="module">
+        import { getNovelById, getScenes } from './js/data.js';
+
+        let scenes = [];
+        let currentSceneIndex = 0;
+        let isPlaying = false;
+
+        window.startGame = async () => {
+            document.querySelector('.start-screen').style.display = 'none';
+            playScene(0);
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id) return alert("게임 정보가 없습니다.");
+
+            const { data: novel } = await getNovelById(id);
+            if (novel) document.getElementById('gameTitle').innerText = novel.title;
+
+            const { data: list } = await getScenes(id);
+            scenes = list || [];
+        });
+
+        function playScene(index) {
+            if (index >= scenes.length) {
+                alert("엔딩입니다! 플레이해주셔서 감사합니다.");
+                location.href = 'index.html';
+                return;
+            }
+            currentSceneIndex = index;
+            const scene = scenes[index];
+            const data = scene.data || {};
+
+            // 1. Set BG
+            const bgEl = document.getElementById('bgLayer');
+            if (data.bg) bgEl.style.backgroundImage = `url('${data.bg}')`;
+
+            // 2. Clear Actors & Set new
+            const actorLayer = document.getElementById('actorLayer');
+            actorLayer.innerHTML = '';
+            // Mock Actor for demo if array is empty or simple
+            if (data.actors) {
+                // For now, simple assumption: data is just mock object from editor
+                // In real runtime, we would iterate actors array
+                const img = document.createElement('img');
+                img.src = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400';
+                img.className = 'actor';
+                img.style.left = '10%';
+                actorLayer.appendChild(img);
+            }
+
+            // 3. Dialogue
+            // In a real engine, a scene has multiple dialogue steps. 
+            // For this MVP, each "Scene" DB entry is Treated as ONE Beat/Dialogue for simplicity.
+            document.getElementById('charName').innerText = "시스템";
+            document.getElementById('dialogueText').innerText = scene.title || "...";
+
+            // If data has dialog property (from editor)
+            if (data.actors && data.actors[0]) {
+                document.getElementById('charName').innerText = data.actors[0].name;
+                document.getElementById('dialogueText').innerText = data.actors[0].dialog;
+            }
+        }
+
+        window.nextStep = () => {
+            playScene(currentSceneIndex + 1);
+        }
+    </script>
+</head>
+
+<body>
+    <div class="game-stage" onclick="nextStep()">
+        <div id="bgLayer" class="bg-layer"
+            style="background-image:url('https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=1000');"></div>
+        <div id="actorLayer" class="actor-layer">
+            <!-- Dynamic Actors -->
+        </div>
+
+        <div class="ui-overlay">
+            <button class="ui-btn" onclick="location.href='index.html'">나가기</button>
+            <button class="ui-btn">설정</button>
+        </div>
+
+        <div class="dialogue-box">
+            <div id="charName" class="char-name">???</div>
+            <div id="dialogueText" class="dialogue-text">화면을 클릭하여 시작하세요...</div>
+        </div>
+
+        <div class="start-screen">
+            <h1 id="gameTitle" style="color:white; font-size:40px; margin-bottom:20px; text-shadow:0 0 10px black;">
+                Loading...</h1>
+            <button class="start-btn" onclick="startGame()">Game Start</button>
+        </div>
+    </div>
+</body>
+
+</html>

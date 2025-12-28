@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAFIQ Reader</title>
+    <link rel="stylesheet" as="style" crossOrigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/turbo-router.js"></script>
+
+    <style>
+        .reader-body {
+            background: #fdfdfd;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .reader-container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+        }
+
+        .reader-header {
+            position: sticky;
+            top: 0;
+            background: rgba(253, 253, 253, 0.95);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            transition: top 0.3s;
+            z-index: 100;
+        }
+
+        .chapter-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #333;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .content-area {
+            font-size: 18px;
+            line-height: 2.0;
+            color: #222;
+            margin-top: 40px;
+            white-space: pre-wrap;
+            word-break: keep-all;
+        }
+
+        /* Viewer Themes */
+        .theme-dark .reader-body,
+        .theme-dark .reader-header {
+            background: #111;
+            color: #ccc;
+            border-color: #333;
+        }
+
+        .theme-dark .chapter-title {
+            color: #eee;
+        }
+
+        .theme-dark .content-area {
+            color: #bbb;
+        }
+
+        .theme-sepia .reader-body,
+        .theme-sepia .reader-header {
+            background: #f4ecd8;
+            color: #5b4636;
+        }
+
+        .theme-sepia .chapter-title {
+            color: #5b4636;
+        }
+
+        .theme-sepia .content-area {
+            color: #433;
+        }
+
+        .viewer-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: 200;
+        }
+
+        .viewer-controls.show {
+            transform: translateY(0);
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+        }
+    </style>
+
+    <script type="module">
+        import { getNovelById, getChapters } from './js/data.js';
+
+        let currentNovelId = null;
+        let currentChapterIndex = 0;
+        let chapters = [];
+        let isMenuOpen = false;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            currentNovelId = params.get('id');
+
+            if (!currentNovelId) return alert("작품 정보가 없습니다.");
+
+            // Load Content
+            const { data: novel } = await getNovelById(currentNovelId);
+            if (novel) document.getElementById('bookTitle').innerText = novel.title;
+
+            const { data: chList } = await getChapters(currentNovelId);
+            if (chList && chList.length > 0) {
+                chapters = chList;
+                renderChapter(0);
+            } else {
+                document.getElementById('content').innerText = "아직 등록된 회차가 없습니다.";
+            }
+
+            // Click listener for menu
+            document.body.addEventListener('click', (e) => {
+                // Ignore clicks on controls
+                if (e.target.closest('.viewer-controls') || e.target.closest('.reader-header')) return;
+                toggleMenu();
+            });
+        });
+
+        function renderChapter(index) {
+            if (index < 0 || index >= chapters.length) return;
+            currentChapterIndex = index;
+            const ch = chapters[index];
+
+            document.getElementById('chTitle').innerText = ch.title;
+            document.getElementById('content').innerText = ch.content || "내용이 없습니다.";
+            window.scrollTo(0, 0);
+
+            // Update UI State
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === chapters.length - 1;
+        }
+
+        window.prevChapter = () => renderChapter(currentChapterIndex - 1);
+        window.nextChapter = () => renderChapter(currentChapterIndex + 1);
+
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            const controls = document.getElementById('controls');
+            const header = document.querySelector('.reader-header');
+
+            if (isMenuOpen) {
+                controls.classList.add('show');
+                header.style.top = '0';
+            } else {
+                controls.classList.remove('show');
+                header.style.top = '-50px';
+            }
+        }
+
+        window.setTheme = (theme) => {
+            document.body.className = `reader-body theme-${theme}`;
+        }
+    </script>
+</head>
+
+<body class="reader-body">
+    <div class="reader-header">
+        <a href="javascript:history.back()" style="padding:10px;"><svg width="24" height="24" fill="none"
+                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+            </svg></a>
+        <div class="chapter-title" id="chTitle">Loading...</div>
+        <div style="width:24px;"></div> <!-- Spacer -->
+    </div>
+
+    <div class="reader-container">
+        <div style="font-size:12px; color:#888; margin-bottom:10px;" id="bookTitle"></div>
+        <div id="content" class="content-area">
+            Loading Content...
+        </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div id="controls" class="viewer-controls show">
+        <button id="prevBtn" class="control-btn" onclick="prevChapter()">이전화</button>
+        <div style="display:flex; gap:8px;">
+            <button class="control-btn" onclick="setTheme('default')"
+                style="background:#fff; width:30px; height:30px; padding:0; border-radius:50%; border:1px solid #ddd;"></button>
+            <button class="control-btn" onclick="setTheme('sepia')"
+                style="background:#f4ecd8; width:30px; height:30px; padding:0; border-radius:50%; border:1px solid #ddd;"></button>
+            <button class="control-btn" onclick="setTheme('dark')"
+                style="background:#333; width:30px; height:30px; padding:0; border-radius:50%; border:1px solid #ddd;"></button>
+        </div>
+        <button id="nextBtn" class="control-btn" onclick="nextChapter()">다음화</button>
+    </div>
+</body>
+
+</html>
