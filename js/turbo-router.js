@@ -1,68 +1,106 @@
-// TURBO ROUTER (Vanilla SPA Linker)
-// Intercepts clicks, fetches HTML, replaces body, and EXECUTES SCRIPTS.
+
+/* 
+    TURBO ROUTER v3 (Robust Script & Style Support)
+    - Captures clicks on internal links
+    - Fetches content via fetch()
+    - Swaps body
+    - Merges HEAD (New CSS/Title)
+    - Re-executes Scripts (Both inline and src)
+    - Dispatches 'turbo:load'
+*/
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle initial navigation (if back/forward button is used)
-    window.addEventListener('popstate', (e) => loadPage(window.location.href, false));
-
-    // Intercept clicks
-    document.body.addEventListener('click', (e) => {
+    document.body.addEventListener('click', e => {
         const link = e.target.closest('a');
-        if (link && link.href && link.host === window.location.host) {
-            // Ignore hash links or special targets
-            if (link.getAttribute('target') === '_blank' || link.href.includes('#')) return;
-
+        if (link && link.href.startsWith(window.location.origin) && !link.getAttribute('target') && !link.getAttribute('download')) {
             e.preventDefault();
-            loadPage(link.href, true);
+            navigateTo(link.href);
         }
     });
+
+    // Handle Back/Forward
+    window.addEventListener('popstate', () => {
+        loadPage(window.location.href, false);
+    });
+
+    // Initial Load Event
+    document.documentElement.setAttribute('data-turbo-loaded', 'true');
+    window.dispatchEvent(new Event('turbo:load'));
 });
 
-async function loadPage(url, pushState = true) {
+async function navigateTo(url) {
+    history.pushState(null, '', url);
+    await loadPage(url);
+}
+
+async function loadPage(url, push = true) {
     try {
-        // Fetch the new page
-        const response = await fetch(url);
-        const html = await response.text();
+        console.log("Navigating to:", url);
+        const res = await fetch(url);
+        const text = await res.text();
 
         // Parse HTML
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        const doc = parser.parseFromString(text, 'text/html');
 
-        // Update Head (Title, Meta) - Optional but good for SEO/Context
+        // 1. Swap Body
+        document.body = doc.body;
+
+        // 2. Update Title
         document.title = doc.title;
 
-        // Update Body
-        const newBody = doc.body;
-        document.body.className = newBody.className; // Keep body classes (e.g. reader theme)
-        document.body.innerHTML = newBody.innerHTML;
+        // 3. Merge Head Styles (Preserve existing, add new)
+        const newStyles = doc.head.querySelectorAll('link[rel="stylesheet"], style');
+        const currentHead = document.head;
 
-        // EXECUTE SCRIPTS (Crucial fix)
-        // Browsers do not execute <script> tags in innerHTML. We must manually recreate them.
-        const scripts = document.body.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-
-            // Copy attributes
-            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-
-            // Copy content
-            newScript.textContent = oldScript.textContent;
-
-            // Replace
-            oldScript.parentNode.replaceChild(newScript, oldScript);
+        newStyles.forEach(newStyle => {
+            let exists = false;
+            if (newStyle.tagName === 'LINK') {
+                exists = !!currentHead.querySelector(`link[href="${newStyle.getAttribute('href')}"]`);
+            }
+            // We generally don't duplicate styles, but if it's a new one, append it.
+            if (!exists) {
+                const clone = newStyle.cloneNode(true);
+                currentHead.appendChild(clone);
+            }
         });
 
-        // Update URL
-        if (pushState) window.history.pushState({}, '', url);
+        // 4. Re-Execute Scripts
+        // This is CRITICAL. innerHTML does not run scripts.
+        // We must manually create script elements.
+        const scripts = document.body.querySelectorAll('script');
 
-        // Re-trigger DOMContentLoaded listeners manually (since the event already fired once)
-        // We can't dispatch the real event again easily, so we rely on the scripts running immediately.
-        // However, if scripts rely on 'DOMContentLoaded', they might miss it.
-        // Quick fix: Dispatch a custom 'turbo:load' event or just rely on immediate execution.
-        window.dispatchEvent(new Event('DOMContentLoaded'));
+        for (const script of scripts) {
+            const newScript = document.createElement('script');
+
+            // Copy attributes (src, type, etc)
+            Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+
+            // Log for debugging
+            // console.log("Re-executing script:", script.src || "inline");
+
+            // Copy content
+            newScript.textContent = script.textContent;
+
+            // Replace old with new to trigger execution
+            script.parentNode.replaceChild(newScript, script);
+
+            // If it's a module or src, we might need to wait? 
+            // Browser executes them async usually.
+        }
+
+        // 5. Scroll to Top
+        window.scrollTo(0, 0);
+
+        // 6. Dispatch Event
+        // Giving a small delay to allow DOM paint
+        setTimeout(() => {
+            document.documentElement.setAttribute('data-turbo-loaded', 'true');
+            window.dispatchEvent(new Event('turbo:load'));
+        }, 50);
 
     } catch (err) {
-        console.error("Turbo Nav Error:", err);
-        window.location.href = url; // Fallback to full reload
+        console.error("Navigation Failed, falling back to reload", err);
+        window.location.reload();
     }
 }
