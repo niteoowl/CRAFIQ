@@ -18,18 +18,23 @@
 
         // Ensure global access
         window.handleCreate = async (type) => {
-            const title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요:" : "비주얼 노벨 제목을 입력하세요:");
-            if (!title) return;
+            let title = prompt(type === 'novel' ? "웹소설 제목을 입력하세요:" : "비주얼 노벨 제목을 입력하세요:");
 
-            const { data, error } = await createNovel(title, type);
-            if (error) {
-                if (error.code === '23505' || error.status === 409) {
-                    alert("이미 존재하는 작품 제목입니다. 다른 제목을 사용해주세요.");
+            while (title) {
+                const { data, error } = await createNovel(title, type);
+                if (error) {
+                    // Check for Unique Violation (Postgres 23505) or 409 Conflict
+                    if (error.code === '23505' || error.status === 409 || (error.message && error.message.includes('unique'))) {
+                        title = prompt("⚠️ 이미 존재하는 제목입니다.\n다른 제목을 입력해주세요:", title);
+                    } else {
+                        alert("시스템 오류: " + error.message);
+                        console.error(error);
+                        break;
+                    }
                 } else {
-                    alert("생성 실패: " + error.message);
+                    location.reload();
+                    break;
                 }
-            } else {
-                location.reload();
             }
         };
 
