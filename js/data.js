@@ -1,4 +1,7 @@
-import { getSupabase, getCurrentUser, ensureUserHasProfile } from './auth.js';
+import { supabase } from './init-supabase.js';
+import { getCurrentUser, ensureUserHasProfile } from './auth.js';
+
+const getSupabase = () => supabase;
 
 // --- NOVELS ---
 
