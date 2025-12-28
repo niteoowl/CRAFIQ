@@ -55,6 +55,39 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="M21 21L16.65 16.65" />
                     </svg></button>
+                <script type="module">
+                    import { getRecentPublishedNovels } from './js/data.js';
+
+                    async function initBest() {
+                        // For 'Best', we can reuse recent or add a sort by views if tracking views. 
+                        // For now, using recent as proxy or filter.
+                        const { data: novels, error } = await getRecentPublishedNovels();
+                        const list = document.getElementById('bestList');
+
+                        if (error || !novels) {
+                            list.innerHTML = '<div style="padding:20px;">로딩 실패</div>';
+                            return;
+                        }
+
+                        list.innerHTML = novels.map((n, i) => `
+            <a href="detail.html?id=${n.id}" class="best-item" style="display:flex; padding:15px 0; border-bottom:1px solid #eee; text-decoration:none; color:inherit;">
+                <div class="best-rank rank-${i + 1}" style="font-size:20px; font-weight:bold; font-style:italic; margin-right:20px; color:${i < 3 ? '#1f8ce6' : '#888'}; width:30px; text-align:center;">${i + 1}</div>
+                <div class="best-cover" style="width:80px; height:120px; overflow:hidden; border-radius:4px; margin-right:15px; background:#ddd;">
+                    <img src="${n.cover_url || 'https://via.placeholder.com/150'}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="best-info" style="flex:1;">
+                    <div class="best-title" style="font-size:16px; font-weight:bold; margin-bottom:6px;">${n.title}</div>
+                    <div class="best-meta" style="font-size:13px; color:#666;">
+                        ${n.is_visual_novel ? '🎮 비주얼 노벨' : '📖 웹소설'} · ${n.profiles?.username || '작가'}
+                    </div>
+                </div>
+            </a>
+            `).join('');
+                    }
+
+                    if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', initBest);
+                    else initBest();
+                </script>
             </div>
         </div>
     </header>

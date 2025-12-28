@@ -25,49 +25,61 @@
 
     <!-- Dynamic Content Injector -->
     <script type="module">
-        import { getRecentPublishedNovels } from './js/data.js';
+        import { getRecentPublishedNovels, getNovelsByCategory } from './js/data.js';
 
         async function initHome() {
             // Give time for Supabase to init
             await new Promise(r => setTimeout(r, 100));
 
-            // Load Recent
-            const { data: novels, error } = await getRecentPublishedNovels();
-            const container = document.getElementById('homeRecentList');
+            // Helper to render lists
+            const renderList = (elementId, list) => {
+                const container = document.getElementById(elementId);
+                if (!container) return;
 
-            if (container) {
-                if (novels && novels.length > 0) {
-                    container.innerHTML = novels.map(n => `
-                        <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item">
+                if (list && list.length > 0) {
+                    container.innerHTML = list.map(n => `
+                        <a href="detail.html?id=${n.id}" class="item">
                             <div class="book-cover">
                                 <img src="${n.cover_url || 'https://via.placeholder.com/150'}" loading="lazy">
                                 ${n.is_visual_novel ? '<span style="position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.6); color:white; padding:2px 6px; border-radius:4px; font-size:10px;">🎮 Game</span>' : ''}
                             </div>
                             <div class="book-title">${n.title}</div>
-                            <div class="book-meta">${n.profiles?.username || '작가'} • 신작</div>
+                            <div class="book-meta">${n.profiles?.username || '작가'}</div>
                         </a>
                     `).join('');
                 } else {
-                    container.innerHTML = '<div style="padding:20px;">등록된 작품이 없습니다.</div>';
+                    container.innerHTML = '<div style="padding:20px; color:#666; font-size:13px;">등록된 작품이 없습니다.</div>';
                 }
+            };
+
+            // 1. Hot New (Recent)
+            const { data: recent } = await getRecentPublishedNovels();
+            renderList('homeRecentList', recent);
+
+            // 2. Featured (MD Pick - Mocked for now as Random or Specific)
+            // (Assuming Featured is just top recent for this sprint)
+            const featuredContainer = document.getElementById('homeFeaturedList');
+            if (featuredContainer && recent) {
+                featuredContainer.innerHTML = recent.slice(0, 5).map(n => `
+                     <a href="detail.html?id=${n.id}" class="item wide-item">
+                        <div class="wide-cover"><img src="${n.cover_url || 'https://via.placeholder.com/600x300'}" style="object-fit:cover;"></div>
+                        <div class="book-title">${n.title}</div>
+                        <div class="book-meta">${n.description || n.profiles?.username || '추천 작품'}</div>
+                    </a>
+                `).join('');
             }
 
-            // Load Featured (MD Pick)
-            const { data: featured } = await import('./js/data.js').then(m => m.getFeaturedNovels());
-            const featuredContainer = document.getElementById('homeFeaturedList');
-            if (featuredContainer) {
-                if (featured && featured.length > 0) {
-                    featuredContainer.innerHTML = featured.map(n => `
-                         <a href="${n.is_visual_novel ? `play.html?id=${n.id}` : `read.html?id=${n.id}`}" class="item wide-item">
-                            <div class="wide-cover"><img src="${n.cover_url || 'https://via.placeholder.com/600x300'}" style="object-fit:cover;"></div>
-                            <div class="book-title">${n.title}</div>
-                            <div class="book-meta">${n.description || n.profiles?.username || '추천 작품'}</div>
-                        </a>
-                    `).join('');
-                } else {
-                    featuredContainer.innerHTML = '<div style="padding:20px; color:#666;">추천 작품을 준비 중입니다.</div>';
-                }
-            }
+            // 3. Romance Section
+            const { data: romance } = await getNovelsByCategory('Romance');
+            renderList('homeRomanceList', romance);
+
+            // 4. Fantasy Section
+            const { data: fantasy } = await getNovelsByCategory('Fantasy');
+            renderList('homeFantasyList', fantasy);
+
+            // 5. Wuxia Section (using homeWuxiaList id if exists, otherwise create it in HTML)
+            const { data: wuxia } = await getNovelsByCategory('Wuxia');
+            renderList('homeWuxiaList', wuxia);
         }
 
         window.addEventListener('DOMContentLoaded', initHome);
@@ -234,45 +246,10 @@
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">💕 로맨스 기대작</h2>
-                <a href="discover.html" class="sec-more">더보기</a>
+                <a href="discover.html?q=Romance" class="sec-more">더보기</a>
             </div>
-            <div class="h-scroll-view">
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1516726817505-f5ed825624d8?w=300"></div>
-                    <div class="book-title">황제의 외동딸</div>
-                    <div class="book-meta">윤슬</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"></div>
-                    <div class="book-title">어느 날 공주가</div>
-                    <div class="book-meta">스푼</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300"></div>
-                    <div class="book-title">상수리나무 아래</div>
-                    <div class="book-meta">김수지</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300"></div>
-                    <div class="book-title">악녀는 오늘도</div>
-                    <div class="book-meta">헤이</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300"></div>
-                    <div class="book-title">재혼 황후</div>
-                    <div class="book-meta">알파타르트</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=300"></div>
-                    <div class="book-title">이번 생은 가주</div>
-                    <div class="book-meta">김로아</div>
-                </a>
+            <div id="homeRomanceList" class="h-scroll-view">
+                <div class="loading-placeholder">로맨스 작품 로딩 중...</div>
             </div>
         </section>
 
@@ -280,39 +257,10 @@
         <section class="section">
             <div class="section-head">
                 <h2 class="sec-title">⚔️ 판타지 명작</h2>
-                <a href="discover.html" class="sec-more">더보기</a>
+                <a href="discover.html?q=Fantasy" class="sec-more">더보기</a>
             </div>
-            <div class="h-scroll-view">
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1626544827763-d516dce335e2?w=300"></div>
-                    <div class="book-title">나노 마신</div>
-                    <div class="book-meta">한중월야</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300"></div>
-                    <div class="book-title">두 번 사는 랭커</div>
-                    <div class="book-meta">사도연</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=300"></div>
-                    <div class="book-title">템빨</div>
-                    <div class="book-meta">박새날</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=300"></div>
-                    <div class="book-title">SSS급 자살헌터</div>
-                    <div class="book-meta">신노아</div>
-                </a>
-                <a href="#" class="item">
-                    <div class="book-cover"><img
-                            src="https://images.unsplash.com/photo-1596727147705-54a7128052a9?w=300"></div>
-                    <div class="book-title">전생검신</div>
-                    <div class="book-meta">구로수번</div>
-                </a>
+            <div id="homeFantasyList" class="h-scroll-view">
+                <div class="loading-placeholder">판타지 작품 로딩 중...</div>
             </div>
         </section>
 

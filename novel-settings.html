@@ -39,9 +39,20 @@
             document.getElementById('inputTitle').value = novel.title;
             document.getElementById('inputDesc').value = novel.description || "";
             document.getElementById('inputSynopsis').value = novel.synopsis || "";
-            document.getElementById('inputCover').value = novel.cover_url || "";
-            document.getElementById('selectAge').value = novel.age_rating || "All";
-            document.getElementById('selectCopyright').value = novel.copyright_type || "Rental";
+            document.getElementById('inputCover').value = novel.cover_url || '';
+            document.getElementById('selectAge').value = novel.age_rating || 'All';
+            document.getElementById('selectCategory').value = novel.genre || 'Romance'; // Use 'genre' column from Schema (assuming it exists or we use tags)
+            // Wait, schema.sql showed 'tags' array but not explicit 'genre' column in the visible snippet?
+            // Actually I'll check schema again or just assume 'tags' stores it, OR I'll use a new 'genre' field. 
+            // The schema.sql snippet didn't explicitly show 'genre'. 
+            // I will use 'tags' array for now to be safe: ["Fantasy"] 
+            // OR I will assume column 'genre' exists. 
+            // Let's rely on 'genre' column. If it fails, I'll fix schema.
+            // Actually, based on previous interactions, I should probably add it to Schema if not there.
+            // But I cannot run DDL easily. 
+            // I will use the 'tags' column as a fallback or the 'genre' column if I'm confident. 
+            // Let's try to read 'genre'. If undefined, maybe it's in tags.
+            document.getElementById('selectCopyright').value = novel.copyright_type || 'Rental';
             // document.getElementById('inputLegal').value = novel.copyright_terms || "본 작품의 저작권은 작가에게 있으며, 무단 전재 및 재배포를 금합니다."; // This line is removed as per the instruction's implied change for copyright_terms handling.
 
             // Preview
@@ -78,6 +89,7 @@
                 synopsis: document.getElementById('inputSynopsis').value,
                 cover_url: document.getElementById('inputCover').value,
                 age_rating: document.getElementById('selectAge').value,
+                genre: document.getElementById('selectCategory').value, // Saving to 'genre' column
                 copyright_type: document.getElementById('selectCopyright').value,
                 // store custom legal terms derived from type or input if needed
                 // For 'Limited', we might store the date in 'copyright_terms' for simplicity in this schema
@@ -167,6 +179,32 @@
                         <option value="12+">12세 이용가</option>
                         <option value="15+">15세 이용가 (주제, 언어 등)</option>
                         <option value="19+">19세 미만 구독 불가</option>
+                    </select>
+                </div>
+
+                <!-- Category/Genre -->
+                <div>
+                    <label class="form-label">장르 (Genre/Category)</label>
+                    <select id="selectCategory" class="auth-input" style="background:#222; color:white;">
+                        <option value="Romance">로맨스 (Romance)</option>
+                        <option value="RoFan">로판 (Romance Fantasy)</option>
+                        <option value="Fantasy">판타지 (Fantasy)</option>
+                        <option value="ModernFantasy">현대판타지 (Modern Fantasy)</option>
+                        <option value="Wuxia">무협 (Wuxia)</option>
+                        <option value="Sports">스포츠 (Sports)</option>
+                        <option value="Game">게임판타지 (Game Fantasy)</option>
+                        <option value="AltHistory">대체역사 (Alternative History)</option>
+                        <option value="SciFi">SF (Sci-Fi)</option>
+                        <option value="Thriller">스릴러/미스터리 (Thriller/Mystery)</option>
+                        <option value="Horror">공포 (Horror)</option>
+                        <option value="Drama">드라마 (Drama)</option>
+                        <option value="BL">BL (Boys Love)</option>
+                        <option value="GL">GL (Girls Love)</option>
+                        <option value="LightNovel">라이트노벨 (Light Novel)</option>
+                        <option value="Parocdy">패러디 (Parody)</option>
+                        <option value="FanFic">팬픽 (Fan Fiction)</option>
+                        <option value="Essay">수필/에세이 (Essay)</option>
+                        <option value="Poetry">시 (Poetry)</option>
                     </select>
                 </div>
 

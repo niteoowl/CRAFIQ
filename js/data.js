@@ -102,6 +102,16 @@ export const getRecentPublishedNovels = async () => {
     return { data, error };
 };
 
+export const getNovelsByCategory = async (category) => {
+    const { data, error } = await getSupabase()
+        .from('novels')
+        .select(`*, profiles(username)`)
+        .eq('genre', category)
+        .order('created_at', { ascending: false })
+        .limit(10);
+    return { data, error };
+};
+
 
 // --- CHAPTERS (Web Novel) ---
 
