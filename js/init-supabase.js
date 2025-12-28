@@ -7,15 +7,40 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // Check if we have a valid client (must have .from method)
 // The CDN script sets window.supabase to the Factory object. We need the Client instance.
+let _supabase;
 if (!window.supabase || typeof window.supabase.from !== 'function') {
     try {
-        // If window.supabase exists but has createClient (it's the factory), use it.
-        // If not, rely on the import (module fallback).
-        const factory = window.supabase && window.supabase.createClient ? window.supabase.createClient : createClient;
+        // If window.supabase exists and has createClient (it's the factory), use it.
+        // If not, rely on the imported createClient (module fallback).
+        const factory = window.supabase && typeof window.supabase.createClient === 'function' ? window.supabase.createClient : createClient;
 
-        window.supabase = factory(SUPABASE_URL, SUPABASE_KEY);
+        _supabase = factory(SUPABASE_URL, SUPABASE_KEY);
+        window.supabase = _supabase; // Set the client instance on window.supabase
         console.log("✅ Supabase Client Initialized:", SUPABASE_URL);
     } catch (e) {
         console.error("❌ Supabase Init Error:", e);
+        // Fallback or re-throw if initialization fails
+        _supabase = null; // Ensure _supabase is null if init fails
     }
+} else {
+    // If window.supabase is already a valid client, use it.
+    _supabase = window.supabase;
 }
+
+// Alias for consistency, especially for legacy scripts expecting window.supabaseClient
+if (_supabase && !window.supabaseClient) {
+    window.supabaseClient = _supabase;
+}
+
+// Export the Supabase client for module-based imports
+export const supabase = _supabase;
+
+// Helper to check auth state mainly
+export const checkAuth = async () => {
+    if (!supabase) {
+        console.error("Supabase client not initialized.");
+        return null;
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    return session;
+};
